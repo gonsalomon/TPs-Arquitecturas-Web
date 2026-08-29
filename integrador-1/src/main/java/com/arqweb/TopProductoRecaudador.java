@@ -6,9 +6,18 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * TP1 - Ejercicio Integrador - Punto 3
+ * Retorna el producto que más recaudó (suma de cantidad * valor).
+ * Requisito: haber corrido SchemaCreator y DataLoader primero.
+ */
 public class TopProductoRecaudador {
 
-    private static final String URL = "jdbc:mysql://localhost:3306/facturas_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
+    private static final String URL =
+            "jdbc:mysql://localhost:3306/facturas_db" +
+            "?useSSL=false" +
+            "&serverTimezone=UTC" +
+            "&allowPublicKeyRetrieval=true";
     private static final String USER = "root";
     private static final String PASSWORD = "admin";
 

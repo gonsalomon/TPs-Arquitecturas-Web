@@ -6,9 +6,18 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * TP1 - Ejercicio Integrador - Punto 4
+ * Imprime una lista de clientes ordenados por monto total facturado (de mayor a menor).
+ * Requisito: haber corrido SchemaCreator y DataLoader primero.
+ */
 public class ClientesOrdenadosPorFacturacion {
 
-    private static final String URL = "jdbc:mysql://localhost:3306/facturas_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
+    private static final String URL =
+            "jdbc:mysql://localhost:3306/facturas_db" +
+            "?useSSL=false" +
+            "&serverTimezone=UTC" +
+            "&allowPublicKeyRetrieval=true";
     private static final String USER = "root";
     private static final String PASSWORD = "admin";
 
