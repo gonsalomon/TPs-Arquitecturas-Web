@@ -1,0 +1,18 @@
+Levantar MySQL con Docker para el Ejercicio 2
+----------------------------------------------
+
+docker run --name persona-mysql \
+  -e MYSQL_ROOT_PASSWORD=admin \
+  -e MYSQL_DATABASE=persona_db \
+  -p 3306:3306 \
+  -d mysql:8.0
+
+Verificar que levantó:
+docker ps
+
+Parar / volver a levantar el contenedor:
+docker stop persona-mysql
+docker start persona-mysql
+
+Si cambian la contraseña acá, hay que actualizar PASSWORD en MySQLPersonaApp.java
+(y en PersonaDAOMySQL.java del Ejercicio 3) para que coincida.
