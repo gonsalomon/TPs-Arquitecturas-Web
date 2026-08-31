@@ -10,11 +10,12 @@
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.release>21</maven.compiler.release>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <hibernate.version>6.5.2.Final</hibernate.version>
         <mysql.driver.version>9.0.0</mysql.driver.version>
-    </project>
+    </properties>
 
     <dependencies>
         <dependency>
