@@ -41,7 +41,7 @@ public class MySQLClienteDAO implements ClienteDAO{
             ps.setString(2, cl.getEmail());
             ps.executeUpdate();
             try(ResultSet keys = ps.getGeneratedKeys()){
-                if(keys.next()) cl.setIdCliente(keys.getLong(1));
+                if(keys.next()) cl.setIdCliente(keys.getInt(1));
             }
         } catch (SQLException e){
             throw new RuntimeException("Error en create", e);
@@ -103,7 +103,7 @@ public class MySQLClienteDAO implements ClienteDAO{
     //para qué chori nos hacen usar este map privado? ni idea
     private Cliente map(ResultSet rs) throws SQLException{
         Cliente cl = new Cliente();
-        cl.setIdCliente(rs.getLong("idCliente"));
+        cl.setIdCliente(rs.getInt("idCliente"));
         cl.setNombre(rs.getString("nombre"));
         cl.setEmail(rs.getString("email"));
 

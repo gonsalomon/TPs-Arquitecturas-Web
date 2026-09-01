@@ -8,7 +8,7 @@ import lombok.*;
 @Setter
 @ToString
 public class FacturaProducto {
-    private Long idFactura;
-    private Long idProducto;
-    private Long cantidad;      
+    private int idFactura;
+    private int idProducto;
+    private int cantidad;
 }

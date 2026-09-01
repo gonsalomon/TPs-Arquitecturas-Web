@@ -8,7 +8,7 @@ import lombok.*;
 @Setter
 @ToString
 public class Cliente {
-    private Long idCliente;
+    private int idCliente;
     private String nombre;
     private String email;
 }
