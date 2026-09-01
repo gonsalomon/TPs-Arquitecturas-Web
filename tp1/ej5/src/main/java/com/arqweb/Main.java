@@ -1,4 +1,4 @@
-package main.java.com.arqweb;
+package com.arqweb;
 
 import com.arqweb.entidades.Persona;
 

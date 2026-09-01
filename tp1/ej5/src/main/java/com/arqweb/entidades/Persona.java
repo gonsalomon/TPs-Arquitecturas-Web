@@ -1,4 +1,4 @@
-package main.java.com.arqweb.entidades;
+package com.arqweb.entidades;
 
 import javax.persistence.*;
 
