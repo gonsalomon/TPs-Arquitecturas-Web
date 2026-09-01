@@ -8,6 +8,6 @@ import lombok.*;
 @Setter
 @ToString
 public class Factura {
-    private Long idFactura;
-    private Long idCliente;    
+    private int idFactura;
+    private int idCliente;
 }

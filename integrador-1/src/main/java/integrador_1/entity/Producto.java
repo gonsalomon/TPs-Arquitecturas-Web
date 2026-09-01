@@ -8,7 +8,7 @@ import lombok.*;
 @Setter
 @ToString
 public class Producto {
-    private Long idProducto;
+    private int idProducto;
     private String nombre;
-    private Float valor; 
+    private double valor;
 }
