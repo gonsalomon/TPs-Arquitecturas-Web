@@ -1,5 +1,7 @@
 package integrador_1.repository.mysql;
 
-public class MySQLFacturaDAO {
+import integrador_1.dao.FacturaDAO;
+
+public class MySQLFacturaDAO implements FacturaDAO{
     
 }

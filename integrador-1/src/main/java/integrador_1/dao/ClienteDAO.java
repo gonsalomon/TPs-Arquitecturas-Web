@@ -6,15 +6,17 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ClienteDAO {
+    //create
+    void create(Cliente c);
+    //read: n, 1
     Cliente findById(Long id);
     List<Cliente> findAll();
-    List<Cliente> findByCliente(Long idCliente);
-
-    void create(Cliente c);
+    //update
     void update(Cliente c);
+    //delete: n, 1
     void delete(Long idCliente);
-
     void deleteAll();
 
+    //especial p resolver ej 4: lista ordenada x facturacion
     Optional<List<Cliente>> sortClientesByFacturacion();
 }

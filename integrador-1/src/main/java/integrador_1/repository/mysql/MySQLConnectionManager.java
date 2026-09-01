@@ -1,5 +1,69 @@
 package integrador_1.repository.mysql;
 
-public class MySQLConnectionManager {
-    
+import integrador_1.factory.ConnectionManager;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public final class MySQLConnectionManager implements ConnectionManager{
+    private static volatile MySQLConnectionManager instance;
+    private Connection connection;
+
+    private static final String URL="jdbc:mysql://localhost:3306/mysql_dao_DB?createDatabaseIfNotExist=true";
+    private static final String USER="root";
+    private static final String PASSWORD="admin";
+
+    private MySQLConnectionManager(){
+        try{
+            // Registrar el driver de MySQL
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            // Establecer la conexión
+            this.connection = DriverManager.getConnection(URL, USER, PASSWORD);
+            System.out.println("Conexión establecida correctamente con MySQL.");
+        } catch (ClassNotFoundException e) {
+            System.err.println("Error: No se encontró el driver de MySQL.");
+            e.printStackTrace();
+        } catch (SQLException e) {
+            System.err.println("Error al conectar con la base de datos.");
+            e.printStackTrace();
+        }
+    }
+
+    public static MySQLConnectionManager getInstance() {
+        if (instance == null) { // 1er chequeo: Evita bloquear si ya existe la instancia.
+            synchronized (MySQLConnectionManager.class) { // Bloque sincronizado: Asegura que solo un hilo cree la instancia en caso de concurrencia.
+                if (instance == null) { // 2do chequeo Confirma que instance sigue siendo null antes de crearla.
+                    instance = new MySQLConnectionManager();
+                }
+            }
+        }
+        return instance;
+    }
+
+    @Override
+    public Connection getConnection() {
+        return connection;
+    }
+
+    /* el mismo DBMS de MySQL corre en otro lado y se cierra por sí solo
+    * cuando detecta que no hay (ni van a haber en un futuro cercano) conexiones.
+    */
+    @Override
+    public void shutdown() {
+        try {
+            if (connection != null && !connection.isClosed()) {
+                connection.close();
+                System.out.println("Conexión con MySQL cerrada.");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al cerrar la conexión con MySQL: " + e.getMessage());
+        } finally {
+            connection = null;
+            synchronized (MySQLConnectionManager.class) {
+                instance = null;
+            }
+        }
+    }
 }
