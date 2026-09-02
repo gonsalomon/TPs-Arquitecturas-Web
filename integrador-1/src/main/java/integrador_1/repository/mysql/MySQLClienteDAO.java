@@ -5,8 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import integrador_1.dao.ClienteDAO;
 import integrador_1.entity.Cliente;
@@ -32,7 +32,7 @@ public class MySQLClienteDAO implements ClienteDAO{
         }
     }
 
-    
+
     @Override
     public void create(Cliente cl){
         final String sql = "INSERT INTO cliente (nombre, email) VALUES (?, ?)";
@@ -48,16 +48,35 @@ public class MySQLClienteDAO implements ClienteDAO{
         }
     }
 
-    //TODO 0 read n
     @Override
     public List<Cliente> findAll(){
-        return null;
+        List<Cliente> resultado = new ArrayList<>();
+        final String sql = "SELECT * FROM cliente ORDER BY idCliente";
+        try (Statement st = cn.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                resultado.add(map(rs));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error en findAll", e);
+        }
+        return resultado;
     }
 
-    //TODO 1 read 1
     @Override
     public Cliente findById(int id){
-        return null;
+        final String sql = "SELECT * FROM cliente WHERE idCliente = ?";
+        try (PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return map(rs);
+                }
+                return null;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error en findById", e);
+        }
     }
 
     @Override
@@ -94,10 +113,29 @@ public class MySQLClienteDAO implements ClienteDAO{
         }
     }
 
+    // clientes ordenados por total facturado (cantidad * valor, sumado sobre
+    // todas sus facturas). Uso LEFT JOIN para que aparezcan tambien los
+    // clientes sin facturas (con 0), no solo los que ya compraron algo.
     @Override
     public List<Cliente> sortClientesByFacturacion(){
-        
-        return null;
+        List<Cliente> resultado = new ArrayList<>();
+        final String sql = "SELECT c.idCliente, c.nombre, c.email, " +
+                "COALESCE(SUM(fp.cantidad * p.valor), 0) AS totalFacturado " +
+                "FROM cliente c " +
+                "LEFT JOIN factura f ON f.idCliente = c.idCliente " +
+                "LEFT JOIN factura_producto fp ON fp.idFactura = f.idFactura " +
+                "LEFT JOIN producto p ON p.idProducto = fp.idProducto " +
+                "GROUP BY c.idCliente, c.nombre, c.email " +
+                "ORDER BY totalFacturado DESC";
+        try (Statement st = cn.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                resultado.add(map(rs));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error en sortClientesByFacturacion", e);
+        }
+        return resultado;
     }
 
     private Cliente map(ResultSet rs) throws SQLException{

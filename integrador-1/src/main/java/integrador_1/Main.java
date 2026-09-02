@@ -3,10 +3,13 @@ package integrador_1;
 import integrador_1.dao.ClienteDAO;
 import integrador_1.dao.ProductoDAO;
 import integrador_1.dto.TopProductoRecaudador;
+import integrador_1.entity.Cliente;
 import integrador_1.factory.DAOFactory;
 import integrador_1.factory.DBType;
 import integrador_1.utils.BorrarDatos;
 import integrador_1.utils.CargarDatos;
+
+import java.util.List;
 
 public class Main {
     private static final DBType MOTOR = DBType.MYSQL;
@@ -38,8 +41,8 @@ public class Main {
         ClienteDAO clienteDao = daoFactory.createClienteDAO();
         System.out.println("Lista de clientes ordenados por mayor facturacion");
 
-        clienteDao.sortClientesByFacturacion();
-        System.out.println(clienteDao);
+        List<Cliente> clientesOrdenados = clienteDao.sortClientesByFacturacion();
+        clientesOrdenados.forEach(System.out::println);
 
     }
 }
