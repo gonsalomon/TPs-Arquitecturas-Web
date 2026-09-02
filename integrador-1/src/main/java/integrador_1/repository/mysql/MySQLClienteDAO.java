@@ -21,9 +21,9 @@ public class MySQLClienteDAO implements ClienteDAO{
 
     private void crearTablaSiNoExiste() {
         final String sql = "CREATE TABLE IF NOT EXISTS cliente (" +
-                "idCliente BIGINT PRIMARY KEY AUTO_INCREMENT," +
+                "idCliente INT PRIMARY KEY AUTO_INCREMENT," +
                 "nombre VARCHAR(100) NOT NULL," +
-                "email VARCHAR(120) NOT NULL UNIQUE," +
+                "email VARCHAR(120) NOT NULL UNIQUE" +
                 ")";
         try (Statement st = cn.createStatement()) {
             st.execute(sql);
@@ -56,7 +56,7 @@ public class MySQLClienteDAO implements ClienteDAO{
 
     //TODO 1 read 1
     @Override
-    public Cliente findById(Long id){
+    public Cliente findById(int id){
         return null;
     }
 
@@ -66,7 +66,7 @@ public class MySQLClienteDAO implements ClienteDAO{
         try (PreparedStatement ps = cn.prepareStatement(sql)) {
             ps.setString(1, cl.getNombre());
             ps.setString(2, cl.getEmail());
-            ps.setLong(3, cl.getIdCliente());
+            ps.setInt(3, cl.getIdCliente());
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Error en update", e);
@@ -74,10 +74,10 @@ public class MySQLClienteDAO implements ClienteDAO{
     }
 
     @Override
-    public void delete(Long id){
+    public void delete(int id){
         final String sql = "DELETE FROM cliente WHERE idCliente = ?";
         try (PreparedStatement ps = cn.prepareStatement(sql)) {
-            ps.setLong(1, id);
+            ps.setInt(1, id);
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Error en delete", e);
@@ -95,12 +95,11 @@ public class MySQLClienteDAO implements ClienteDAO{
     }
 
     @Override
-    public Optional<List<Cliente>> sortClientesByFacturacion(){
-        //TODO 2 copypaste de la query SQL desde un commit viejo
+    public List<Cliente> sortClientesByFacturacion(){
+        
         return null;
     }
 
-    //para qué chori nos hacen usar este map privado? ni idea
     private Cliente map(ResultSet rs) throws SQLException{
         Cliente cl = new Cliente();
         cl.setIdCliente(rs.getInt("idCliente"));

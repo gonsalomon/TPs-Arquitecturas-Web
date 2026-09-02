@@ -24,7 +24,7 @@ public class MySQLFacturaDAO implements FacturaDAO{
                 "idFactura int," +
                 "idCliente int," +
                 "primary key(idFactura)," +
-                "foreign key(idCliente) references cliente(id) ON DELETE CASCADE ON UPDATE CASCADE)";
+                "foreign key(idCliente) references cliente(idCliente) ON DELETE CASCADE ON UPDATE CASCADE)";
         try{
             Statement st=connection.createStatement();
             st.execute(sql);

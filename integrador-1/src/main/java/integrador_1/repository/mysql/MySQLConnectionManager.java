@@ -10,9 +10,9 @@ public final class MySQLConnectionManager implements ConnectionManager{
     private static volatile MySQLConnectionManager instance;
     private Connection connection;
 
-    private static final String URL="jdbc:mysql://localhost:3306/mysql_dao_DB?createDatabaseIfNotExist=true";
+    private static final String URL="jdbc:mysql://localhost:3306/Integrador";//?createDatabaseIfNotExist=true";
     private static final String USER="root";
-    private static final String PASSWORD="admin";
+    private static final String PASSWORD="";
 
     private MySQLConnectionManager(){
         try{

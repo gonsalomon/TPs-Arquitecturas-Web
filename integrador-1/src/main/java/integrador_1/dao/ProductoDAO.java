@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ProductoDAO {
-    Producto findById(Long id);
+    Producto findById(int id);
     List<Producto> findAll();
     void create(Producto p);
     void update(Producto p);
-    void delete(Long id);
+    void delete(int id);
     void deleteAll();
 
     //no sé si tengo que traer algo de FacturaProducto así que lo dejo afuera del import... será el main que lo usa? Ni ideaaaa
-    Optional<TopProductoRecaudador> topProductoRecaudador();
+    TopProductoRecaudador findProductMaxFacturacion();
 }

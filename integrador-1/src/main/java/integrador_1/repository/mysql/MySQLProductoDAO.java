@@ -36,11 +36,11 @@ public class MySQLProductoDAO implements ProductoDAO {
     }
 
     @Override
-    public Producto findById(Long id) {
+    public Producto findById(int id) {
         String sql = "SELECT * FROM producto WHERE idProducto=?";
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setLong(1, id);
+            ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return map(rs);
@@ -96,11 +96,11 @@ public class MySQLProductoDAO implements ProductoDAO {
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(int id) {
         String sql = "DELETE FROM producto WHERE idProducto=?";
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setLong(1, id);
+            ps.setInt(1, id);
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -120,26 +120,24 @@ public class MySQLProductoDAO implements ProductoDAO {
 
     // producto con mayor recaudacion (cantidad * valor) segun lo facturado en factura_producto
     @Override
-    public Optional<TopProductoRecaudador> topProductoRecaudador() {
-        String sql = "SELECT p.nombre AS nombre, SUM(fp.cantidad) AS unidades, " +
-                "SUM(fp.cantidad * p.valor) AS recaudacion " +
+    public TopProductoRecaudador findProductMaxFacturacion() {
+        String sql = "SELECT p.*, SUM(fp.cantidad * p.valor) AS totalRecaudado " +
                 "FROM factura_producto fp " +
                 "JOIN producto p ON fp.idProducto = p.idProducto " +
-                "GROUP BY p.idProducto, p.nombre " +
-                "ORDER BY recaudacion DESC " +
-                "LIMIT 1";
+                "GROUP BY p.idProducto " +
+                "ORDER BY totalRecaudado DESC " +
+                "LIMIT 1;";
         try {
-            Statement st = connection.createStatement();
-            ResultSet rs = st.executeQuery(sql);
+            PreparedStatement ps=connection.prepareStatement(sql);
+            ResultSet rs=ps.executeQuery();
             if (rs.next()) {
-                TopProductoRecaudador top = new TopProductoRecaudador(
+                return new TopProductoRecaudador(
+                        rs.getInt("idProducto"),
                         rs.getString("nombre"),
-                        rs.getLong("unidades"),
-                        rs.getBigDecimal("recaudacion")
+                        rs.getDouble("totalRecaudado")
                 );
-                return Optional.of(top);
             }
-            return Optional.empty();
+            return null;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

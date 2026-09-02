@@ -38,11 +38,11 @@ public class MySQLFacturaProductoDAO implements FacturaProductoDAO {
 
     // "id" es idFactura (asi lo trata el resto de la interfaz, ver comentario de updateProducto)
     @Override
-    public FacturaProducto findById(Long id) {
+    public FacturaProducto findById(int id) {
         String sql = "SELECT * FROM factura_producto WHERE idFactura=?";
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setLong(1, id);
+            ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return map(rs);
@@ -70,12 +70,12 @@ public class MySQLFacturaProductoDAO implements FacturaProductoDAO {
     }
 
     @Override
-    public Optional<List<FacturaProducto>> findByProducto(Long idProducto) {
+    public Optional<List<FacturaProducto>> findByProducto(int idProducto) {
         List<FacturaProducto> resultado = new ArrayList<>();
         String sql = "SELECT * FROM factura_producto WHERE idProducto=?";
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setLong(1, idProducto);
+            ps.setInt(1, idProducto);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 resultado.add(map(rs));
@@ -116,12 +116,12 @@ public class MySQLFacturaProductoDAO implements FacturaProductoDAO {
 
     // la FK (idProducto) se puede reasignar sin tocar la PK (idFactura)
     @Override
-    public void updateProducto(Long id, Long idProducto) {
+    public void updateProducto(int id, int idProducto) {
         String sql = "UPDATE factura_producto SET idProducto=? WHERE idFactura=?";
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setLong(1, idProducto);
-            ps.setLong(2, id);
+            ps.setInt(1, idProducto);
+            ps.setInt(2, id);
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -129,11 +129,11 @@ public class MySQLFacturaProductoDAO implements FacturaProductoDAO {
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(int id) {
         String sql = "DELETE FROM factura_producto WHERE idFactura=?";
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setLong(1, id);
+            ps.setInt(1, id);
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);

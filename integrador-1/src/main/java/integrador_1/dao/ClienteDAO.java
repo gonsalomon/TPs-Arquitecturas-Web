@@ -9,14 +9,14 @@ public interface ClienteDAO {
     //create
     void create(Cliente c);
     //read: n, 1
-    Cliente findById(Long id);
+    Cliente findById(int id);
     List<Cliente> findAll();
     //update
     void update(Cliente c);
     //delete: n, 1
-    void delete(Long idCliente);
+    void delete(int idCliente);
     void deleteAll();
 
     //especial p resolver ej 4: lista ordenada x facturacion
-    Optional<List<Cliente>> sortClientesByFacturacion();
+    List<Cliente> sortClientesByFacturacion();
 }
