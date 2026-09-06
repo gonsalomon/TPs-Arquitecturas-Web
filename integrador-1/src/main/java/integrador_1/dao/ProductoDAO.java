@@ -14,6 +14,5 @@ public interface ProductoDAO {
     void delete(int id);
     void deleteAll();
 
-    //no sé si tengo que traer algo de FacturaProducto así que lo dejo afuera del import... será el main que lo usa? Ni ideaaaa
     TopProductoRecaudador findProductMaxFacturacion();
 }

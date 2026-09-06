@@ -33,8 +33,6 @@ public class Main {
         TopProductoRecaudador productoRecaudador = productoDao.findProductMaxFacturacion();
         System.out.println(productoRecaudador);
 
-
-
         /*Escriba un programa JDBC que imprima una lista de clientes, ordenada por a cuál se le
         facturó más.*/
 

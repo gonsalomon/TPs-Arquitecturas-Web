@@ -2,7 +2,6 @@ package integrador_1.repository.mysql;
 
 import integrador_1.dao.FacturaDAO;
 import integrador_1.entity.Factura;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

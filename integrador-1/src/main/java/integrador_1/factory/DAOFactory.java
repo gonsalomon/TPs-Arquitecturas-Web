@@ -17,16 +17,7 @@ import integrador_1.repository.mysql.MySQLDAOFactory;
 
 public abstract class DAOFactory {
     private static volatile DAOFactory instance;
-    
-    /* el switch acá adentro permite que uses distintas bases de datos, enumeradas en DBType.java. 
-    * Estamos usando solamente MySQL porque para qué más, pero la factory es capaz de lidiar con 
-    * más de un tipo de base de datos (hence, the reason it's applying abstract factory; this is 
-    * the power of it being abstract)
-    * 
-    * none of this is needed anymore though, since we got a lovely framework called Spring Boot
-    * that solves all of this behind curtains nótese mi espanglish en manners of speaking
-    * nadie dice "detrás del cortinado" en inglés
-    */
+
     public static DAOFactory getInstance(DBType type){
         if(instance == null){
             synchronized (DAOFactory.class){
@@ -35,6 +26,9 @@ public abstract class DAOFactory {
                         case MYSQL:
                             instance = new MySQLDAOFactory();
                             break;
+//                        case DERBY:
+//                            instance = new DerbyDAOFactory();
+//                            break;
                         default:
                             throw new IllegalArgumentException("DBType no soportado: " + type);
                     }

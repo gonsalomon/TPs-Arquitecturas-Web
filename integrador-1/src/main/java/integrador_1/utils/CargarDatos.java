@@ -31,7 +31,6 @@ public class CargarDatos {
         this.facturaProductoDAO = factoryDAO.createFacturaProductoDAO();
     }
 
-
     public void run(){
         cargarClientes("src/main/resources/clientes.csv");
         cargarProductos("src/main/resources/productos.csv");

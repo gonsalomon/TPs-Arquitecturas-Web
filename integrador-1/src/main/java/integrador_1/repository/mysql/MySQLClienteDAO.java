@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-
 import integrador_1.dao.ClienteDAO;
 import integrador_1.entity.Cliente;
 
@@ -126,7 +125,8 @@ public class MySQLClienteDAO implements ClienteDAO{
                 "LEFT JOIN factura_producto fp ON fp.idFactura = f.idFactura " +
                 "LEFT JOIN producto p ON p.idProducto = fp.idProducto " +
                 "GROUP BY c.idCliente, c.nombre, c.email " +
-                "ORDER BY totalFacturado DESC";
+                "ORDER BY totalFacturado DESC " +
+                "LIMIT 5;";
         try (Statement st = cn.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
             while (rs.next()) {

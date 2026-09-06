@@ -1,7 +1,6 @@
 package integrador_1.repository.mysql;
 
 import integrador_1.factory.ConnectionManager;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -18,7 +17,6 @@ public final class MySQLConnectionManager implements ConnectionManager{
         try{
             // Registrar el driver de MySQL
             Class.forName("com.mysql.cj.jdbc.Driver");
-
             // Establecer la conexión
             this.connection = DriverManager.getConnection(URL, USER, PASSWORD);
             System.out.println("Conexión establecida correctamente con MySQL.");

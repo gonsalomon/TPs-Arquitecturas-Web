@@ -1,7 +1,6 @@
 package integrador_1.repository.mysql;
 
 import java.sql.Connection;
-
 import integrador_1.dao.ClienteDAO;
 import integrador_1.dao.FacturaDAO;
 import integrador_1.dao.FacturaProductoDAO;
