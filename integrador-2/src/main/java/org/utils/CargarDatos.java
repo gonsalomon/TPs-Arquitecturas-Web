@@ -104,7 +104,6 @@ public class CargarDatos{
 
                 // Crear la inscripción usando las entidades
                 Inscripcion nueva = new Inscripcion(
-                        id,
                         carrera,
                         estudiante,
                         inscripcion,

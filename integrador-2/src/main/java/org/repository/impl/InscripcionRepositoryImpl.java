@@ -4,6 +4,9 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import org.entity.Inscripcion;
 import org.repository.InscripcionRepository;
+import org.entity.Estudiante;
+import org.entity.Carrera;
+import java.time.LocalDate;
 
 public class InscripcionRepositoryImpl implements InscripcionRepository {
     private EntityManagerFactory emf;
@@ -26,42 +29,42 @@ public class InscripcionRepositoryImpl implements InscripcionRepository {
 
 
     /* --------------------------- CRUD --------------------------- */
-//    @Override
-//    public Inscripcion create(Integer id, Integer idEstudiante, Integer idCarrera, Integer fechaInscripcion, Integer fechaGraduacion, Integer antiguedad) {
-//        EntityManager em = emf.createEntityManager();
-//        try {
-//            em.getTransaction().begin();
-//            Estudiante e = em.find(Estudiante.class, idEstudiante);
-//            Carrera c = em.find(Carrera.class, idCarrera);
-//            if (e == null) {
-//                throw new RuntimeException(
-//                        "No existe el estudiante con id " + idEstudiante
-//                );
-//            }
-//
-//            if (c == null) {
-//                throw new RuntimeException(
-//                        "No existe la carrera con id " + idCarrera
-//                );
-//            }
-//            if (fechaInscripcion == null) {
-//                fechaInscripcion = LocalDate.now().getYear();
-//            }
-//
-//            Inscripcion inscripcion = new Inscripcion(id,c,e,fechaInscripcion,fechaGraduacion,antiguedad);
-//
-//            em.persist(inscripcion);
-//            em.getTransaction().commit();
-//            return inscripcion;
-//        } catch (Exception ex) {
-//            if (em.getTransaction().isActive()) {
-//                em.getTransaction().rollback();
-//            }
-//            throw ex;
-//        } finally {
-//            em.close();
-//        }
-//    }
+    @Override
+    public Inscripcion create(Integer idCarrera, Integer idEstudiante, Integer fechaInscripcion, Integer fechaGraduacion, Integer antiguedad) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            em.getTransaction().begin();
+            Estudiante e = em.find(Estudiante.class, idEstudiante);
+            Carrera c = em.find(Carrera.class, idCarrera);
+            if (e == null) {
+                throw new RuntimeException(
+                        "No existe el estudiante con id " + idEstudiante
+                );
+            }
+
+            if (c == null) {
+                throw new RuntimeException(
+                        "No existe la carrera con id " + idCarrera
+                );
+            }
+            if (fechaInscripcion == null) {
+                fechaInscripcion = LocalDate.now().getYear();
+            }
+
+            Inscripcion inscripcion = new Inscripcion(c,e,fechaInscripcion,fechaGraduacion,antiguedad);
+
+            em.persist(inscripcion);
+            em.getTransaction().commit();
+            return inscripcion;
+        } catch (Exception ex) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw ex;
+        } finally {
+            em.close();
+        }
+    }
 
     @Override
     public void save(Inscripcion nueva) {
