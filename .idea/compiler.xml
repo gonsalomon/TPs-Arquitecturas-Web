@@ -13,5 +13,8 @@
         <module name="tp1-ej2" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="integrador-2" target="17" />
+    </bytecodeTargetLevel>
   </component>
 </project>
