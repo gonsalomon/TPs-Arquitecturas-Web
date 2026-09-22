@@ -20,6 +20,8 @@ public class EstudianteRepositoryImpl implements EstudianteRepository {
         return instance;
     }
 
+
+    //    a) dar de alta un estudiante
     @Override
     public Estudiante create(Estudiante estudiante) {
         EntityManager em = emf.createEntityManager();
@@ -35,8 +37,6 @@ public class EstudianteRepositoryImpl implements EstudianteRepository {
             em.close();
         }
     }
-
-//    ===== CRUD =====
 
     @Override
     public Estudiante findByDni(Integer dni) {
