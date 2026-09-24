@@ -12,41 +12,21 @@ import java.util.List;
 import java.util.Optional;
 
 public class MySQLFacturaProductoDAO implements FacturaProductoDAO {
-    private Connection connection;
+    private final Connection connection;
 
     public MySQLFacturaProductoDAO(Connection connection) {
         this.connection = connection;
-        createTableIfNotExists();
     }
 
-    private void createTableIfNotExists() {
-        String sql = "CREATE TABLE IF NOT EXISTS factura_producto(" +
-                "idFactura int," +
-                "idProducto int," +
-                "cantidad int," +
-                "primary key(idFactura,idProducto)," +
-                "foreign key(idFactura) references factura(idFactura) ON DELETE CASCADE ON UPDATE CASCADE," +
-                "foreign key(idProducto) references producto(idProducto) ON DELETE CASCADE ON UPDATE CASCADE)";
-        try {
-            Statement st = connection.createStatement();
-            st.execute(sql);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    // "id" es idFactura (asi lo trata el resto de la interfaz, ver comentario de updateProducto)
+    // "id" es idFactura (asi lo trata el resto de la interfaz, ver updateProducto)
     @Override
     public FacturaProducto findById(int id) {
         String sql = "SELECT * FROM factura_producto WHERE idFactura=?";
-        try {
-            PreparedStatement ps = connection.prepareStatement(sql);
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, id);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return map(rs);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? map(rs) : null;
             }
-            return null;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -56,9 +36,8 @@ public class MySQLFacturaProductoDAO implements FacturaProductoDAO {
     public List<FacturaProducto> findAll() {
         List<FacturaProducto> resultado = new ArrayList<>();
         String sql = "SELECT * FROM factura_producto";
-        try {
-            Statement st = connection.createStatement();
-            ResultSet rs = st.executeQuery(sql);
+        try (Statement st = connection.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
             while (rs.next()) {
                 resultado.add(map(rs));
             }
@@ -72,12 +51,12 @@ public class MySQLFacturaProductoDAO implements FacturaProductoDAO {
     public Optional<List<FacturaProducto>> findByProducto(int idProducto) {
         List<FacturaProducto> resultado = new ArrayList<>();
         String sql = "SELECT * FROM factura_producto WHERE idProducto=?";
-        try {
-            PreparedStatement ps = connection.prepareStatement(sql);
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, idProducto);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                resultado.add(map(rs));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    resultado.add(map(rs));
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -88,8 +67,7 @@ public class MySQLFacturaProductoDAO implements FacturaProductoDAO {
     @Override
     public void create(FacturaProducto fp) {
         String sql = "INSERT INTO factura_producto(idFactura,idProducto,cantidad) VALUES(?,?,?)";
-        try {
-            PreparedStatement ps = connection.prepareStatement(sql);
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, fp.getIdFactura());
             ps.setInt(2, fp.getIdProducto());
             ps.setInt(3, fp.getCantidad());
@@ -102,8 +80,7 @@ public class MySQLFacturaProductoDAO implements FacturaProductoDAO {
     @Override
     public void update(FacturaProducto fp) {
         String sql = "UPDATE factura_producto SET cantidad=? WHERE idFactura=? AND idProducto=?";
-        try {
-            PreparedStatement ps = connection.prepareStatement(sql);
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, fp.getCantidad());
             ps.setInt(2, fp.getIdFactura());
             ps.setInt(3, fp.getIdProducto());
@@ -117,8 +94,7 @@ public class MySQLFacturaProductoDAO implements FacturaProductoDAO {
     @Override
     public void updateProducto(int id, int idProducto) {
         String sql = "UPDATE factura_producto SET idProducto=? WHERE idFactura=?";
-        try {
-            PreparedStatement ps = connection.prepareStatement(sql);
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, idProducto);
             ps.setInt(2, id);
             ps.executeUpdate();
@@ -130,8 +106,7 @@ public class MySQLFacturaProductoDAO implements FacturaProductoDAO {
     @Override
     public void delete(int id) {
         String sql = "DELETE FROM factura_producto WHERE idFactura=?";
-        try {
-            PreparedStatement ps = connection.prepareStatement(sql);
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, id);
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -141,10 +116,8 @@ public class MySQLFacturaProductoDAO implements FacturaProductoDAO {
 
     @Override
     public void deleteAll() {
-        String sql = "DELETE FROM factura_producto";
-        try {
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ps.executeUpdate();
+        try (Statement st = connection.createStatement()) {
+            st.executeUpdate("DELETE FROM factura_producto");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

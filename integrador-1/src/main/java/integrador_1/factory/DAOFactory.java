@@ -6,22 +6,21 @@ import integrador_1.dao.ClienteDAO;
 import integrador_1.dao.FacturaDAO;
 import integrador_1.dao.FacturaProductoDAO;
 import integrador_1.dao.ProductoDAO;
-
-/* no usamos más que mysql para resolver este integrador, pero sabemos bien que podemos meter otras bases de datos en JDBC
-* y también cómo hacer eso (sumamos el tipo a DBType, añadimos el tipo al switch en getInstance, resolvemos la implementación
-* de la db concreta que hayamos sumado dentro de la carpeta repository)
-* 
-* pero ese es el motivo por el que sólo se usa la DAOFactory concreta de MySQL: no usamos ninguna otra para resolver el integrador
-*/
 import integrador_1.repository.mysql.MySQLDAOFactory;
 
+/* Abstract Factory + Singleton.
+ * El integrador se resuelve solo con MySQL, pero toda la aplicacion habla
+ * contra esta clase abstracta y contra las interfaces DAO: sumar otro motor es
+ * agregar el valor a DBType, un case al switch de getInstance y la
+ * implementacion concreta dentro de repository. Ninguna otra clase se entera.
+ */
 public abstract class DAOFactory {
     private static volatile DAOFactory instance;
 
-    public static DAOFactory getInstance(DBType type){
-        if(instance == null){
-            synchronized (DAOFactory.class){
-                if(instance == null){
+    public static DAOFactory getInstance(DBType type) {
+        if (instance == null) {
+            synchronized (DAOFactory.class) {
+                if (instance == null) {
                     switch (type) {
                         case MYSQL:
                             instance = new MySQLDAOFactory();
@@ -38,9 +37,11 @@ public abstract class DAOFactory {
         return instance;
     }
 
-    //distinta signatura por si no pasan el tipo
+    /* Variante sin parametros: lee la system property db.type (por ejemplo
+     * -Ddb.type=MYSQL) y si no esta definida usa MYSQL por defecto.
+     */
     public static DAOFactory getInstance() {
-        String v = System.getProperty("db.type", "MYSQL");  // lee una “system property” llamada db.type. Si no existe, usa "MYSQL" como valor por defecto.
+        String v = System.getProperty("db.type", "MYSQL");
         DBType type = DBType.valueOf(v.toUpperCase());
         return getInstance(type);
     }
@@ -50,23 +51,30 @@ public abstract class DAOFactory {
     public abstract FacturaProductoDAO createFacturaProductoDAO();
     public abstract ProductoDAO createProductoDAO();
 
-    /* que sea protected hace que tanto esta clase como las hijas puedan llamar
-    * y esto tiene sentido al pensar que todas las factory emplean este abstract
-    * las factory puntuales de cada DB están en repository
-    * 
-    * igual persisto en afirmar: para qué más que una db concreta, con MySQL solo ya tenemos persistencia
-    * aunque entendemos la necesidad de varias, la flexibilidad del abstract factory + factory method + singleton
-    */
+    /* Punto 1: creacion del esquema. El DDL depende del motor, asi que se
+     * declara aca y lo resuelve cada factory concreta.
+     */
+    public abstract void createSchema();
+
+    /* Ejecuta un bloque de trabajo dentro de una unica transaccion (commit al
+     * final, rollback si algo falla). Lo usa la carga de los CSV: con ~3200
+     * inserts, hacer un commit por fila es lo que la vuelve lenta.
+     */
+    public abstract void runInTransaction(Runnable work);
+
+    /* Protegido: la conexion es un detalle de cada motor y no sale de la
+     * jerarquia de factories.
+     */
     protected abstract Connection getConnection();
 
-    //todas las DAOfactory tienen que tener manera de cerrar con certeza todo lo que hayan arrancado
-    public final void shutdown(){
+    // toda factory tiene que poder cerrar con certeza lo que abrio
+    public final void shutdown() {
         doShutdown();
-        synchronized (DAOFactory.class){
+        synchronized (DAOFactory.class) {
             instance = null;
         }
     }
 
-    //cada db tiene su propia manera de cerrar conexiones y se delega
+    // cada motor cierra a su manera, se delega
     protected abstract void doShutdown();
 }

@@ -4,7 +4,6 @@ import integrador_1.dto.TopProductoRecaudador;
 import integrador_1.entity.Producto;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ProductoDAO {
     Producto findById(int id);
@@ -14,5 +13,8 @@ public interface ProductoDAO {
     void delete(int id);
     void deleteAll();
 
+    /* Ej 3. Devuelve un DTO y no un Producto porque la recaudacion se calcula
+     * cruzando con factura_producto: la consulta vive en el DAO, no en el Main.
+     */
     TopProductoRecaudador findProductMaxFacturacion();
 }

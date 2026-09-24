@@ -1,9 +1,9 @@
 package integrador_1.dao;
 
+import integrador_1.dto.ClienteFacturacion;
 import integrador_1.entity.Cliente;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ClienteDAO {
     void create(Cliente c);
@@ -12,5 +12,7 @@ public interface ClienteDAO {
     void update(Cliente c);
     void delete(int idCliente);
     void deleteAll();
-    List<Cliente> sortClientesByFacturacion();
+
+    //especial p resolver ej 4: lista ordenada x facturacion
+    List<ClienteFacturacion> sortClientesByFacturacion();
 }
