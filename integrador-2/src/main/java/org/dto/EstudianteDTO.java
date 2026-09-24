@@ -1,5 +1,12 @@
 package org.dto;
 
+import jakarta.persistence.*;
+import lombok.*;
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+
 public class EstudianteDTO {
     private Integer DNI;
     private String nombre;

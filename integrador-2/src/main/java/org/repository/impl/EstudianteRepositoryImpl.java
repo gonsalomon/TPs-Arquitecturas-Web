@@ -2,8 +2,11 @@ package org.repository.impl;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import org.dto.EstudianteDTO;
 import org.entity.Estudiante;
 import org.repository.EstudianteRepository;
+
+import java.util.List;
 
 public class EstudianteRepositoryImpl implements EstudianteRepository {
     private EntityManagerFactory emf;
@@ -47,4 +50,20 @@ public class EstudianteRepositoryImpl implements EstudianteRepository {
             em.close();
         }
     }
+
+    /* Obtener estudiantes por genero */
+    @Override
+    public List<EstudianteDTO> findByGender(String genero) {
+        EntityManager em = emf.createEntityManager();
+        List<EstudianteDTO> resultado = em.createQuery("SELECT new org.dto.EstudianteDTO(e.DNI, e.nombre, e.apellido, e.genero, e.edad, e.ciudad, e.LU)" +
+                                        " FROM Estudiante e WHERE genero = :genero", EstudianteDTO.class)
+                .setParameter("genero", genero)
+                .getResultList();
+        em.close();
+        return resultado;
+    }
+
+
+
+
 }
