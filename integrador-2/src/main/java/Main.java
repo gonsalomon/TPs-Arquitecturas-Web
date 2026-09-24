@@ -2,10 +2,13 @@ import jakarta.persistence.EntityManagerFactory;
 import org.entity.Carrera;
 import org.entity.Estudiante;
 import org.entity.Inscripcion;
+import org.dto.ReporteDTO;
 import org.factory.JPAUtil;
 import org.repository.CarreraRepository;
 import org.repository.EstudianteRepository;
 import org.repository.InscripcionRepository;
+
+import java.util.List;
 import org.repository.impl.CarreraRepositoryImpl;
 import org.repository.impl.EstudianteRepositoryImpl;
 import org.repository.impl.InscripcionRepositoryImpl;
@@ -53,6 +56,11 @@ public class Main {
     //Generar un reporte de las carreras, que para cada carrera incluya información de los
     //inscriptos y egresados por año. Se deben ordenar las carreras alfabéticamente, y presentar
     //los años de manera cronológica.
+    System.out.println("\n=== Reporte de carreras (inscriptos y egresados por anio) ===");
+    List<ReporteDTO> reporteCarreras = carreraRepository.generarReporteCarreras();
+    for (ReporteDTO r : reporteCarreras) {
+        System.out.println(r);
+    }
 
     }
 }
