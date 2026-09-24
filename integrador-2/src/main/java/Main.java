@@ -1,4 +1,5 @@
 import jakarta.persistence.EntityManagerFactory;
+import org.dto.EstudianteDTO;
 import org.entity.Carrera;
 import org.entity.Estudiante;
 import org.entity.Inscripcion;
@@ -47,7 +48,13 @@ public class Main {
 
     //D) recuperar un estudiante, en base a su número de libreta universitaria.
 
-    //E) recuperar todos los estudiantes, en base a su género.
+    //E) recuperar todos los estudiantes, en base a su género. (Male / Masculino / Female / Femenino).
+        String genero = "Male";
+        System.out.println("\n=== Estudiantes recuperados del genero: "+ genero +" ===");
+        List<EstudianteDTO> estudiantesPorGeneroDTO = estudianteRepository.findByGender(genero);
+        for (EstudianteDTO e : estudiantesPorGeneroDTO){
+            System.out.println(e);
+        }
 
     //F) recuperar las carreras con estudiantes inscriptos, y ordenar por cantidad de inscriptos.
 
