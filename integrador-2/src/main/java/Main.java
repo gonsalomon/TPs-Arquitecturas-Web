@@ -1,4 +1,5 @@
 import jakarta.persistence.EntityManagerFactory;
+import org.dto.CarreraDTO;
 import org.dto.EstudianteDTO;
 import org.entity.Carrera;
 import org.entity.Estudiante;
@@ -44,9 +45,23 @@ public class Main {
 
     //B) matricular un estudiante en una carrer
         inscripcionRepository.create(6,23322529, 2025, 0, 1);
-    //C) recuperar todos los estudiantes, y especificar algún criterio de ordenamiento simple.
+    //C) recuperar todos los estudiantes, y especificar algún criterio de ordenamiento simple
+    System.out.println("\n=== Estudiantes ordenados por apellido ===");
+    List<EstudianteDTO> estudiantesOrdenados = estudianteRepository.findAllOrderByApellido();
+    for (EstudianteDTO e : estudiantesOrdenados){
+        System.out.println(e);
+    }
 
     //D) recuperar un estudiante, en base a su número de libreta universitaria.
+    Integer lu = 256879;
+    System.out.println("\n=== Estudiante recuperado por LU: " + lu + " ===");
+    Estudiante estudiantePorLU = estudianteRepository.findByLU(lu);
+    if (estudiantePorLU != null) {
+        System.out.println("Dni: " + estudiantePorLU.getDNI() + " " + estudiantePorLU.getNombre()
+                + " " + estudiantePorLU.getApellido() + ", LU: " + estudiantePorLU.getLU());
+    } else {
+        System.out.println("No existe ningun estudiante con LU " + lu);
+    }
 
     //E) recuperar todos los estudiantes, en base a su género. (Male / Masculino / Female / Femenino).
         String genero = "Male";
@@ -57,6 +72,11 @@ public class Main {
         }
 
     //F) recuperar las carreras con estudiantes inscriptos, y ordenar por cantidad de inscriptos.
+    System.out.println("\n=== Carreras con inscriptos, ordenadas por cantidad ===");
+    List<CarreraDTO> carrerasPorInscriptos = carreraRepository.findConInscriptosOrdenadasPorCantidad();
+    for (CarreraDTO c : carrerasPorInscriptos) {
+        System.out.println(c);
+    }
 
     //G) recuperar los estudiantes de una determinada carrera, filtrado por ciudad de residencia.
 

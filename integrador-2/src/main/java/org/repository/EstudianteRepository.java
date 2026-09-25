@@ -9,4 +9,6 @@ public interface EstudianteRepository {
     public Estudiante create(Estudiante estudiante);
     public Estudiante findByDni(Integer dni);
     public List<EstudianteDTO> findByGender(String genero);
+    public List<EstudianteDTO> findAllOrderByApellido();
+    public Estudiante findByLU(Integer lu);
 }

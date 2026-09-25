@@ -63,7 +63,33 @@ public class EstudianteRepositoryImpl implements EstudianteRepository {
         return resultado;
     }
 
+    //C: traemos todos los estudiantes, ordenados por apellido como criterio simple de ordenamiento
+    @Override
+    public List<EstudianteDTO> findAllOrderByApellido() {
+        EntityManager em = emf.createEntityManager();
+        try {
+            return em.createQuery("SELECT new org.dto.EstudianteDTO(e.DNI, e.nombre, e.apellido, e.genero, e.edad, e.ciudad, e.LU)" +
+                            " FROM Estudiante e ORDER BY e.apellido ASC", EstudianteDTO.class)
+                    .getResultList();
+        } finally {
+            em.close();
+        }
+    }
 
-
+    //D: buscamos un estudiante por su numero de libreta universitaria (LU)
+    @Override
+    public Estudiante findByLU(Integer lu) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            List<Estudiante> resultado = em.createQuery(
+                            "SELECT e FROM Estudiante e WHERE e.LU = :lu", Estudiante.class)
+                    .setParameter("lu", lu)
+                    .getResultList();
+            // Si no hay ningun estudiante con ese LU, devolvemos null en vez de lanzar excepcion
+            return resultado.isEmpty() ? null : resultado.get(0);
+        } finally {
+            em.close();
+        }
+    }
 
 }

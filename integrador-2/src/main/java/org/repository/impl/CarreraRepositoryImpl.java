@@ -2,6 +2,7 @@ package org.repository.impl;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import org.dto.CarreraDTO;
 import org.dto.ReporteDTO;
 import org.entity.Carrera;
 import org.repository.CarreraRepository;
@@ -52,6 +53,20 @@ public class CarreraRepositoryImpl implements CarreraRepository {
         try{
             return em.find(Carrera.class, idCarrera);
         }  finally {
+            em.close();
+        }
+    }
+
+    //F: recupero las carreras con inscriptos y ordeno por cantidad de inscriptos
+    @Override
+    public List<CarreraDTO> findConInscriptosOrdenadasPorCantidad() {
+        EntityManager em = emf.createEntityManager();
+        try {
+            return em.createQuery(
+                            "SELECT new org.dto.CarreraDTO(c.nombre, COUNT(i)) FROM Carrera c JOIN c.alumnosInscriptos i " +
+                                    "GROUP BY c.nombre ORDER BY COUNT(i) DESC", CarreraDTO.class)
+                    .getResultList();
+        } finally {
             em.close();
         }
     }
