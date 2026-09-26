@@ -1,5 +1,6 @@
 package org.repository;
 
+import org.dto.InscripcionDTO;
 import org.entity.Inscripcion;
 
 

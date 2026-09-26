@@ -2,6 +2,7 @@ package org.repository.impl;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.TypedQuery;
 import org.dto.EstudianteDTO;
 import org.entity.Estudiante;
 import org.repository.EstudianteRepository;
@@ -92,4 +93,24 @@ public class EstudianteRepositoryImpl implements EstudianteRepository {
         }
     }
 
+    //G: recuperar los estudiantes de una determinada carrera, filtrado por ciudad de residencia
+    @Override
+    public List<EstudianteDTO> buscarPorCarreraYCiudad(Integer carreraId, String ciudad) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            String jpql = "SELECT DISTINCT new org.dto.EstudianteDTO(" +
+                    "e.DNI, e.nombre, e.apellido, e.genero, e.edad, e.ciudad, e.LU) " +
+                    "FROM Inscripcion i " +
+                    "JOIN i.estudiante e " +
+                    "JOIN i.carrera c " +
+                    "WHERE c.idCarrera = :carreraId AND e.ciudad = :ciudad";
+
+            TypedQuery<EstudianteDTO> query = em.createQuery(jpql, EstudianteDTO.class);
+            query.setParameter("carreraId", carreraId);
+            query.setParameter("ciudad", ciudad);
+            return query.getResultList();
+        } finally {
+            em.close();
+        }
+    }
 }

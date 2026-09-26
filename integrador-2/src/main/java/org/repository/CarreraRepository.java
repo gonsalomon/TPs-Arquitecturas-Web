@@ -1,6 +1,7 @@
 package org.repository;
 
 import org.dto.CarreraDTO;
+import org.dto.EstudianteDTO;
 import org.dto.ReporteDTO;
 import org.entity.Carrera;
 

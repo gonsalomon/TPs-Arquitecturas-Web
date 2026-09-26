@@ -3,6 +3,7 @@ package org.repository.impl;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import org.dto.CarreraDTO;
+import org.dto.EstudianteDTO;
 import org.dto.ReporteDTO;
 import org.entity.Carrera;
 import org.repository.CarreraRepository;

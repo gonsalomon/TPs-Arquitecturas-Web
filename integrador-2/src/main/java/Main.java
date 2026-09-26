@@ -31,7 +31,7 @@ public class Main {
         cargarDatos.addEstudiante(estudianteRepository);
         cargarDatos.addInscripcion(inscripcionRepository, estudianteRepository, carreraRepository);
 
-
+    // 2)
     // A) Dar de alta un estudiante
     Estudiante e1 = new Estudiante();
         e1.setDNI(00000001);
@@ -79,8 +79,15 @@ public class Main {
     }
 
     //G) recuperar los estudiantes de una determinada carrera, filtrado por ciudad de residencia.
+    Integer idCarrera = 6;
+    String ciudadResidencia = "Rauch";
+    System.out.println("\n=== Estudiantes de la carrera " + idCarrera + " en " + ciudadResidencia + " ===");
+    List<EstudianteDTO> estudiantesPorCarreraYCiudad = estudianteRepository.buscarPorCarreraYCiudad(idCarrera, ciudadResidencia);
+    for (EstudianteDTO e : estudiantesPorCarreraYCiudad) {
+        System.out.println(e);
+    }
 
-    //Generar un reporte de las carreras, que para cada carrera incluya información de los
+    //3) Generar un reporte de las carreras, que para cada carrera incluya información de los
     //inscriptos y egresados por año. Se deben ordenar las carreras alfabéticamente, y presentar
     //los años de manera cronológica.
     System.out.println("\n=== Reporte de carreras (inscriptos y egresados por anio) ===");

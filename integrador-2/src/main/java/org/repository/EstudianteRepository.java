@@ -10,5 +10,6 @@ public interface EstudianteRepository {
     public Estudiante findByDni(Integer dni);
     public List<EstudianteDTO> findByGender(String genero);
     public List<EstudianteDTO> findAllOrderByApellido();
+    public List<EstudianteDTO> buscarPorCarreraYCiudad(Integer carreraId, String ciudad);
     public Estudiante findByLU(Integer lu);
 }

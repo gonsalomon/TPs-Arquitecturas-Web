@@ -2,6 +2,7 @@ package org.repository.impl;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import org.dto.InscripcionDTO;
 import org.entity.Inscripcion;
 import org.repository.InscripcionRepository;
 import org.entity.Estudiante;
@@ -66,6 +67,7 @@ public class InscripcionRepositoryImpl implements InscripcionRepository {
         }
     }
 
+
     @Override
     public void save(Inscripcion nueva) {
         EntityManager em = emf.createEntityManager();
@@ -87,5 +89,4 @@ public class InscripcionRepositoryImpl implements InscripcionRepository {
             em.close();
         }
     }
-
 }
