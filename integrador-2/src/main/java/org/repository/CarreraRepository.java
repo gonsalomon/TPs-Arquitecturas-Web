@@ -11,11 +11,5 @@ public interface CarreraRepository {
     public Carrera create(Carrera carrera);
     public Carrera findById(Integer idCarrera);
     public List<CarreraDTO> findConInscriptosOrdenadasPorCantidad();
-
-    /**
-     * Punto 3: reporte de carreras con inscriptos y egresados por año.
-     * Las carreras se devuelven ordenadas alfabéticamente y, dentro de cada
-     * una, los años en orden cronológico.
-     */
     public List<ReporteDTO> generarReporteCarreras();
 }

@@ -2,6 +2,7 @@ package org.repository.impl;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import org.dto.EstudianteDTO;
 import org.entity.Estudiante;
@@ -57,7 +58,7 @@ public class EstudianteRepositoryImpl implements EstudianteRepository {
     public List<EstudianteDTO> findByGender(String genero) {
         EntityManager em = emf.createEntityManager();
         List<EstudianteDTO> resultado = em.createQuery("SELECT new org.dto.EstudianteDTO(e.DNI, e.nombre, e.apellido, e.genero, e.edad, e.ciudad, e.LU)" +
-                                        " FROM Estudiante e WHERE genero = :genero", EstudianteDTO.class)
+                                        " FROM Estudiante e WHERE e.genero = :genero", EstudianteDTO.class)
                 .setParameter("genero", genero)
                 .getResultList();
         em.close();
@@ -66,7 +67,7 @@ public class EstudianteRepositoryImpl implements EstudianteRepository {
 
     //C: traemos todos los estudiantes, ordenados por apellido como criterio simple de ordenamiento
     @Override
-    public List<EstudianteDTO> findAllOrderByApellido() {
+    public List<EstudianteDTO> findAllOrderByApellidoASC() {
         EntityManager em = emf.createEntityManager();
         try {
             return em.createQuery("SELECT new org.dto.EstudianteDTO(e.DNI, e.nombre, e.apellido, e.genero, e.edad, e.ciudad, e.LU)" +
@@ -79,16 +80,22 @@ public class EstudianteRepositoryImpl implements EstudianteRepository {
 
     //D: buscamos un estudiante por su numero de libreta universitaria (LU)
     @Override
-    public Estudiante findByLU(Integer lu) {
+    public EstudianteDTO findByLU(Integer lu) {
         EntityManager em = emf.createEntityManager();
         try {
-            List<Estudiante> resultado = em.createQuery(
-                            "SELECT e FROM Estudiante e WHERE e.LU = :lu", Estudiante.class)
+            EstudianteDTO estudiante = em.createQuery(
+                            "SELECT new org.dto.EstudianteDTO(" +
+                                    "e.DNI, e.nombre, e.apellido, e.genero, e.edad, e.ciudad, e.LU)" +
+                                    "FROM Estudiante e " +
+                                    "WHERE e.LU = :lu", EstudianteDTO.class)
                     .setParameter("lu", lu)
-                    .getResultList();
-            // Si no hay ningun estudiante con ese LU, devolvemos null en vez de lanzar excepcion
-            return resultado.isEmpty() ? null : resultado.get(0);
-        } finally {
+                    .getSingleResult();
+            return estudiante;
+        } catch (NoResultException e) {
+            return null;
+
+        }
+        finally {
             em.close();
         }
     }

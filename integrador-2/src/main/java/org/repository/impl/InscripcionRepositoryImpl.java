@@ -2,7 +2,6 @@ package org.repository.impl;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import org.dto.InscripcionDTO;
 import org.entity.Inscripcion;
 import org.repository.InscripcionRepository;
 import org.entity.Estudiante;
@@ -35,14 +34,19 @@ public class InscripcionRepositoryImpl implements InscripcionRepository {
         EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
+            if (idEstudiante == null) {
+                throw new RuntimeException("El id del estudiante no puede ser null");
+            }
             Estudiante e = em.find(Estudiante.class, idEstudiante);
-            Carrera c = em.find(Carrera.class, idCarrera);
             if (e == null) {
                 throw new RuntimeException(
                         "No existe el estudiante con id " + idEstudiante
                 );
             }
-
+            if (idCarrera == null) {
+                throw new RuntimeException("El id del carrera no puede ser null");
+            }
+            Carrera c = em.find(Carrera.class, idCarrera);
             if (c == null) {
                 throw new RuntimeException(
                         "No existe la carrera con id " + idCarrera
@@ -50,6 +54,10 @@ public class InscripcionRepositoryImpl implements InscripcionRepository {
             }
             if (fechaInscripcion == null) {
                 fechaInscripcion = LocalDate.now().getYear();
+                antiguedad = 0;
+            }
+            if (fechaGraduacion == null) {
+                fechaGraduacion = 0;
             }
 
             Inscripcion inscripcion = new Inscripcion(c,e,fechaInscripcion,fechaGraduacion,antiguedad);
