@@ -88,7 +88,7 @@ La configuración actual de JPA se conecta a `localhost:3306`, con base de datos
 
 1. Clonar el repositorio:
    ```bash
-   git clone <https://github.com/gonsalomon/TPs-Arquitecturas-Web.git>
+   git clone https://github.com/gonsalomon/TPs-Arquitecturas-Web.git
 
 2.  Levantar la base de datos con Docker 🐳:
     ```bash
