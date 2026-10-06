@@ -1,0 +1,57 @@
+{
+  "info": {
+    "_postman_id": "d6a9a31f-68f4-46b8-936c-988a956636fa",
+    "name": "Integrador3",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "49340244"
+  },
+  "item": [
+    {
+      "name": "findByIdCarrera",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/carreras/2",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "carreras",
+            "2"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "findCarrerasInscriptos",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "http://localhost:8080/carreras/carreras-inscriptos",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "carreras",
+            "carreras-inscriptos"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

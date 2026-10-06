@@ -12,9 +12,4 @@ public class CarreraDTO {
     private String nombre;
     private Integer duracion;
 
-    public CarreraDTO(Carrera carrera) {
-        this.idCarrera = carrera.getIdCarrera();
-        this.nombre = carrera.getNombre();
-        this.duracion = carrera.getDuracion();
-    }
 }
