@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: Integrador3
+  datasource:
+    url: jdbc:mysql://localhost:3306/Integrador3?createDatabaseIfNotExist=true
+    username: root
+    password: ""
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop  # crea/borra tablas automáticamente
+    show-sql: true       # opcional, para ver las queries en consola
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect

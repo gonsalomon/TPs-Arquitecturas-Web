@@ -1,4 +1,4 @@
-package org.entity;
+package org.example.ejercicioIntegrador3.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -12,25 +12,33 @@ import java.util.List;
 @Entity
 public class Estudiante {
     @Id
-    private Integer dni;
+    @Column
+    private Integer DNI;
+    @Column
     private String nombre;
+    @Column
     private String apellido;
+    @Column
     private String genero;
+    @Column
     private Integer edad;
+    @Column
     private String ciudad;
-    private Integer lu;
+    @Column
+    private Integer LU;
 
     @OneToMany(mappedBy = "estudiante", fetch = FetchType.LAZY)
-    private List<Inscripcion> listCarreras = new ArrayList<>();
+    private List<Inscripcion> listCarreras;
 
-    public Estudiante(Integer dni, String nombre, String apellido, Integer edad,
-                      String genero, String ciudad, Integer lu) {
-        this.dni = dni;
+    public Estudiante(Integer dni, String nombre, String apellido,Integer edad, String genero, String ciudad, Integer LU) {
+        this.DNI = dni;
         this.nombre = nombre;
         this.apellido = apellido;
-        this.edad = edad;
         this.genero = genero;
+        this.edad = edad;
         this.ciudad = ciudad;
-        this.lu = lu;
+        this.LU = LU;
+        this.listCarreras = new ArrayList<Inscripcion>();
+
     }
 }

@@ -1,4 +1,4 @@
-package org.dto;
+package org.example.ejercicioIntegrador3.dto;
 
 import lombok.*;
 

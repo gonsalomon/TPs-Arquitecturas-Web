@@ -1,14 +1,15 @@
-package org.utils;
+package org.example.ejercicioIntegrador3.utils;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.entity.Carrera;
-import org.entity.Estudiante;
-import org.entity.Inscripcion;
-import org.repository.CarreraRepository;
-import org.repository.EstudianteRepository;
-import org.repository.InscripcionRepository;
+import org.example.ejercicioIntegrador3.entity.Carrera;
+import org.example.ejercicioIntegrador3.entity.Estudiante;
+import org.example.ejercicioIntegrador3.entity.Inscripcion;
+import org.example.ejercicioIntegrador3.repository.CarreraRepository;
+import org.example.ejercicioIntegrador3.repository.EstudianteRepository;
+import org.example.ejercicioIntegrador3.repository.InscripcionRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +25,7 @@ public class CargarDatos implements CommandLineRunner {
     private final EstudianteRepository estudianteRepo;
     private final InscripcionRepository inscripcionRepo;
 
+    @Autowired //sirve para que Spring inyecte automáticamente una dependencia en una clase.
     public CargarDatos(CarreraRepository carreraRepo,
                        EstudianteRepository estudianteRepo,
                        InscripcionRepository inscripcionRepo) {
