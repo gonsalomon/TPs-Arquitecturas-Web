@@ -19,9 +19,9 @@ public class Estudiante {
     @Column
     private String apellido;
     @Column
-    private String genero;
-    @Column
     private Integer edad;
+    @Column
+    private String genero;
     @Column
     private String ciudad;
     @Column
@@ -41,4 +41,5 @@ public class Estudiante {
         this.listCarreras = new ArrayList<Inscripcion>();
 
     }
+
 }

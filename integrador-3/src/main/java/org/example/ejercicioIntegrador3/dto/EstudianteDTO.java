@@ -10,10 +10,11 @@ public class EstudianteDTO {
     private Integer dni;
     private String nombre;
     private String apellido;
-    private String genero;
     private Integer edad;
+    private String genero;
     private String ciudad;
     private Integer lu;
+
 
     @Override
     public String toString() {

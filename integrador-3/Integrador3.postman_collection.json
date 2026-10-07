@@ -52,6 +52,27 @@
         }
       },
       "response": []
+    },
+    {
+      "name": "recuperarEstudiantesPorCarreraYCiudad",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/estudiantes?ciudad=Rauch&carrera=TUDAI",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "estudiantes",
+            "Rauch",
+            "TUDAI"
+          ]
+        }
+      },
+      "response": []
     }
   ]
 }
