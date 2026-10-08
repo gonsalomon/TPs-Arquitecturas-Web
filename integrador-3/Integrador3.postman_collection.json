@@ -1,9 +1,10 @@
 {
   "info": {
-    "_postman_id": "d6a9a31f-68f4-46b8-936c-988a956636fa",
+    "_postman_id": "5e790c45-3910-4d51-abf8-9c762589da81",
     "name": "Integrador3",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "49340244"
+    "_exporter_id": "49340244",
+    "_collection_link": "https://go.postman.co/collection/49340244-5e790c45-3910-4d51-abf8-9c762589da81?source=collection_link"
   },
   "item": [
     {
@@ -66,9 +67,45 @@
           ],
           "port": "8080",
           "path": [
-            "estudiantes",
-            "Rauch",
-            "TUDAI"
+            "estudiantes"
+          ],
+          "query": [
+            {
+              "key": "ciudad",
+              "value": "Rauch"
+            },
+            {
+              "key": "carrera",
+              "value": "TUDAI"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "createEstudianteOk Copy",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": " {\r\n        \"dni\": 12345678,\r\n        \"nombre\": \"Marta\",\r\n        \"apellido\": \"Lopez\",\r\n        \"genero\": \"Female\",\r\n        \"lu\": 9999\r\n }\r\n    ",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/estudiantes",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "estudiantes"
           ]
         }
       },
