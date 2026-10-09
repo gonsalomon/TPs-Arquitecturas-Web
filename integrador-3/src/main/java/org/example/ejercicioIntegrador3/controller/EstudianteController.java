@@ -30,8 +30,8 @@ public class EstudianteController {
         return ResponseEntity.ok(estudiantes);
     }
 
-    //c) recuperar todos los estudiantes, y especificar algún criterio de ordenamiento simple.
-    @GetMapping
+    //c) recuperar todos los estudiantes, y especificar algún criterio de ordenamiento simple. (ordena por apellido ASC si hay mas de uno ordena por nombre ASC)
+    @GetMapping("")
     public ResponseEntity<List<EstudianteDTO>> recuperarTodosLosEstudiantes(){
         List<EstudianteDTO> estudiantes = service.recuperarTodosLosEstudiantes();
         return ResponseEntity.ok(estudiantes);

@@ -35,7 +35,7 @@ public class EstudianteService {
         return mapper.convertToDTO(nuevo);
     }
 
-
+    //g) recuperar los estudiantes de una determinada carrera, filtrado por ciudad de residencia.
     @Transactional(readOnly = true)
     public List<EstudianteDTO> recuperarEstudiantesPorCarreraYCiudad(String ciudad, String Carrera) {
         return estudianteRepository.recuperarEstudiantesPorCarreraYCiudad(ciudad,Carrera);

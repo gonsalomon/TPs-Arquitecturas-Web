@@ -11,6 +11,8 @@ import org.example.ejercicioIntegrador3.repository.InscripcionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+
 @AllArgsConstructor
 @Service
 public class InscripcionService {
@@ -21,19 +23,18 @@ public class InscripcionService {
 
     //b) matricular un estudiante en una carrera
     @Transactional
-    public InscripcionDTO matricular(Integer dni, Integer idCarrera, Integer anioInscripcion) {
-        if (anioInscripcion == null) {
-            throw new IllegalArgumentException("El año de inscripción es obligatorio");
-        }
+    public InscripcionDTO matricular(InscripcionDTO  request) {
+        Integer dni = request.getDni();
+        Integer idCarrera = request.getIdCarrera();
         Estudiante estudiante = estudianteRepository.findById(dni)
                 .orElseThrow(() -> new IllegalArgumentException("No se encontró un estudiante con el DNI: " + dni));
         Carrera carrera = carreraRepository.findById(idCarrera)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró una carrera con el id: " + idCarrera));
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró una carrera con el id: " +idCarrera));
         if (inscripcionRepository.existeInscripcion(dni, idCarrera)) {
             throw new IllegalArgumentException("El estudiante ya está matriculado en esa carrera");
         }
-
-        Inscripcion inscripcion = new Inscripcion(carrera, estudiante, anioInscripcion, null, null);
+        Integer anioInscripcion =  LocalDate.now().getYear();
+        Inscripcion inscripcion = new Inscripcion(carrera, estudiante, anioInscripcion, 0, 1);
         Inscripcion nueva = inscripcionRepository.save(inscripcion);
         return mapper.convertToDTO(nueva);
     }
