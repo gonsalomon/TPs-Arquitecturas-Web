@@ -1,10 +1,10 @@
 {
   "info": {
-    "_postman_id": "5e790c45-3910-4d51-abf8-9c762589da81",
+    "_postman_id": "c7c530d4-4584-4dca-8a7c-b4fb0a66b310",
     "name": "Integrador3",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "49340244",
-    "_collection_link": "https://go.postman.co/collection/49340244-5e790c45-3910-4d51-abf8-9c762589da81?source=collection_link"
+    "_collection_link": "https://go.postman.co/collection/49340244-c7c530d4-4584-4dca-8a7c-b4fb0a66b310?source=collection_link"
   },
   "item": [
     {
@@ -125,7 +125,7 @@
       "response": []
     },
     {
-      "name": "createEstudianteOk Copy",
+      "name": "createEstudianteOk",
       "request": {
         "method": "POST",
         "header": [],
@@ -183,6 +183,5 @@
       },
       "response": []
     }
-
   ]
 }
