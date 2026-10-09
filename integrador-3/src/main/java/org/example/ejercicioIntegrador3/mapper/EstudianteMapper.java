@@ -9,25 +9,25 @@ public class EstudianteMapper {
 
     public static Estudiante convertToEntity(EstudianteDTO dto){
         return new Estudiante(
-                dto.getDni(),
+                dto.getDNI(),
                 dto.getNombre(),
                 dto.getApellido(),
                 dto.getEdad(),
                 dto.getGenero(),
                 dto.getCiudad(),
-                dto.getLu()
+                dto.getLU()
         );
     }
 
     public EstudianteDTO convertToDTO(Estudiante entity){
         EstudianteDTO dto = new EstudianteDTO();
-        dto.setDni(entity.getDNI());
+        dto.setDNI(entity.getDNI());
         dto.setNombre(entity.getNombre());
         dto.setApellido(entity.getApellido());
         dto.setGenero(entity.getGenero());
         dto.setEdad(entity.getEdad());
         dto.setCiudad(entity.getCiudad());
-        dto.setLu(entity.getLU());
+        dto.setLU(entity.getLU());
         return dto;
     }
 }

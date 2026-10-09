@@ -7,17 +7,17 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EstudianteDTO {
-    private Integer dni;
+    private Integer DNI;
     private String nombre;
     private String apellido;
     private Integer edad;
     private String genero;
     private String ciudad;
-    private Integer lu;
+    private Integer LU;
 
 
     @Override
     public String toString() {
-        return "Dni: " + dni + " " + nombre + " " + apellido + ", Género: " + genero + " LU: " + lu;
+        return "Dni: " + DNI + " " + nombre + " " + apellido + ", Género: " + genero + " LU: " + LU;
     }
 }
