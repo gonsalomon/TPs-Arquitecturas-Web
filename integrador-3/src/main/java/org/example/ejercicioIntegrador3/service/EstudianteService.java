@@ -5,8 +5,10 @@ import org.example.ejercicioIntegrador3.dto.EstudianteDTO;
 import org.example.ejercicioIntegrador3.entity.Estudiante;
 import org.example.ejercicioIntegrador3.mapper.EstudianteMapper;
 import org.example.ejercicioIntegrador3.repository.EstudianteRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -23,7 +25,7 @@ public class EstudianteService {
             throw new IllegalArgumentException("El DNI es obligatorio");
         }
         if(estudianteRepository.existsById(request.getDNI())) {
-            throw new IllegalArgumentException("El DNI existe en el sistema");
+            throw new IllegalStateException("El DNI existe en el sistema");
         }
         if(request.getLU() ==null){
             throw new IllegalArgumentException("El LU es obligatorio");
@@ -51,6 +53,6 @@ public class EstudianteService {
     @Transactional(readOnly = true)
     public EstudianteDTO recuperarEstudiantePorLU(Integer lu) {
         return estudianteRepository.recuperarEstudiantePorLU(lu)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró un estudiante con el LU: " + lu));
+                .orElseThrow(() -> new ResponseStatusException( HttpStatus.NOT_FOUND, "No se encontró un estudiante con el LU: " + lu));
     }
 }
