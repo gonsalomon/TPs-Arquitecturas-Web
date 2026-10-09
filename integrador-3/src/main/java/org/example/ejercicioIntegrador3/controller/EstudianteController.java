@@ -17,9 +17,23 @@ public class EstudianteController {
     private final EstudianteRepository estudianteRepository;
 
     //g) recuperar los estudiantes de una determinada carrera, filtrado por ciudad de residencia.
-    @GetMapping
+    @GetMapping("/filtro")
     public ResponseEntity<List<EstudianteDTO>> recuperarEstudiantesPorCarreraYCiudad(@RequestParam("ciudad") String ciudad, @RequestParam("carrera") String carrera){
         List<EstudianteDTO> estudiantes = service.recuperarEstudiantesPorCarreraYCiudad(ciudad,carrera);
         return ResponseEntity.ok(estudiantes);
+    }
+
+    //c) recuperar todos los estudiantes, y especificar algún criterio de ordenamiento simple.
+    @GetMapping
+    public ResponseEntity<List<EstudianteDTO>> recuperarTodosLosEstudiantes(){
+        List<EstudianteDTO> estudiantes = service.recuperarTodosLosEstudiantes();
+        return ResponseEntity.ok(estudiantes);
+    }
+
+    //d) recuperar un estudiante, en base a su número de libreta universitaria.
+    @GetMapping("/lu/{lu}")
+    public ResponseEntity<EstudianteDTO> recuperarEstudiantePorLU(@PathVariable Integer lu){
+        EstudianteDTO estudiante = service.recuperarEstudiantePorLU(lu);
+        return ResponseEntity.ok(estudiante);
     }
 }

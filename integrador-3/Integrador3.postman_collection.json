@@ -59,7 +59,7 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:8080/estudiantes?ciudad=Rauch&carrera=TUDAI",
+          "raw": "http://localhost:8080/estudiantes/filtro?ciudad=Rauch&carrera=TUDAI",
           "protocol": "http",
           "host": [
             "localhost"
@@ -67,8 +67,57 @@
           "port": "8080",
           "path": [
             "estudiantes",
-            "Rauch",
-            "TUDAI"
+            "filtro"
+          ],
+          "query": [
+            {
+              "key": "ciudad",
+              "value": "Rauch"
+            },
+            {
+              "key": "carrera",
+              "value": "TUDAI"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "recuperarTodosLosEstudiantes",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/estudiantes",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "estudiantes"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "recuperarEstudiantePorLU",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/estudiantes/lu/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "estudiantes",
+            "lu",
+            "1"
           ]
         }
       },
