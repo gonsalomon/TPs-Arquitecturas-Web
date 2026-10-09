@@ -151,6 +151,37 @@
         }
       },
       "response": []
+    },
+    {
+      "name": "matricularEstudiante",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": " {\r\n        \"anioInscripcion\": 2024\r\n }\r\n    ",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/estudiantes/12345678/carreras/2",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "estudiantes",
+            "12345678",
+            "carreras",
+            "2"
+          ]
+        }
+      },
+      "response": []
     }
 
   ]
