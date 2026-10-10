@@ -32,4 +32,6 @@ public interface EstudianteRepository  extends JpaRepository<Estudiante,Integer>
             "FROM Estudiante e " +
             "WHERE e.LU = :lu")
     Optional<EstudianteDTO> recuperarEstudiantePorLU(@Param("lu") Integer lu);
+
+    boolean existsByLU(Integer lu);
 }

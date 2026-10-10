@@ -241,6 +241,33 @@
             "description": "Usa un DNI nuevo (para pasar la validacion de duplicado) pero sin LU: IllegalArgumentException -> 400."
           },
           "response": []
+        },
+        {
+          "name": "a) alta con LU repetido, DNI nuevo (409)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"dni\": {{luRep}},\r\n    \"nombre\": \"Marta\",\r\n    \"apellido\": \"Lopez\",\r\n    \"edad\": 23,\r\n    \"genero\": \"Femenino\",\r\n    \"ciudad\": \"Tandil\",\r\n    \"lu\": {{luTest}}\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/estudiantes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "estudiantes"
+              ]
+            },
+            "description": "Reenvia el mismo LU que el request anterior pero usa un DNI nuevo. EstudianteService tira IllegalStateException y GlobalExceptionHandler lo mapea a 409."
+          },
+          "response": []
         }
       ]
     },
@@ -923,6 +950,11 @@
     },
     {
       "key": "dniSinLu",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "luRep",
       "value": "",
       "type": "string"
     }

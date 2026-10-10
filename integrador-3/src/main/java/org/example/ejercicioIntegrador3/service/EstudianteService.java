@@ -27,6 +27,9 @@ public class EstudianteService {
         if(estudianteRepository.existsById(request.getDNI())) {
             throw new IllegalStateException("El DNI existe en el sistema");
         }
+        if(estudianteRepository.existsByLU(request.getLU())){
+            throw new IllegalStateException("El LU existe en el sistema");
+        }
         if(request.getLU() ==null){
             throw new IllegalArgumentException("El LU es obligatorio");
         }
