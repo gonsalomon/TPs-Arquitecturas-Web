@@ -17,14 +17,17 @@
             {
               "listen": "prerequest",
               "script": {
-                "type": "text/javascript",
                 "exec": [
                   "// El alta falla con 409 si el DNI ya existe, asi que cada corrida usa uno nuevo.",
                   "// Los DNI del CSV son de 8 digitos y los LU llegan hasta 250021: generando",
                   "// DNI de 9 digitos y LU arriba de 900000 no hay choque con los datos precargados.",
                   "pm.collectionVariables.set('dniTest', 100000000 + Math.floor(Math.random() * 899999999));",
-                  "pm.collectionVariables.set('luTest', 900000 + Math.floor(Math.random() * 99999));"
-                ]
+                  "pm.collectionVariables.set('luTest', 900000 + Math.floor(Math.random() * 99999));",
+                  "pm.collectionVariables.set('luRep', 900000 + Math.floor(Math.random() * 99999));"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
               }
             },
             {
