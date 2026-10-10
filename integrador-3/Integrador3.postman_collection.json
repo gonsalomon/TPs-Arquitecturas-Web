@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "c7c530d4-4584-4dca-8a7c-b4fb0a66b310",
     "name": "Integrador3",
-    "description": "Punto 3 del integrador: pruebas de los servicios REST.\n\nCOMO CORRERLA\n1. Levantar MySQL (docker compose up -d desde la carpeta integrador-3) y la\n   aplicacion (mvn spring-boot:run). Al arrancar, CargarDatos carga los CSV.\n2. Correrla entera con el Collection Runner, o request por request de arriba\n   hacia abajo. El orden importa: el punto a) crea el estudiante que despues\n   usan b) y d), y lo deja guardado en las variables dniTest y luTest.\n\nLa variable baseUrl apunta a http://localhost:8080; si la app corre en otro\npuerto, alcanza con cambiarla ahi.\n\nQUE CUBRE\nCada consigna tiene su caso feliz y, cuando aplica, los casos de error que\nmaneja GlobalExceptionHandler (400 por datos invalidos, 409 por duplicados,\n404 por entidad inexistente). Se puede correr varias veces seguidas: el DNI\ny el LU del alta se generan al azar en cada corrida.\n\nPENDIENTE\nFaltan los endpoints de las consignas e) (estudiantes por genero) y h)\n(reporte de inscriptos y egresados por anio): todavia no estan implementados\nen el backend, asi que no hay requests para ellos.",
+    "description": "Punto 3 del integrador: pruebas de los servicios REST.\n\nCOMO CORRERLA\n1. Levantar MySQL (docker compose up -d desde la carpeta integrador-3) y la\n   aplicacion (mvn spring-boot:run). Al arrancar, CargarDatos carga los CSV.\n2. Correrla entera con el Collection Runner, o request por request de arriba\n   hacia abajo. El orden importa: el punto a) crea el estudiante que despues\n   usan b) y d), y lo deja guardado en las variables dniTest y luTest.\n\nLa variable baseUrl apunta a http://localhost:8080; si la app corre en otro\npuerto, alcanza con cambiarla ahi.\n\nQUE CUBRE\nCada consigna tiene su caso feliz y, cuando aplica, los casos de error que\nmaneja GlobalExceptionHandler (400 por datos invalidos, 409 por duplicados,\n404 por entidad inexistente). Se puede correr varias veces seguidas: el DNI\ny el LU del alta se generan al azar en cada corrida.\n\nPENDIENTE\nFalta el endpoint de la consigna e) (estudiantes por genero): todavia no esta\nimplementado en el backend, asi que no hay request para esa consigna.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "49340244"
   },
@@ -831,6 +831,74 @@
               ]
             },
             "description": "Deja documentado que, cuando no hay coincidencias, el endpoint responde 200 con una lista vacia y no un 404."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "h) Reporte de carreras",
+      "description": "GET /carreras/reporte: inscriptos y egresados por año.",
+      "item": [
+        {
+          "name": "h) reporte de inscriptos y egresados por anio (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 y devuelve el reporte', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Cada fila trae carrera, anio, inscriptos y egresados', function () {",
+                  "    const lista = pm.response.json();",
+                  "    pm.expect(lista).to.be.an('array').that.is.not.empty;",
+                  "    pm.expect(lista[0]).to.have.all.keys('carrera', 'anio', 'inscriptos', 'egresados');",
+                  "});",
+                  "pm.test('Las carreras vienen en orden alfabetico', function () {",
+                  "    const lista = pm.response.json();",
+                  "    // Nombres de carrera sin repetir, en el orden en que llegan.",
+                  "    const carreras = [...new Set(lista.map(function (f) { return f.carrera.toLowerCase(); }))];",
+                  "    pm.expect(carreras).to.eql(carreras.slice().sort());",
+                  "});",
+                  "pm.test('Dentro de cada carrera los anios van de menor a mayor', function () {",
+                  "    const lista = pm.response.json();",
+                  "    const porCarrera = {};",
+                  "    lista.forEach(function (f) {",
+                  "        porCarrera[f.carrera] = porCarrera[f.carrera] || [];",
+                  "        porCarrera[f.carrera].push(f.anio);",
+                  "    });",
+                  "    Object.keys(porCarrera).forEach(function (c) {",
+                  "        const anios = porCarrera[c];",
+                  "        const ordenados = anios.slice().sort(function (a, b) { return a - b; });",
+                  "        pm.expect(anios, 'anios desordenados en ' + c).to.eql(ordenados);",
+                  "    });",
+                  "});",
+                  "pm.test('Ninguna fila viene en cero y cero', function () {",
+                  "    const lista = pm.response.json();",
+                  "    lista.forEach(function (f) {",
+                  "        pm.expect(f.inscriptos + f.egresados, 'fila vacia en ' + f.carrera + ' ' + f.anio).to.be.above(0);",
+                  "    });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/carreras/reporte",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "carreras",
+                "reporte"
+              ]
+            },
+            "description": "Consigna h). Una fila por carrera y año, con cuantos se inscribieron y cuantos egresaron ese año. Las carreras salen en orden alfabetico y, dentro de cada una, los años en orden cronologico. Con los datos precargados son 114 filas sobre 15 carreras."
           },
           "response": []
         }
