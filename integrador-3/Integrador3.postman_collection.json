@@ -2,186 +2,861 @@
   "info": {
     "_postman_id": "c7c530d4-4584-4dca-8a7c-b4fb0a66b310",
     "name": "Integrador3",
+    "description": "Punto 3 del integrador: pruebas de los servicios REST.\n\nCOMO CORRERLA\n1. Levantar MySQL (docker compose up -d desde la carpeta integrador-3) y la\n   aplicacion (mvn spring-boot:run). Al arrancar, CargarDatos carga los CSV.\n2. Correrla entera con el Collection Runner, o request por request de arriba\n   hacia abajo. El orden importa: el punto a) crea el estudiante que despues\n   usan b) y d), y lo deja guardado en las variables dniTest y luTest.\n\nLa variable baseUrl apunta a http://localhost:8080; si la app corre en otro\npuerto, alcanza con cambiarla ahi.\n\nQUE CUBRE\nCada consigna tiene su caso feliz y, cuando aplica, los casos de error que\nmaneja GlobalExceptionHandler (400 por datos invalidos, 409 por duplicados,\n404 por entidad inexistente). Se puede correr varias veces seguidas: el DNI\ny el LU del alta se generan al azar en cada corrida.\n\nPENDIENTE\nFaltan los endpoints de las consignas e) (estudiantes por genero) y h)\n(reporte de inscriptos y egresados por anio): todavia no estan implementados\nen el backend, asi que no hay requests para ellos.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "49340244",
-    "_collection_link": "https://go.postman.co/collection/49340244-c7c530d4-4584-4dca-8a7c-b4fb0a66b310?source=collection_link"
+    "_exporter_id": "49340244"
   },
   "item": [
     {
-      "name": "findByIdCarrera",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:8080/carreras/2",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8080",
-          "path": [
-            "carreras",
-            "2"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "findCarrerasInscriptos",
-      "protocolProfileBehavior": {
-        "disableBodyPruning": true
-      },
-      "request": {
-        "method": "GET",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": ""
-        },
-        "url": {
-          "raw": "http://localhost:8080/carreras/carreras-inscriptos",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8080",
-          "path": [
-            "carreras",
-            "carreras-inscriptos"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "recuperarEstudiantesPorCarreraYCiudad",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:8080/estudiantes/filtro?ciudad=Rauch&carrera=TUDAI",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8080",
-          "path": [
-            "estudiantes",
-            "filtro"
-          ],
-          "query": [
+      "name": "a) Alta de estudiante",
+      "description": "POST /estudiantes: caso feliz y las tres formas de rechazo.",
+      "item": [
+        {
+          "name": "a) alta de estudiante (200)",
+          "event": [
             {
-              "key": "ciudad",
-              "value": "Rauch"
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// El alta falla con 409 si el DNI ya existe, asi que cada corrida usa uno nuevo.",
+                  "// Los DNI del CSV son de 8 digitos y los LU llegan hasta 250021: generando",
+                  "// DNI de 9 digitos y LU arriba de 900000 no hay choque con los datos precargados.",
+                  "pm.collectionVariables.set('dniTest', 100000000 + Math.floor(Math.random() * 899999999));",
+                  "pm.collectionVariables.set('luTest', 900000 + Math.floor(Math.random() * 99999));"
+                ]
+              }
             },
             {
-              "key": "carrera",
-              "value": "TUDAI"
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 y da de alta al estudiante', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Devuelve el estudiante que se acaba de crear', function () {",
+                  "    const b = pm.response.json();",
+                  "    pm.expect(b.dni).to.eql(Number(pm.collectionVariables.get('dniTest')));",
+                  "    pm.expect(b.lu).to.eql(Number(pm.collectionVariables.get('luTest')));",
+                  "    pm.expect(b.nombre).to.eql('Marta');",
+                  "    pm.expect(b.apellido).to.eql('Lopez');",
+                  "    pm.expect(b.ciudad).to.eql('Tandil');",
+                  "});"
+                ]
+              }
             }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "recuperarTodosLosEstudiantes",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:8080/estudiantes",
-          "protocol": "http",
-          "host": [
-            "localhost"
           ],
-          "port": "8080",
-          "path": [
-            "estudiantes"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "recuperarEstudiantePorLU",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:8080/estudiantes/lu/1",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8080",
-          "path": [
-            "estudiantes",
-            "lu",
-            "1"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "createEstudianteOk",
-      "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": " {\r\n        \"dni\": 12345678,\r\n        \"nombre\": \"Marta\",\r\n        \"apellido\": \"Lopez\",\r\n        \"genero\": \"Female\",\r\n        \"lu\": 9999\r\n }\r\n    ",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"dni\": {{dniTest}},\n    \"nombre\": \"Marta\",\n    \"apellido\": \"Lopez\",\n    \"edad\": 23,\n    \"genero\": \"Femenino\",\n    \"ciudad\": \"Tandil\",\n    \"lu\": {{luTest}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/estudiantes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "estudiantes"
+              ]
+            },
+            "description": "Consigna a). POST /estudiantes con el EstudianteDTO en el body. El DNI y el LU se generan en el pre-request para que la coleccion se pueda correr varias veces seguidas sin chocar con el 409 de DNI duplicado."
+          },
+          "response": []
         },
-        "url": {
-          "raw": "http://localhost:8080/estudiantes",
-          "protocol": "http",
-          "host": [
-            "localhost"
+        {
+          "name": "a) alta con DNI repetido (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409 por DNI duplicado', function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});",
+                  "pm.test('El cuerpo del error tiene el formato de GlobalExceptionHandler', function () {",
+                  "    const b = pm.response.json();",
+                  "    pm.expect(b).to.have.property('timestamp');",
+                  "    pm.expect(b).to.have.property('error');",
+                  "    pm.expect(b).to.have.property('message');",
+                  "    pm.expect(String(b.message)).to.include('DNI');",
+                  "});"
+                ]
+              }
+            }
           ],
-          "port": "8080",
-          "path": [
-            "estudiantes"
-          ]
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"dni\": {{dniTest}},\n    \"nombre\": \"Marta\",\n    \"apellido\": \"Lopez\",\n    \"edad\": 23,\n    \"genero\": \"Femenino\",\n    \"ciudad\": \"Tandil\",\n    \"lu\": {{luTest}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/estudiantes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "estudiantes"
+              ]
+            },
+            "description": "Reenvia el mismo DNI que el request anterior. EstudianteService tira IllegalStateException y GlobalExceptionHandler lo mapea a 409."
+          },
+          "response": []
+        },
+        {
+          "name": "a) alta sin DNI (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400 porque el DNI es obligatorio', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('El cuerpo del error tiene el formato de GlobalExceptionHandler', function () {",
+                  "    const b = pm.response.json();",
+                  "    pm.expect(b).to.have.property('timestamp');",
+                  "    pm.expect(b).to.have.property('error');",
+                  "    pm.expect(b).to.have.property('message');",
+                  "    pm.expect(String(b.message)).to.include('DNI');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"nombre\": \"Sin\",\n    \"apellido\": \"Documento\",\n    \"edad\": 20,\n    \"genero\": \"Femenino\",\n    \"ciudad\": \"Tandil\",\n    \"lu\": 999111\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/estudiantes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "estudiantes"
+              ]
+            },
+            "description": "EstudianteService valida que el DNI sea obligatorio: IllegalArgumentException -> 400."
+          },
+          "response": []
+        },
+        {
+          "name": "a) alta sin LU (400)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('dniSinLu', 100000000 + Math.floor(Math.random() * 899999999));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400 porque el LU es obligatorio', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('El cuerpo del error tiene el formato de GlobalExceptionHandler', function () {",
+                  "    const b = pm.response.json();",
+                  "    pm.expect(b).to.have.property('timestamp');",
+                  "    pm.expect(b).to.have.property('error');",
+                  "    pm.expect(b).to.have.property('message');",
+                  "    pm.expect(String(b.message)).to.include('LU');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"dni\": {{dniSinLu}},\n    \"nombre\": \"Sin\",\n    \"apellido\": \"Libreta\",\n    \"edad\": 20,\n    \"genero\": \"Masculino\",\n    \"ciudad\": \"Tandil\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/estudiantes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "estudiantes"
+              ]
+            },
+            "description": "Usa un DNI nuevo (para pasar la validacion de duplicado) pero sin LU: IllegalArgumentException -> 400."
+          },
+          "response": []
         }
-      },
-      "response": []
+      ]
     },
     {
-      "name": "matricularEstudiante",
-      "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": " {\r\n        \"anioInscripcion\": 2024\r\n }\r\n    ",
-          "options": {
-            "raw": {
-              "language": "json"
+      "name": "b) Matricular estudiante en carrera",
+      "description": "POST /inscripciones con {dni, idCarrera}.",
+      "item": [
+        {
+          "name": "b) matricular estudiante en carrera (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 y matricula al estudiante', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('La inscripcion queda asociada al estudiante y a la carrera', function () {",
+                  "    const b = pm.response.json();",
+                  "    pm.expect(b.dni).to.eql(Number(pm.collectionVariables.get('dniTest')));",
+                  "    pm.expect(b.idCarrera).to.eql(1);",
+                  "    pm.expect(b.id).to.be.a('number');",
+                  "});",
+                  "pm.test('InscripcionService completa anio actual, graduacion 0 y antiguedad 1', function () {",
+                  "    const b = pm.response.json();",
+                  "    pm.expect(b.anioInscripcion).to.eql(new Date().getFullYear());",
+                  "    pm.expect(b.anioGraduacion).to.eql(0);",
+                  "    pm.expect(b.antiguedad).to.eql(1);",
+                  "});"
+                ]
+              }
             }
-          }
-        },
-        "url": {
-          "raw": "http://localhost:8080/estudiantes/12345678/carreras/2",
-          "protocol": "http",
-          "host": [
-            "localhost"
           ],
-          "port": "8080",
-          "path": [
-            "estudiantes",
-            "12345678",
-            "carreras",
-            "2"
-          ]
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"dni\": {{dniTest}},\n    \"idCarrera\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/inscripciones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "inscripciones"
+              ]
+            },
+            "description": "Consigna b). POST /inscripciones con {dni, idCarrera} en el body (InscripcionDTO). La carrera 1 es TUDAI. El service completa el anio de inscripcion con el anio actual, graduacion en 0 y antiguedad en 1."
+          },
+          "response": []
+        },
+        {
+          "name": "b) matricular dos veces en la misma carrera (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409 por matricula duplicada', function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});",
+                  "pm.test('El cuerpo del error tiene el formato de GlobalExceptionHandler', function () {",
+                  "    const b = pm.response.json();",
+                  "    pm.expect(b).to.have.property('timestamp');",
+                  "    pm.expect(b).to.have.property('error');",
+                  "    pm.expect(b).to.have.property('message');",
+                  "    pm.expect(String(b.message)).to.include('matriculado');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"dni\": {{dniTest}},\n    \"idCarrera\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/inscripciones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "inscripciones"
+              ]
+            },
+            "description": "InscripcionRepository.existeInscripcion detecta la doble matricula: IllegalStateException -> 409."
+          },
+          "response": []
+        },
+        {
+          "name": "b) matricular estudiante inexistente (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 404 porque no existe el estudiante', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('El cuerpo del error tiene el formato de GlobalExceptionHandler', function () {",
+                  "    const b = pm.response.json();",
+                  "    pm.expect(b).to.have.property('timestamp');",
+                  "    pm.expect(b).to.have.property('error');",
+                  "    pm.expect(b).to.have.property('message');",
+                  "    pm.expect(String(b.message)).to.include('DNI');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"dni\": 1,\n    \"idCarrera\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/inscripciones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "inscripciones"
+              ]
+            },
+            "description": "No hay ningun DNI 1 en los datos (el minimo del CSV es 10719241): ResponseStatusException NOT_FOUND -> 404."
+          },
+          "response": []
+        },
+        {
+          "name": "b) matricular en carrera inexistente (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 404 porque no existe la carrera', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('El cuerpo del error tiene el formato de GlobalExceptionHandler', function () {",
+                  "    const b = pm.response.json();",
+                  "    pm.expect(b).to.have.property('timestamp');",
+                  "    pm.expect(b).to.have.property('error');",
+                  "    pm.expect(b).to.have.property('message');",
+                  "    pm.expect(String(b.message)).to.include('carrera');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"dni\": {{dniTest}},\n    \"idCarrera\": 999\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/inscripciones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "inscripciones"
+              ]
+            },
+            "description": "Las carreras del CSV van de 1 a 15: ResponseStatusException NOT_FOUND -> 404."
+          },
+          "response": []
         }
-      },
-      "response": []
+      ]
+    },
+    {
+      "name": "c) Todos los estudiantes",
+      "description": "GET /estudiantes, ordenados por apellido y nombre.",
+      "item": [
+        {
+          "name": "c) todos los estudiantes ordenados (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 y lista los estudiantes', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Devuelve una lista no vacia de EstudianteDTO', function () {",
+                  "    const lista = pm.response.json();",
+                  "    pm.expect(lista).to.be.an('array').that.is.not.empty;",
+                  "    pm.expect(lista[0]).to.have.all.keys('dni', 'nombre', 'apellido', 'edad', 'genero', 'ciudad', 'lu');",
+                  "});",
+                  "pm.test('La lista viene ordenada por apellido', function () {",
+                  "    const lista = pm.response.json();",
+                  "    // Se pasa todo a minusculas porque MySQL ordena sin distinguir",
+                  "    // mayusculas, y se compara contra la misma lista ya ordenada.",
+                  "    const apellidos = lista.map(function (e) { return e.apellido.toLowerCase(); });",
+                  "    pm.expect(apellidos).to.eql(apellidos.slice().sort());",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/estudiantes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "estudiantes"
+              ]
+            },
+            "description": "Consigna c). GET /estudiantes devuelve todos los estudiantes ordenados por apellido ASC y, a igual apellido, por nombre ASC."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "d) Estudiante por libreta universitaria",
+      "description": "GET /estudiantes/lu/{lu}.",
+      "item": [
+        {
+          "name": "d) estudiante por LU (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 y encuentra al estudiante', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Es el estudiante dado de alta en el punto a)', function () {",
+                  "    const b = pm.response.json();",
+                  "    pm.expect(b.lu).to.eql(Number(pm.collectionVariables.get('luTest')));",
+                  "    pm.expect(b.dni).to.eql(Number(pm.collectionVariables.get('dniTest')));",
+                  "    pm.expect(b.nombre).to.eql('Marta');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/estudiantes/lu/{{luTest}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "estudiantes",
+                "lu",
+                "{{luTest}}"
+              ]
+            },
+            "description": "Consigna d). Busca por el LU del estudiante creado en el punto a)."
+          },
+          "response": []
+        },
+        {
+          "name": "d) estudiante por LU inexistente (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 404 porque no existe ese LU', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('El cuerpo del error tiene el formato de GlobalExceptionHandler', function () {",
+                  "    const b = pm.response.json();",
+                  "    pm.expect(b).to.have.property('timestamp');",
+                  "    pm.expect(b).to.have.property('error');",
+                  "    pm.expect(b).to.have.property('message');",
+                  "    pm.expect(String(b.message)).to.include('LU');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/estudiantes/lu/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "estudiantes",
+                "lu",
+                "1"
+              ]
+            },
+            "description": "No hay LU 1 en los datos (el minimo del CSV es 10383): EstudianteService tira ResponseStatusException NOT_FOUND -> 404."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "f) Carreras con inscriptos",
+      "description": "GET /carreras/carreras-inscriptos, ordenadas por cantidad de inscriptos.",
+      "item": [
+        {
+          "name": "f) carreras con inscriptos ordenadas por cantidad (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 y lista las carreras con inscriptos', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Devuelve nombre y cantidad de inscriptos', function () {",
+                  "    const lista = pm.response.json();",
+                  "    pm.expect(lista).to.be.an('array').that.is.not.empty;",
+                  "    pm.expect(lista[0]).to.have.all.keys('nombre', 'cantidadInscriptos');",
+                  "    pm.expect(lista[0].cantidadInscriptos).to.be.a('number');",
+                  "});",
+                  "pm.test('Viene ordenada por cantidad de inscriptos descendente', function () {",
+                  "    const lista = pm.response.json();",
+                  "    for (let i = 1; i < lista.length; i++) {",
+                  "        pm.expect(lista[i - 1].cantidadInscriptos,",
+                  "            'quedo desordenado en ' + lista[i - 1].nombre + ' / ' + lista[i].nombre",
+                  "        ).to.be.at.least(lista[i].cantidadInscriptos);",
+                  "    }",
+                  "});",
+                  "pm.test('TUDAI encabeza la lista (17 inscriptos en el CSV)', function () {",
+                  "    const lista = pm.response.json();",
+                  "    pm.expect(lista[0].nombre).to.eql('TUDAI');",
+                  "});",
+                  "pm.test('Ninguna carrera aparece con 0 inscriptos', function () {",
+                  "    const lista = pm.response.json();",
+                  "    lista.forEach(function (c) { pm.expect(c.cantidadInscriptos).to.be.above(0); });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/carreras/carreras-inscriptos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "carreras",
+                "carreras-inscriptos"
+              ]
+            },
+            "description": "Consigna f). Solo trae las carreras que tienen al menos un inscripto (es un JOIN) y las ordena por cantidad de inscriptos de mayor a menor."
+          },
+          "response": []
+        },
+        {
+          "name": "carrera por id (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 y devuelve la carrera', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Es Abogacia, de 4 anios', function () {",
+                  "    const b = pm.response.json();",
+                  "    pm.expect(b.idCarrera).to.eql(2);",
+                  "    pm.expect(b.nombre).to.eql('Abogacia');",
+                  "    pm.expect(b.duracion).to.eql(4);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/carreras/2",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "carreras",
+                "2"
+              ]
+            },
+            "description": "Endpoint auxiliar del CarreraController. El id 2 es Abogacia, que dura 4 anios segun carreras.csv."
+          },
+          "response": []
+        },
+        {
+          "name": "carrera por id inexistente (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 404 porque no existe la carrera', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('El cuerpo del error tiene el formato de GlobalExceptionHandler', function () {",
+                  "    const b = pm.response.json();",
+                  "    pm.expect(b).to.have.property('timestamp');",
+                  "    pm.expect(b).to.have.property('error');",
+                  "    pm.expect(b).to.have.property('message');",
+                  "    pm.expect(String(b.message)).to.include('carrera');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/carreras/999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "carreras",
+                "999"
+              ]
+            },
+            "description": "CarreraService tira ResponseStatusException NOT_FOUND -> 404."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "g) Estudiantes por carrera y ciudad",
+      "description": "GET /estudiantes/filtro?ciudad=&carrera=.",
+      "item": [
+        {
+          "name": "g) estudiantes por carrera y ciudad (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 y filtra por carrera y ciudad', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Trae al menos los 4 estudiantes de TUDAI que viven en Rauch', function () {",
+                  "    const lista = pm.response.json();",
+                  "    pm.expect(lista).to.be.an('array');",
+                  "    pm.expect(lista.length).to.be.at.least(4);",
+                  "});",
+                  "pm.test('Todos los resultados son de la ciudad pedida', function () {",
+                  "    const lista = pm.response.json();",
+                  "    lista.forEach(function (e) { pm.expect(e.ciudad).to.eql('Rauch'); });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/estudiantes/filtro?ciudad=Rauch&carrera=TUDAI",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "estudiantes",
+                "filtro"
+              ],
+              "query": [
+                {
+                  "key": "ciudad",
+                  "value": "Rauch"
+                },
+                {
+                  "key": "carrera",
+                  "value": "TUDAI"
+                }
+              ]
+            },
+            "description": "Consigna g). En los datos precargados hay 4 estudiantes de TUDAI que viven en Rauch."
+          },
+          "response": []
+        },
+        {
+          "name": "g) filtro sin resultados (200 y lista vacia)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 aunque no haya coincidencias', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('La lista viene vacia', function () {",
+                  "    pm.expect(pm.response.json()).to.be.an('array').that.is.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/estudiantes/filtro?ciudad=Ciudad Inexistente&carrera=TUDAI",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "estudiantes",
+                "filtro"
+              ],
+              "query": [
+                {
+                  "key": "ciudad",
+                  "value": "Ciudad Inexistente"
+                },
+                {
+                  "key": "carrera",
+                  "value": "TUDAI"
+                }
+              ]
+            },
+            "description": "Deja documentado que, cuando no hay coincidencias, el endpoint responde 200 con una lista vacia y no un 404."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "dniTest",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "luTest",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dniSinLu",
+      "value": "",
+      "type": "string"
     }
   ]
 }
