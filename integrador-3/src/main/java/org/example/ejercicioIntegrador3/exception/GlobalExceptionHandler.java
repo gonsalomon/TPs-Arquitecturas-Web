@@ -53,14 +53,33 @@ public class GlobalExceptionHandler {
         body.put("message", "No se pudo completar la operación. Es posible que el registro ya exista o que esté violando una restricción de integridad en la base de datos.");
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
-    //Maneja inexistencia de un recurso -> 404
+
+    /* Respeta el estado que trae la excepción en vez de responder siempre 404.
+     * Hoy todas las ResponseStatusException del proyecto son NOT_FOUND, pero si
+     * mañana alguien lanza una con 400 o 409, el cliente recibe ese código y no
+     * un 404 equivocado. */
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<Map<String, Object>> handleResponseStatusException(ResponseStatusException ex) {
+        HttpStatus estado = HttpStatus.valueOf(ex.getStatusCode().value());
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now());
-        body.put("error", "No existe la entidad solicitada");
+        body.put("error", describir(estado));
         body.put("message", ex.getReason());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+        return ResponseEntity.status(estado).body(body);
+    }
+
+    // Texto del campo "error" según el estado, para no perder los mensajes en castellano.
+    private String describir(HttpStatus estado) {
+        switch (estado) {
+            case NOT_FOUND:
+                return "No existe la entidad solicitada";
+            case BAD_REQUEST:
+                return "Solicitud inválida";
+            case CONFLICT:
+                return "Conflicto en la solicitud";
+            default:
+                return estado.getReasonPhrase();
+        }
     }
 
 }
