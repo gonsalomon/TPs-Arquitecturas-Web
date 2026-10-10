@@ -244,6 +244,28 @@
         },
         {
           "name": "a) alta con LU repetido, DNI nuevo (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Responde 409 por LU duplicado', function () {\r",
+                  "    pm.response.to.have.status(409);\r",
+                  "});\r",
+                  "pm.test('El cuerpo del error tiene el formato de GlobalExceptionHandler', function () {\r",
+                  "    const b = pm.response.json();\r",
+                  "    pm.expect(b).to.have.property('timestamp');\r",
+                  "    pm.expect(b).to.have.property('error');\r",
+                  "    pm.expect(b).to.have.property('message');\r",
+                  "    pm.expect(String(b.message)).to.include('LU');\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [],
