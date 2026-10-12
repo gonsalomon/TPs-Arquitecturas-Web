@@ -43,4 +43,10 @@ public class EstudianteController {
         EstudianteDTO estudiante = service.recuperarEstudiantePorLU(lu);
         return ResponseEntity.ok(estudiante);
     }
+
+    //e) recuperar todos los estudiantes en base a su género
+    @GetMapping("/genero/{genero}")
+    public ResponseEntity<List<EstudianteDTO>> recuperarEstudiantesPorGenero(@PathVariable String genero){
+        return ResponseEntity.ok(service.recuperarEstudiantesPorGenero(genero));
+    }
 }

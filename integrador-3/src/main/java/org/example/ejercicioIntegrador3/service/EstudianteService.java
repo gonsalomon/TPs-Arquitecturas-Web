@@ -58,4 +58,13 @@ public class EstudianteService {
         return estudianteRepository.recuperarEstudiantePorLU(lu)
                 .orElseThrow(() -> new ResponseStatusException( HttpStatus.NOT_FOUND, "No se encontró un estudiante con el LU: " + lu));
     }
+
+    //e) recuperar todos los estudiantes en base a su género
+    @Transactional(readOnly = true)
+    public List<EstudianteDTO> recuperarEstudiantesPorGenero(String genero) {
+        return estudianteRepository.findByGenero(genero)
+                .stream()
+                .map(estudianteMapper::convertToDTO)
+                .toList();
+    }
 }

@@ -33,5 +33,9 @@ public interface EstudianteRepository  extends JpaRepository<Estudiante,Integer>
             "WHERE e.LU = :lu")
     Optional<EstudianteDTO> recuperarEstudiantePorLU(@Param("lu") Integer lu);
 
+    //e) recuperar todos los estudiantes en base a su género
+    @Query("SELECT e FROM Estudiante e WHERE e.genero = :genero")
+    List<Estudiante> findByGenero(@Param("genero") String genero);
+
     boolean existsByLU(Integer lu);
 }
