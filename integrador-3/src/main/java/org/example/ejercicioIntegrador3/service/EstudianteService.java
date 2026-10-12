@@ -62,9 +62,14 @@ public class EstudianteService {
     //e) recuperar todos los estudiantes en base a su género
     @Transactional(readOnly = true)
     public List<EstudianteDTO> recuperarEstudiantesPorGenero(String genero) {
-        return estudianteRepository.findByGenero(genero)
-                .stream()
-                .map(estudianteMapper::convertToDTO)
-                .toList();
+        List<EstudianteDTO> recuperarEstudiantesPorGenero = estudianteRepository.recuperarPorGenero(genero)
+            .stream()
+            .map(mapper::convertToDTO)
+            .toList();
+        if(!recuperarEstudiantesPorGenero.isEmpty()){
+           return recuperarEstudiantesPorGenero;
+        }else{
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró estudiantes con el género " + genero);
+        }
     }
 }
