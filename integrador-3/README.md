@@ -44,12 +44,12 @@ Todas las respuestas y solicitudes con cuerpo usan JSON. Los parámetros de ruta
 
 ### Estudiantes
 
-| Método | Endpoint | Descripción | Respuesta exitosa |
-| --- | --- | --- | --- |
-| `POST` | `/estudiantes` | Da de alta un estudiante. El DNI y la LU son obligatorios y no pueden estar duplicados. | `200 OK`, estudiante creado |
-| `GET` | `/estudiantes` | Lista todos los estudiantes ordenados por apellido y luego por nombre. | `200 OK`, arreglo de estudiantes |
-| `GET` | `/estudiantes/lu/{lu}` | Busca un estudiante por libreta universitaria. | `200 OK`, estudiante |
-| `GET` | `/estudiantes/genero/{genero}` | Lista estudiantes del género indicado. | `200 OK`, arreglo de estudiantes |
+| Método | Endpoint | Descripción | Respuesta exitosa                                   |
+| --- | --- | --- |-----------------------------------------------------|
+| `POST` | `/estudiantes` | Da de alta un estudiante. El DNI y la LU son obligatorios y no pueden estar duplicados. | `201 Created`, estudiante creado                    |
+| `GET` | `/estudiantes` | Lista todos los estudiantes ordenados por apellido y luego por nombre. | `200 OK`, arreglo de estudiantes                    |
+| `GET` | `/estudiantes/lu/{lu}` | Busca un estudiante por libreta universitaria. | `200 OK`, estudiante                                |
+| `GET` | `/estudiantes/genero/{genero}` | Lista estudiantes del género indicado. | `200 OK`, arreglo de estudiantes                    |
 | `GET` | `/estudiantes/filtro?ciudad={ciudad}&carrera={carrera}` | Filtra estudiantes por ciudad de residencia y carrera. | `200 OK`, arreglo de estudiantes; puede estar vacío |
 
 Ejemplo para `POST /estudiantes`:
@@ -72,7 +72,7 @@ El filtro se puede invocar, por ejemplo, como `GET /estudiantes/filtro?ciudad=Ra
 
 | Método | Endpoint | Descripción | Respuesta exitosa |
 | --- | --- | --- | --- |
-| `POST` | `/inscripciones` | Matricula un estudiante en una carrera. La fecha de inscripción se establece con el año actual. | `200 OK`, inscripción creada |
+| `POST` | `/inscripciones` | Matricula un estudiante en una carrera. La fecha de inscripción se establece con el año actual. | `201 Created`, inscripción creada |
 
 Ejemplo para `POST /inscripciones`:
 
