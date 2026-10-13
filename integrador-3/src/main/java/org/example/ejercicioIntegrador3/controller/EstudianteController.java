@@ -2,9 +2,8 @@ package org.example.ejercicioIntegrador3.controller;
 
 import lombok.AllArgsConstructor;
 import org.example.ejercicioIntegrador3.dto.EstudianteDTO;
-import org.example.ejercicioIntegrador3.entity.Estudiante;
-import org.example.ejercicioIntegrador3.repository.EstudianteRepository;
 import org.example.ejercicioIntegrador3.service.EstudianteService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,13 +14,12 @@ import java.util.List;
 @AllArgsConstructor
 public class EstudianteController {
     private final EstudianteService service;
-    private final EstudianteRepository estudianteRepository;
 
     //a)dar de alta un estudiante
     @PostMapping("")
     public ResponseEntity<EstudianteDTO> creataEstudiante(@RequestBody EstudianteDTO estudiante) {
         EstudianteDTO nuevo = service.save(estudiante);
-        return ResponseEntity.ok(nuevo);
+        return ResponseEntity.status(HttpStatus.CREATED).body(nuevo);
     }
     //g) recuperar los estudiantes de una determinada carrera, filtrado por ciudad de residencia.
     @GetMapping("/filtro")

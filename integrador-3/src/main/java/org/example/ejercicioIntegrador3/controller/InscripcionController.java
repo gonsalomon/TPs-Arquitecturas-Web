@@ -1,9 +1,9 @@
 package org.example.ejercicioIntegrador3.controller;
 
 import lombok.AllArgsConstructor;
-import org.example.ejercicioIntegrador3.dto.EstudianteDTO;
 import org.example.ejercicioIntegrador3.dto.InscripcionDTO;
 import org.example.ejercicioIntegrador3.service.InscripcionService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +17,6 @@ public class InscripcionController {
     @PostMapping("")
     public ResponseEntity<InscripcionDTO> matricular(@RequestBody InscripcionDTO request) {
         InscripcionDTO nuevo = service.matricular(request);
-        return ResponseEntity.ok(nuevo);
+        return ResponseEntity.status(HttpStatus.CREATED).body(nuevo);
     }
 }

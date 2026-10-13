@@ -1,7 +1,6 @@
 package org.example.ejercicioIntegrador3.dto;
 
 import lombok.*;
-import org.example.ejercicioIntegrador3.entity.Carrera;
 
 @Getter
 @Setter

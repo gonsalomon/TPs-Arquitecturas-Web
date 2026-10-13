@@ -8,8 +8,8 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create-drop  # crea/borra tablas automáticamente
-    show-sql: true       # opcional, para ver las queries en consola
+      ddl-auto: create-drop
+    show-sql: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect

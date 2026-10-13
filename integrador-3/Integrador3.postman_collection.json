@@ -11,7 +11,7 @@
       "name": "a) Alta de estudiante",
       "item": [
         {
-          "name": "a) alta de estudiante (200)",
+          "name": "a) alta de estudiante (201)",
           "event": [
             {
               "listen": "prerequest",
@@ -33,8 +33,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Responde 200 y da de alta al estudiante', function () {",
-                  "    pm.response.to.have.status(200);",
+                  "pm.test('Responde 201 y da de alta al estudiante', function () {",
+                  "    pm.response.to.have.status(201);",
                   "});",
                   "pm.test('Devuelve el estudiante que se acaba de crear', function () {",
                   "    const b = pm.response.json();",
@@ -302,15 +302,15 @@
       "name": "b) Matricular estudiante en carrera",
       "item": [
         {
-          "name": "b) matricular estudiante en carrera (200)",
+          "name": "b) matricular estudiante en carrera (201)",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Responde 200 y matricula al estudiante', function () {",
-                  "    pm.response.to.have.status(200);",
+                  "pm.test('Responde 201 y matricula al estudiante', function () {",
+                  "    pm.response.to.have.status(201);",
                   "});",
                   "pm.test('La inscripcion queda asociada al estudiante y a la carrera', function () {",
                   "    const b = pm.response.json();",

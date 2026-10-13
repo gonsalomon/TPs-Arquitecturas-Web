@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import org.example.ejercicioIntegrador3.dto.CarreraCantInscriptosDTO;
 import org.example.ejercicioIntegrador3.dto.CarreraDTO;
 import org.example.ejercicioIntegrador3.dto.ReporteCarreraDTO;
-import org.example.ejercicioIntegrador3.repository.CarreraRepository;
 import org.example.ejercicioIntegrador3.service.CarreraService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +16,6 @@ import java.util.List;
 public class CarreraController {
 
     private final CarreraService service;
-    private final CarreraRepository carreraRepository;
 
     //GET ID: obtengo una carrera por su identificador
     @GetMapping("/{id}")
