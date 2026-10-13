@@ -105,13 +105,14 @@ El endpoint de reporte devuelve objetos con `carrera`, `anio`, `inscriptos` y `e
 
 ## Códigos HTTP
 
-| Código | Uso |
-| --- | --- |
-| `200 OK` | Consultas exitosas y operaciones `POST` completadas. |
-| `400 Bad Request` | Solicitud inválida; por ejemplo, alta sin DNI o LU. |
-| `404 Not Found` | No existe el estudiante o la carrera solicitados. |
-| `409 Conflict` | DNI o LU duplicados, matrícula repetida o conflicto de integridad de datos. |
-| `500 Internal Server Error` | Excepción no contemplada por los manejadores específicos. |
+| Código                      | Uso |
+|-----------------------------| --- |
+| `200 OK`                    | Consultas exitosas. |
+| `201 Created`               | Recurso creado exitosamente. |
+| `400 Bad Request`           | Solicitud inválida; por ejemplo, alta sin DNI o LU. |
+| `404 Not Found`             | No existe el estudiante o la carrera solicitados. |
+| `409 Conflict`              | DNI o LU duplicados, matrícula repetida o conflicto de integridad de datos. |
+| `500 Internal Server Error` | Error del servidor. |
 
 Los errores manejados por la aplicación devuelven un objeto JSON con `timestamp`, `error` y `message`.
 
