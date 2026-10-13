@@ -9,7 +9,6 @@
   "item": [
     {
       "name": "a) Alta de estudiante",
-      "description": "POST /estudiantes: caso feliz y las tres formas de rechazo.",
       "item": [
         {
           "name": "a) alta de estudiante (200)",
@@ -33,7 +32,6 @@
             {
               "listen": "test",
               "script": {
-                "type": "text/javascript",
                 "exec": [
                   "pm.test('Responde 200 y da de alta al estudiante', function () {",
                   "    pm.response.to.have.status(200);",
@@ -46,7 +44,10 @@
                   "    pm.expect(b.apellido).to.eql('Lopez');",
                   "    pm.expect(b.ciudad).to.eql('Tandil');",
                   "});"
-                ]
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
               }
             }
           ],
@@ -294,11 +295,11 @@
           },
           "response": []
         }
-      ]
+      ],
+      "description": "POST /estudiantes: caso feliz y las tres formas de rechazo."
     },
     {
       "name": "b) Matricular estudiante en carrera",
-      "description": "POST /inscripciones con {dni, idCarrera}.",
       "item": [
         {
           "name": "b) matricular estudiante en carrera (200)",
@@ -513,11 +514,11 @@
           },
           "response": []
         }
-      ]
+      ],
+      "description": "POST /inscripciones con {dni, idCarrera}."
     },
     {
       "name": "c) Todos los estudiantes",
-      "description": "GET /estudiantes, ordenados por apellido y nombre.",
       "item": [
         {
           "name": "c) todos los estudiantes ordenados (200)",
@@ -562,11 +563,11 @@
           },
           "response": []
         }
-      ]
+      ],
+      "description": "GET /estudiantes, ordenados por apellido y nombre."
     },
     {
       "name": "d) Estudiante por libreta universitaria",
-      "description": "GET /estudiantes/lu/{lu}.",
       "item": [
         {
           "name": "d) estudiante por LU (200)",
@@ -647,11 +648,55 @@
           },
           "response": []
         }
-      ]
+      ],
+      "description": "GET /estudiantes/lu/{lu}."
+    },
+    {
+      "name": "e) Estudiantes por genero",
+      "item": [
+        {
+          "name": "e) estudiantes por genero (200)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/estudiantes/genero/male",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "estudiantes",
+                "genero",
+                "male"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "e) estudiantes por genero erroneo (400)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/estudiantes/genero/males",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "estudiantes",
+                "genero",
+                "males"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "GET /estudiantes/genero/{genero}."
     },
     {
       "name": "f) Carreras con inscriptos",
-      "description": "GET /carreras/carreras-inscriptos, ordenadas por cantidad de inscriptos.",
       "item": [
         {
           "name": "f) carreras con inscriptos ordenadas por cantidad (200)",
@@ -784,11 +829,11 @@
           },
           "response": []
         }
-      ]
+      ],
+      "description": "GET /carreras/carreras-inscriptos, ordenadas por cantidad de inscriptos."
     },
     {
       "name": "g) Estudiantes por carrera y ciudad",
-      "description": "GET /estudiantes/filtro?ciudad=&carrera=.",
       "item": [
         {
           "name": "g) estudiantes por carrera y ciudad (200)",
@@ -886,7 +931,8 @@
           },
           "response": []
         }
-      ]
+      ],
+      "description": "GET /estudiantes/filtro?ciudad=&carrera=."
     },
     {
       "name": "h) Reporte de carreras",
