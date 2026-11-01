@@ -1,0 +1,55 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gateway-service
+  datasource:
+    url: jdbc:mysql://localhost:3305/gateway?createDatabaseIfNotExist=true
+    username: root
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+  cloud:
+    gateway:
+      mvc:
+        routes:
+          - id: usuario-service
+            uri: http://localhost:8081
+            predicates:
+              - Path=/api/usuarios/**
+          - id: pago-service
+            uri: http://localhost:8082
+            predicates:
+              - Path=/api/pagos/**
+          - id: evento-service
+            uri: http://localhost:8083
+            predicates:
+              - Path=/api/eventos/**
+          - id: reserva-service
+            uri: http://localhost:8084
+            predicates:
+              - Path=/api/reservas/**
+          - id: entrada-service
+            uri: http://localhost:8085
+            predicates:
+              - Path=/api/entradas/**
+          - id: notificacion-service
+            uri: http://localhost:8086
+            predicates:
+              - Path=/api/notificaciones/**
+          - id: orden-service
+            uri: http://localhost:8087
+            predicates:
+              - Path=/api/ordenes/**
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"

@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  db-mongo:
+    container_name: eventos
+    image: mongo
+    command:
+      - --auth
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: 1234
+      MONGO_INITDB_DATABASE: eventos
+    volumes:
+      - ./init-mongo:/docker-entrypoint-initdb.d/
+    ports:
+      - "27018:27017"

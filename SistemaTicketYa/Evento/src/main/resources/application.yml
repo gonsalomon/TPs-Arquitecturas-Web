@@ -1,0 +1,10 @@
+spring:
+  application:
+    name:
+      evento
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/eventos
+
+server:
+  port: 8083
