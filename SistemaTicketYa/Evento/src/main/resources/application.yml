@@ -1,10 +1,11 @@
 spring:
   application:
-    name:
-      evento
+    name: evento
   data:
     mongodb:
-      uri: mongodb://localhost:27017/eventos
+      # Mongo del docker-compose de Evento (puerto 27018, usuario root / 1234)
+      uri: mongodb://root:1234@localhost:27018/eventos?authSource=admin
+      auto-index-creation: true
 
 server:
   port: 8083
