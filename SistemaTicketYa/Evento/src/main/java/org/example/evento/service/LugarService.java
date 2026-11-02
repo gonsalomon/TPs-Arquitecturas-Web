@@ -1,6 +1,7 @@
 package org.example.evento.service;
 
 import lombok.AllArgsConstructor;
+import org.example.evento.config.CacheConfig;
 import org.example.evento.dto.request.LugarRequestDTO;
 import org.example.evento.dto.request.SectorRequestDTO;
 import org.example.evento.dto.response.LugarResponseDTO;
@@ -9,12 +10,16 @@ import org.example.evento.mapper.LugarMapper;
 import org.example.evento.repository.EventoRepository;
 import org.example.evento.repository.LugarRepository;
 import org.example.evento.utils.TipoSector;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Service
@@ -38,16 +43,24 @@ public class LugarService {
         return repository.findAll().stream().map(mapper::convertToDTO).toList();
     }
 
+    @Cacheable(value = CacheConfig.LUGARES, key = "'id:' + #idLugar")
     public LugarResponseDTO findById(String idLugar) {
         return mapper.convertToDTO(buscar(idLugar));
     }
 
+    @Cacheable(value = CacheConfig.LUGARES, key = "'nombre:' + #nombre.toLowerCase()")
     public LugarResponseDTO findByNombre(String nombre) {
         Lugar lugar = repository.findByNombreIgnoreCase(nombre)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe un lugar con el nombre: " + nombre));
         return mapper.convertToDTO(lugar);
     }
 
+    /* Si cambia un lugar (nombre, sectores) los eventos y busquedas cacheados quedan viejos. */
+    @Caching(evict = {
+            @CacheEvict(value = CacheConfig.LUGARES, allEntries = true),
+            @CacheEvict(value = CacheConfig.EVENTOS, allEntries = true),
+            @CacheEvict(value = CacheConfig.BUSQUEDAS, allEntries = true)
+    })
     public LugarResponseDTO update(String idLugar, LugarRequestDTO request) {
         Lugar lugar = buscar(idLugar);
         repository.findByNombreIgnoreCase(request.getNombre())
@@ -63,6 +76,7 @@ public class LugarService {
         return mapper.convertToDTO(repository.save(lugar));
     }
 
+    @CacheEvict(value = CacheConfig.LUGARES, allEntries = true)
     public void delete(String idLugar) {
         Lugar lugar = buscar(idLugar);
         if (eventoRepository.existsByIdLugar(idLugar)) {
@@ -75,6 +89,18 @@ public class LugarService {
     public Lugar buscar(String idLugar) {
         return repository.findById(idLugar)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe el lugar con el id: " + idLugar));
+    }
+
+    /* Ids de los lugares de una ciudad (para filtrar la busqueda de eventos). */
+    public List<String> idsPorCiudad(String ciudad) {
+        return repository.findByCiudadIgnoreCase(ciudad).stream().map(Lugar::getIdLugar).toList();
+    }
+
+    /* idLugar -> nombre, en una sola consulta (evita una consulta por evento). */
+    public Map<String, String> nombresPorId(Set<String> ids) {
+        Map<String, String> nombres = new java.util.HashMap<>();
+        repository.findAllById(ids).forEach(l -> nombres.put(l.getIdLugar(), l.getNombre()));
+        return nombres;
     }
 
     /* Numerado necesita filas y asientos; no numerado necesita capacidad. Sin nombres repetidos. */

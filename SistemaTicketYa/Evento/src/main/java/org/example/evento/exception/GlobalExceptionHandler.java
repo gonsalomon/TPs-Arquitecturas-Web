@@ -3,8 +3,10 @@ package org.example.evento.exception;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -22,6 +24,29 @@ public class GlobalExceptionHandler {
         body.put("error", "Error interno del servidor");
         body.put("message", ex.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
+    }
+
+    // @Valid fallido en el body (campo obligatorio vacio, precio negativo...) -> 400
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException ex) {
+        Map<String, String> campos = new HashMap<>();
+        ex.getBindingResult().getFieldErrors()
+                .forEach(e -> campos.put(e.getField(), e.getDefaultMessage()));
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("error", "Solicitud inválida");
+        body.put("message", campos);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
+    // Parametro con formato incorrecto (ej. ?tipo=CUALQUIERA o una fecha mal escrita) -> 400
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Map<String, Object>> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("error", "Solicitud inválida");
+        body.put("message", "Valor inválido para el parámetro '" + ex.getName() + "': " + ex.getValue());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
     // Maneja errores de datos inválidos (IllegalArgumentException) -> 400 Bad Request
