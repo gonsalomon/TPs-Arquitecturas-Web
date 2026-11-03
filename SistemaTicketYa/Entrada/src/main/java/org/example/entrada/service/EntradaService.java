@@ -87,7 +87,7 @@ public class EntradaService{
 
     @Transactional
     public EntradaDTO solicitarDevolucion(Long id) {
-        Entrada e = repo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Entrada no encontrada"))
+        Entrada e = repo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Entrada no encontrada"));
         if (e.getEstado() != EstadoEntrada.VALIDA)
             throw new IllegalStateException("Solo entradas válidas pueden devolverse");
         if (LocalDateTime.now().isAfter(e.getFechaEvento().minusHours(72)))
@@ -98,7 +98,7 @@ public class EntradaService{
 
     @Transactional
     public EntradaDTO resolverDevolucion(Long id, boolean aprobada) {
-        Entrada e = repo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Entrada no encontrada"))
+        Entrada e = repo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Entrada no encontrada"));
         if (e.getEstado() != EstadoEntrada.EN_DEVOLUCION) throw new IllegalStateException("No hay devolución pendiente");
         e.setEstado(aprobada ? EstadoEntrada.REINTEGRO : EstadoEntrada.VALIDA); // @PreUpdate frees/relocks the seat key
         return mapper.toDto(e);

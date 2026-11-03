@@ -1,3 +1,16 @@
+package org.example.entrada.repository;
+
+import org.example.entrada.entity.Entrada;
+import org.example.entrada.utils.EstadoEntrada;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
+import java.util.Collection;
+
 public interface EntradaRepository extends JpaRepository<Entrada, Long> {
 
     List<Entrada> findByOrdenId(Long ordenId);
