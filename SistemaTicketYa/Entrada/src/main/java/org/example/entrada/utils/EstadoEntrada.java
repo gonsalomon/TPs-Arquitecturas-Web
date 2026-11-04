@@ -3,10 +3,20 @@ package org.example.entrada.utils;
 public enum EstadoEntrada {
     VALIDA(true),
     USADA(true),
-    EN_DEVOLUCION(true),   // client requested refund, admin hasn't decided
-    REINTEGRO(false);      // seat/spot released, money to be refunded
+    REINTEGRO(false);   // ticket void, seat/spot free again, money to be returned (handled by Orden/Pago)
 
     private final boolean ocupaLugar;
-    EstadoEntrada(boolean ocupaLugar) { this.ocupaLugar = ocupaLugar; }
-    public boolean ocupaLugar() { return ocupaLugar; }
+
+    EstadoEntrada(boolean ocupaLugar) {
+        this.ocupaLugar = ocupaLugar;
+    }
+
+    public boolean ocupaLugar() {
+        return ocupaLugar;
+    }
+
+    // USADA and REINTEGRO are terminal
+    public boolean puedePasarA(EstadoEntrada nuevo) {
+        return this == VALIDA && (nuevo == USADA || nuevo == REINTEGRO);
+    }
 }

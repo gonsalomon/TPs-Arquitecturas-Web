@@ -7,8 +7,8 @@ import java.time.LocalDateTime;
 
 public record EntradaDTO(
         Long id,
-        Long eventoId,
-        Long sectorId,
+        String eventoId,
+        String sectorId,
         Long clienteId,
         Long ordenId,
         Integer fila,

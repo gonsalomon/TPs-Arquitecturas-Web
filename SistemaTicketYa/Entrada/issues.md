@@ -1,0 +1,9 @@
+1. A ticket issued while an event is being cancelled can stay VALIDA. Orden must stop sales (Evento state) before calling the bulk reintegro.
+   (que hay que tener cuidado cuando se reintegra al cancelar un evento)
+2. LocalDateTime.now() uses the server’s time zone. Fine locally; decide on a zone if the services run elsewhere. (que este msvc usa LocalDateTime pero da lo mismo porque se van a correr todos juntos en la misma PC)
+3. Zone capacity (“last place of a zone”) is not enforced here. It lives in Reserva. Write that in your explanation of the mechanism. (que el último lugar de una zona se refuerza en Reserva y no acá, ojota)
+4. States are VALIDA, USADA, REINTEGRO. I dropped EN_DEVOLUCION, since Orden holds the pending-refund stage. Terminal states can’t change. (que uses EN_DEVOLUCION como un estado intermedio, sólo en Orden)
+5. The 72h rule stays in Entrada, for motivo DEVOLUCION only. Event cancellation and compensation ignore it. If you’d rather leave all of it to Orden, delete that if in aplicarCambio. (que todavía se puede marcar el estado devolución, pero se podría sacar si se necesita)
+6. Idempotent state changes: repeating the same change returns the ticket and does nothing. Orden can retry safely. (que no me hagas dos veces el mismo cambio, soy boludo pero no tanto)
+7. @Version makes two concurrent changes on one ticket return 409 for one of them. (si me tomás de boludo te tiro un 409 en uno de los cambios)
+8. The state USADA can be set through PATCH, with no QR checks. In Entrega 2, add a dedicated QR validation endpoint and restrict this one. (cuando reforcemos los QR para entrada 2, meter un checkeo para que esto no pase)

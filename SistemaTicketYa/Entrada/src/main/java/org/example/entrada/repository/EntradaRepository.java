@@ -3,31 +3,23 @@ package org.example.entrada.repository;
 import org.example.entrada.entity.Entrada;
 import org.example.entrada.utils.EstadoEntrada;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
-import java.util.List;
 import java.util.Collection;
+import java.util.List;
 
 public interface EntradaRepository extends JpaRepository<Entrada, Long> {
 
     List<Entrada> findByOrdenId(Long ordenId);
 
-    long countByClienteIdAndEventoIdAndEstadoIn(Long clienteId, Long eventoId, Collection<EstadoEntrada> estados);
+    List<Entrada> findByOrdenIdAndEstado(Long ordenId, EstadoEntrada estado);
 
-    // Bulk JPQL bypasses @PreUpdate, so claveAsientoActivo MUST be nulled here or seats stay locked.
-    @Modifying(clearAutomatically = true)
-    @Query("""
-        update Entrada e
-           set e.estado = :nuevo, e.claveAsientoActivo = null
-         where e.eventoId = :eventoId and e.estado in :origen
-        """)
-    int cambiarEstadoPorEvento(@Param("eventoId") Long eventoId,
-                               @Param("nuevo") EstadoEntrada nuevo,
-                               @Param("origen") Collection<EstadoEntrada> origen);
     List<Entrada> findByClienteId(Long clienteId);
-    List<Entrada> findByEventoId(Long eventoId);
-    List<Entrada> findByClienteIdAndEventoId(Long clienteId, Long eventoId);
+
+    List<Entrada> findByEventoId(String eventoId);
+
+    List<Entrada> findByClienteIdAndEventoId(Long clienteId, String eventoId);
+
+    List<Entrada> findByEventoIdAndEstado(String eventoId, EstadoEntrada estado);
+
+    long countByClienteIdAndEventoIdAndEstadoIn(Long clienteId, String eventoId, Collection<EstadoEntrada> estados);
 }

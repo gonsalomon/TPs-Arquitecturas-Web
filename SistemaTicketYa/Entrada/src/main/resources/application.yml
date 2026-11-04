@@ -5,7 +5,13 @@ spring:
     url: jdbc:mysql://localhost:3307/entradas?createDatabaseIfNotExist=true
     username: root
     password: ""
-
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            connect-timeout: 2000
+            read-timeout: 5000
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -15,5 +21,47 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
   main:
     allow-bean-definition-overriding: true
+
+clients:
+  evento:
+    url: ${EVENTO_URL:http://localhost:8089}
+  reserva:
+    url: ${RESERVA_URL:http://localhost:8089}
+  pago:
+    url: ${PAGO_URL:http://localhost:8089}
+  notificacion:
+    url: ${NOTIFICACION_URL:http://localhost:8089}
+
+resilience4j:
+  retry:
+    configs:
+      default:
+        max-attempts: 3
+        wait-duration: 300ms
+        enable-exponential-backoff: true
+        retry-exceptions:
+          - feign.RetryableException
+          - feign.FeignException$FeignServerException
+        ignore-exceptions:
+          - feign.FeignException$FeignClientException
+    instances:
+      evento: { base-config: default }
+      reserva: { base-config: default }
+      pago: { base-config: default }
+      notificacion: { base-config: default }
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-size: 20
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 15s
+        ignore-exceptions:
+          - feign.FeignException$FeignClientException
+    instances:
+      evento: { base-config: default }
+      reserva: { base-config: default }
+      pago: { base-config: default }
+      notificacion: { base-config: default }
+
 server:
   port: 8085

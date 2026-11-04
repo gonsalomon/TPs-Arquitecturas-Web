@@ -6,9 +6,11 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -37,7 +39,7 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.INTERNAL_SERVER_ERROR, "Error interno del servidor", "Ocurrió un error inesperado");
     }
 
-    // 400
+    // ---- 400
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, Object>> handleIllegalArgument(IllegalArgumentException ex) {
         return build(HttpStatus.BAD_REQUEST, "Solicitud inválida", ex.getMessage());
@@ -56,7 +58,12 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.BAD_REQUEST, "Solicitud inválida", "Cuerpo de la solicitud inválido");
     }
 
-    // 409
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Map<String, Object>> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        return build(HttpStatus.BAD_REQUEST, "Solicitud inválida", "Parámetro inválido: " + ex.getName());
+    }
+
+    // ---- 409
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<Map<String, Object>> handleIllegalState(IllegalStateException ex) {
         return build(HttpStatus.CONFLICT, "Conflicto en la solicitud", ex.getMessage());
@@ -75,7 +82,14 @@ public class GlobalExceptionHandler {
                 "No se pudo completar la operación. Es posible que el registro ya exista.");
     }
 
-    // 422: valid request, but a business rule rejects it
+    // two concurrent changes on the same ticket (@Version)
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<Map<String, Object>> handleOptimisticLock(ObjectOptimisticLockingFailureException ex) {
+        log.warn("Optimistic lock failure", ex);
+        return build(HttpStatus.CONFLICT, "Conflicto en la solicitud", "La entrada fue modificada por otra operación, reintente");
+    }
+
+    // ---- 422: valid request, a business rule rejects it
     @ExceptionHandler(LimiteEntradasExcedidoException.class)
     public ResponseEntity<Map<String, Object>> handleLimite(LimiteEntradasExcedidoException ex) {
         return build(HttpStatus.UNPROCESSABLE_ENTITY, "Límite de entradas excedido", ex.getMessage());
@@ -86,7 +100,7 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.UNPROCESSABLE_ENTITY, "Devolución fuera de plazo", ex.getMessage());
     }
 
-    // keeps the status carried by the exception (same as your Usuario version)
+    // keeps the status carried by the exception
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<Map<String, Object>> handleResponseStatus(ResponseStatusException ex) {
         HttpStatus estado = HttpStatus.valueOf(ex.getStatusCode().value());
