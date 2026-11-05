@@ -38,6 +38,9 @@ public class Pago {
     @Column
     private LocalDateTime fecha_emision;
 
+    @Column
+    private LocalDateTime fecha_reembolso;
+
     public Pago(Long reserva, Long idCliente, MetodoPago metodoPago){
         this.idReserva = reserva;
         this.idCliente = idCliente;

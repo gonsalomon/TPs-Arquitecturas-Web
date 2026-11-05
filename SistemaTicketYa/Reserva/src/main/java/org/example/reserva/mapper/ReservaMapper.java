@@ -31,7 +31,7 @@ public class ReservaMapper {
                 reserva.getAsientos(),
                 reserva.getEstado(),
                 reserva.getFecha_inicio(),
-                reserva.getFecha_vencimiento()
+                reserva.getFechaVencimiento()
         );
     }
 

@@ -37,7 +37,13 @@ public class PagoController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error al procesar el pago: " + e.getMessage());
+                    .body("Error al procesar el pago");
         }
+    }
+
+    @PostMapping("/reserva/{idReserva}/reembolso")
+    public ResponseEntity<PagoResponseDTO> reembolsarPago(@PathVariable Long idReserva) {
+        PagoResponseDTO response = pagoService.procesarReembolso(idReserva);
+        return ResponseEntity.ok(response);
     }
 }

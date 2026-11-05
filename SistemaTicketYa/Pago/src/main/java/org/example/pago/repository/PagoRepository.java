@@ -2,9 +2,13 @@ package org.example.pago.repository;
 
 import org.example.pago.dto.response.PagoResponseDTO;
 import org.example.pago.entity.Pago;
+import org.example.pago.utils.Estado;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import java.util.Optional;
+
 
 public interface PagoRepository extends JpaRepository<Pago, Long> {
 
@@ -14,4 +18,5 @@ public interface PagoRepository extends JpaRepository<Pago, Long> {
 
     boolean existsByIdReserva(Long idReserva);
 
+    Optional<Pago> findByIdReservaAndEstado(Long idReserva, Estado estado);
 }

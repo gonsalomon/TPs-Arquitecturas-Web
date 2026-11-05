@@ -46,7 +46,7 @@ public class Reserva {
     private LocalDateTime fecha_inicio;
 
     @Column
-    private LocalDateTime fecha_vencimiento;
+    private LocalDateTime fechaVencimiento;
 
     public Reserva(Long idCliente, String idEvento, String sector, List<Long> asientos){
         this.idCliente = idCliente;
@@ -54,7 +54,7 @@ public class Reserva {
         this.sector = sector;
         this.estado = EstadoReserva.PENDIENTE;
         this.fecha_inicio = LocalDateTime.now();
-        this.fecha_vencimiento = fecha_inicio.plusMinutes(10);
+        this.fechaVencimiento = fecha_inicio.plusMinutes(10);
         this.asientos = asientos;
     }
 

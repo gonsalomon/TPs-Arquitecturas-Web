@@ -18,4 +18,7 @@ public class PagoRequestDTO {
 
     @NotNull(message = "Se necesita un metodo de pago")
     private MetodoPago metodoPago;
+
+    @NotNull(message = "Se necesita un monto valido")
+    private Float monto;
 }

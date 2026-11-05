@@ -10,6 +10,7 @@ import org.example.reserva.feignClients.UsuarioClient;
 import org.example.reserva.mapper.ReservaMapper;
 import org.example.reserva.repository.ReservaRepository;
 import org.example.reserva.utils.EstadoReserva;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,7 +58,6 @@ public class ReservaService {
         // 5. VALIDACIÓN INTERNA: Chequear que los asientos no estén ocupados por otra reserva
         List<String> estadosActivos = List.of(
                 EstadoReserva.PENDIENTE.name(),
-                EstadoReserva.VENCIDA.name(),
                 EstadoReserva.CONFIRMADA.name()
         );
         long asientosOcupados = repository.contarAsientosOcupados(request.getIdEvento(), estadosActivos, request.getAsientos());
@@ -66,21 +66,12 @@ public class ReservaService {
             throw new IllegalStateException("Los asientos solicitados ya están ocupados.");
         }
 
-        // 6. VALIDACIÓN INTERNA: Límite de entradas del usuario
-        List<Reserva> reservasCliente = repository.buscarReservasPorCliente(
-                request.getIdCliente(), request.getIdEvento(), estadosActivos);
-
-        int compradas = reservasCliente.stream().mapToInt(r -> r.getAsientos().size()).sum();
-        if ((compradas + request.getAsientos().size()) > LIMITE_ENTRADAS_POR_CLIENTE) {
-            throw new IllegalArgumentException("Límite de entradas excedido.");
-        }
-
-        // 7. PERSISTENCIA
+        // 6. PERSISTENCIA
         Reserva nuevaReserva = mapper.convertToEntity(request);
         nuevaReserva.setMonto(precioTotal);
         nuevaReserva.setEstado(EstadoReserva.PENDIENTE);
         nuevaReserva.setFecha_inicio(LocalDateTime.now());
-        nuevaReserva.setFecha_vencimiento(LocalDateTime.now().plusMinutes(10));
+        nuevaReserva.setFechaVencimiento(LocalDateTime.now().plusMinutes(10));
 
         Reserva reservaGuardada = repository.save(nuevaReserva);
 
@@ -124,5 +115,25 @@ public class ReservaService {
         reserva.setEstado(EstadoReserva.valueOf(nuevoEstado.toUpperCase()));
 
         repository.save(reserva);
+    }
+
+    @Scheduled(fixedRate = 60000) //Verifica cada 1 minuto
+    @Transactional
+    public void liberarReservasVencidas() {
+        LocalDateTime ahora = LocalDateTime.now();
+
+        // Buscamos todas las reservas PENDIENTES que ya pasaron sus 10 minutos
+        List<Reserva> reservasExpiradas = repository.findByEstadoAndFechaVencimientoBefore(
+                EstadoReserva.PENDIENTE, ahora
+        );
+
+        if (!reservasExpiradas.isEmpty()) {
+            for (Reserva reserva : reservasExpiradas) {
+                reserva.setEstado(EstadoReserva.VENCIDA); // Cambiamos el estado
+            }
+            // Guardamos los cambios masivamente
+            repository.saveAll(reservasExpiradas);
+            System.out.println("Se liberaron " + reservasExpiradas.size() + " reservas vencidas.");
+        }
     }
 }

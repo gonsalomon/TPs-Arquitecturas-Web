@@ -1,11 +1,11 @@
 package org.example.pago.service;
 
 import lombok.AllArgsConstructor;
+
 import org.example.pago.dto.request.PagoRequestDTO;
-import org.example.pago.dto.request.ReservaExternatDTO;
 import org.example.pago.dto.response.PagoResponseDTO;
 import org.example.pago.entity.Pago;
-import org.example.pago.feignClients.ReservaClient;
+import org.example.pago.feignClients.OrdenClient;
 import org.example.pago.mapper.PagoMapper;
 import org.example.pago.repository.PagoRepository;
 import org.example.pago.utils.Estado;
@@ -20,57 +20,33 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class PagoService {
     private final PagoMapper mapper;
-    private final ReservaClient reservaClient;
+    private final OrdenClient ordenClient;
     private final PagoRepository repository;
-    private static final int LIMITE_ENTRADAS_POR_CLIENTE = 5;
 
     @Transactional
     public PagoResponseDTO realizarPago(PagoRequestDTO request) {
 
+        // 1. Evita doble cobro por seguridad
         if (repository.existsByIdReserva(request.getIdReserva())) {
-            throw new IllegalStateException("Esta reserva ya se encuentra pagada.");
+            throw new IllegalStateException("Esta reserva ya tiene un pago registrado.");
         }
 
-        // 1. FetchClient: Buscamos la reserva en el microservicio
-        ReservaExternatDTO reserva = reservaClient.obtenerReservaPorId(request.getIdReserva());
-
-        // 2. Validaciones locales (cliente, tiempos, estados)
-        if (!reserva.getIdCliente().equals(request.getIdCliente())) {
-            throw new IllegalArgumentException("El cliente no coincide.");
-        }
-
-        if (LocalDateTime.now().isAfter(reserva.getFechaVencimiento())) {
-            reservaClient.actualizarEstadoReserva(reserva.getIdReserva(), "VENCIDA");
-            throw new IllegalStateException("Reserva expirada.");
-        }
-
-        // 3. FetchClient: Validamos el límite de entradas consultando al otro microservicio
-        List<ReservaExternatDTO> confirmadas = reservaClient.obtenerReservasConfirmadas(
-                request.getIdCliente(),
-                reserva.getIdEvento()
-        );
-
-        int entradasYaCompradas = confirmadas.stream()
-                .filter(r -> r.getAsientos() != null)
-                .mapToInt(r -> r.getAsientos().size())
-                .sum();
-
-        if ((entradasYaCompradas + reserva.getAsientos().size()) > LIMITE_ENTRADAS_POR_CLIENTE) {
-            reservaClient.actualizarEstadoReserva(reserva.getIdReserva(), "VENCIDA");
-            throw new IllegalStateException("Límite de entradas excedido.");
-        }
-
-        // 4. Guardamos el pago de forma local
+        // 2. Crea la entidad de pago
         Pago nuevoPago = mapper.convertToEntity(request);
-        nuevoPago.setIdReserva(reserva.getIdReserva()); // Guardamos solo el ID
-        nuevoPago.setEstado(Estado.ACEPTADO);
         nuevoPago.setFecha_emision(LocalDateTime.now());
-        nuevoPago.setMonto(reserva.getMontoTotal());
 
+        // Simula una lógica simple de aprobación
+        if (request.getMonto() != null && request.getMonto() > 0) {
+            nuevoPago.setEstado(Estado.ACEPTADO);
+        } else {
+            nuevoPago.setEstado(Estado.RECHAZADO);
+        }
+
+        // 3. Guarda en base de datos local de Pagos
         Pago pagoGuardado = repository.save(nuevoPago);
 
-        // 5. FetchClient: Confirmamos la reserva en el otro microservicio
-        reservaClient.actualizarEstadoReserva(reserva.getIdReserva(), "CONFIRMADA");
+        // 4. Notifica al Orquestador (Orden) del resultado
+        ordenClient.notificarResultadoPago(request.getIdReserva(), pagoGuardado.getEstado().name());
 
         return mapper.convertToDTO(pagoGuardado);
     }
@@ -80,6 +56,23 @@ public class PagoService {
         return repository.findAll().stream()
                 .map(mapper::convertToDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public PagoResponseDTO procesarReembolso(Long idReserva) {
+        // 1. Buscamos el pago original que esté APROBADO
+        Pago pago = repository.findByIdReservaAndEstado(idReserva, Estado.ACEPTADO)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró un pago aprobado para la reserva ID: " + idReserva));
+
+        // 3. Actualizamos el estado local
+        pago.setEstado(Estado.REEMBOLSADO);
+
+        pago.setFecha_reembolso(LocalDateTime.now());
+
+        // 3. Guardamos los cambios
+        Pago pagoActualizado = repository.save(pago);
+
+        return mapper.convertToDTO(pagoActualizado);
     }
 
 }
