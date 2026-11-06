@@ -2,17 +2,49 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="hibernate-jpa-app" />
+        <module name="Notificacion" />
+        <module name="Orden" />
+        <module name="Reserva" />
         <module name="tp1-ej3" />
-        <module name="tp1-integrador" />
+        <module name="Entrada" />
         <module name="tp1-ej1" />
+        <module name="integrador-3" />
         <module name="tp1-ej2" />
         <module name="integrador-2" />
+        <module name="hibernate-jpa-app" />
+        <module name="Gateway" />
+        <module name="Evento" />
+        <module name="Pago" />
+        <module name="tp1-integrador" />
+      </profile>
+      <profile name="Annotation profile for Usuario" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-configuration-processor/3.3.4/spring-boot-configuration-processor-3.3.4.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.44/lombok-1.18.44.jar" />
+        </processorPath>
+        <module name="Usuario" />
       </profile>
     </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="Entrada" options="-parameters" />
+      <module name="Evento" options="-parameters" />
+      <module name="Gateway" options="-parameters" />
+      <module name="Notificacion" options="-parameters" />
+      <module name="Orden" options="-parameters" />
+      <module name="Pago" options="-parameters" />
+      <module name="Reserva" options="-parameters" />
+      <module name="Usuario" options="-parameters" />
+      <module name="integrador-3" options="-parameters" />
+    </option>
   </component>
 </project>
