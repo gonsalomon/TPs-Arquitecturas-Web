@@ -1,0 +1,216 @@
+{
+  "info": {
+    "name": "Orden",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "crearOrden - asientos numerados",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "X-Usuario-Id", "value": "7" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"eventoId\": \"6720f1a3000000000000001\",\n  \"sector\": \"Platea\",\n  \"asientos\": [\n    { \"fila\": 3, \"asiento\": 5 },\n    { \"fila\": 3, \"asiento\": 6 }\n  ]\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "http://localhost:8087/api/ordenes",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8087",
+          "path": ["api", "ordenes"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "crearOrden - evento no publicado (409)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "X-Usuario-Id", "value": "7" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"eventoId\": \"evento-borrador\",\n  \"sector\": \"Platea\",\n  \"asientos\": [ { \"fila\": 1, \"asiento\": 1 } ]\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "http://localhost:8087/api/ordenes",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8087",
+          "path": ["api", "ordenes"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "crearOrden - sin header X-Usuario-Id (400)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"eventoId\": \"6720f1a3000000000000001\",\n  \"sector\": \"Platea\",\n  \"asientos\": [ { \"fila\": 1, \"asiento\": 1 } ]\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "http://localhost:8087/api/ordenes",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8087",
+          "path": ["api", "ordenes"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "pagarOrden - aprobado",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "X-Usuario-Id", "value": "7" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"medioPago\": \"TARJETA_CREDITO\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "http://localhost:8087/api/ordenes/1/pago",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8087",
+          "path": ["api", "ordenes", "1", "pago"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "pagarOrden - reintento idempotente",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "X-Usuario-Id", "value": "7" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"medioPago\": \"TARJETA_CREDITO\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "http://localhost:8087/api/ordenes/1/pago",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8087",
+          "path": ["api", "ordenes", "1", "pago"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "pagarOrden - medio de pago inválido (400)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "X-Usuario-Id", "value": "7" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"medioPago\": \"BITCOIN\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "http://localhost:8087/api/ordenes/1/pago",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8087",
+          "path": ["api", "ordenes", "1", "pago"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "buscarOrdenPorId",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "X-Usuario-Id", "value": "7" }
+        ],
+        "url": {
+          "raw": "http://localhost:8087/api/ordenes/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8087",
+          "path": ["api", "ordenes", "1"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "buscarOrdenPorId - ajena (403)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "X-Usuario-Id", "value": "999" }
+        ],
+        "url": {
+          "raw": "http://localhost:8087/api/ordenes/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8087",
+          "path": ["api", "ordenes", "1"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "buscarOrdenPorId - inexistente (404)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "X-Usuario-Id", "value": "7" }
+        ],
+        "url": {
+          "raw": "http://localhost:8087/api/ordenes/999999",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8087",
+          "path": ["api", "ordenes", "999999"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "listarOrdenes - por evento",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "X-Usuario-Id", "value": "7" }
+        ],
+        "url": {
+          "raw": "http://localhost:8087/api/ordenes?eventoId=6720f1a3000000000000001",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8087",
+          "path": ["api", "ordenes"],
+          "query": [
+            { "key": "eventoId", "value": "6720f1a3000000000000001" }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

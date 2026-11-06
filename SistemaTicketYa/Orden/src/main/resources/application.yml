@@ -2,7 +2,7 @@ spring:
   application:
     name: orden
   datasource:
-    url: jdbc:mysql://localhost:3306/ordenes?createDatabaseIfNotExist=true
+    url: jdbc:mysql://localhost:3309/ordenes?createDatabaseIfNotExist=true
     username: root
     password: ""
 
@@ -15,5 +15,28 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
   main:
     allow-bean-definition-overriding: true
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            connectTimeout: 2000
+            readTimeout: 5000
 server:
   port: 8087
+
+servicios:
+  evento:
+    url: http://localhost:8083/api
+  reserva:
+    url: http://localhost:8084/api
+  pago:
+    url: http://localhost:8082/api
+  entrada:
+    url: http://localhost:8085
+
+orden:
+  limite-entradas-por-evento: 6
+  minutos-reserva: 10
+  vencimiento:
+    intervalo-ms: 30000

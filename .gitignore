@@ -17,3 +17,6 @@ buildNumber.properties
 .classpath
 
 /vscode
+
+# Claude Code: local-only settings (machine-specific paths/permissions)
+.claude/settings.local.json
