@@ -29,8 +29,8 @@ public class EventoController {
 
     @Operation(summary = "Crear un evento (queda en BORRADOR)")
     @PostMapping("")
-    public ResponseEntity<EventoResponseDTO> create(@Valid @RequestBody EventoRequestDTO evento) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.save(evento));
+    public ResponseEntity<EventoResponseDTO> create(@Valid @RequestBody EventoRequestDTO evento, @RequestParam Long usuarioId) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.save(evento,usuarioId));
     }
 
     @Operation(summary = "Obtener eventos (opcional: ?estado=PUBLICADO)")
@@ -68,10 +68,10 @@ public class EventoController {
         return ResponseEntity.ok(service.update(id, evento));
     }
 
-    @Operation(summary = "Cambiar el estado: publicar, cancelar, agotar o finalizar")
+    @Operation(summary = "Cambiar el estado: publicar, cancelar, agotar, suspender o finalizar")
     @PatchMapping("/{id}/estado")
-    public ResponseEntity<EventoResponseDTO> cambiarEstado(@PathVariable String id, @Valid @RequestBody CambioEstadoDTO body) {
-        return ResponseEntity.ok(service.cambiarEstado(id, body.getEstado()));
+    public ResponseEntity<EventoResponseDTO> cambiarEstado(@PathVariable String id, @Valid @RequestBody CambioEstadoDTO body, @RequestParam Long usuarioId) {
+        return ResponseEntity.ok(service.cambiarEstado(id, body.getEstado(),usuarioId));
     }
 
     @Operation(summary = "Eliminar un evento (solo en BORRADOR)")

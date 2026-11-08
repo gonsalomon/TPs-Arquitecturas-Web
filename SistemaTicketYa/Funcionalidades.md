@@ -1,13 +1,5 @@
 FUNCIONALIDAD
-1. Cada evento tiene: ID, nombre, descripción, tipo (recital, teatro, deporte, conferencia,
-   etc.), organizador, participantes (artistas, equipos, disertantes), fecha y hora, lugar, y
-   estado (borrador, publicado, agotado, cancelado, finalizado).
-2. Cada lugar (estadio, teatro, sala) tiene: ID, nombre, dirección, ubicación (latitud/longitud)
-   y un conjunto de sectores. Un sector puede ser numerado (filas y asientos identificados)
-   o no numerado (zona con una capacidad máxima, p. ej. “Campo”). Para cada evento, el
-   organizador define el precio de cada sector.
-3. Los organizadores crean sus eventos en estado borrador, configuran sectores y precios, y
-      luego los publican. Los administradores pueden suspender o cancelar cualquier evento.
+# Tareas
 4. Un cliente elige un evento, un sector y, si es numerado, asientos específicos. El sistema
    reserva temporalmente esos lugares (por ej. por 10 minutos) mientras el cliente paga. Si
    el pago es aprobado, se emiten las entradas con un código QR único; si el pago es
@@ -21,10 +13,20 @@ FUNCIONALIDAD
    Un administrador aprueba o rechaza la solicitud; si la aprueba, el asiento o lugar en la zona
    se libera y se solicita el reintegro del dinero a la pasarela de pagos. Si un evento se cancela,
    todas sus entradas vendidas pasan a reintegro y se notifica a los compradores.
-9. El sistema debe permitir búsquedas por múltiples criterios: tipo de evento, organizador,
+
+# Done 
+- 1. Cada evento tiene: ID, nombre, descripción, tipo (recital, teatro, deporte, conferencia,
+     etc.), organizador, participantes (artistas, equipos, disertantes), fecha y hora, lugar, y
+     estado (borrador, publicado, agotado, cancelado, finalizado).
+- 2. Cada lugar (estadio, teatro, sala) tiene: ID, nombre, dirección, ubicación (latitud/longitud)
+      y un conjunto de sectores. Un sector puede ser numerado (filas y asientos identificados)
+      o no numerado (zona con una capacidad máxima, p. ej. “Campo”). Para cada evento, el
+      organizador define el precio de cada sector.
+- 3. Los organizadores crean sus eventos en estado borrador, configuran sectores y precios, y
+   luego los publican. Los administradores pueden suspender o cancelar cualquier evento.
+- 9. El sistema debe permitir búsquedas por múltiples criterios: tipo de evento, organizador,
    participante, ciudad y rango de fechas, con ordenamiento por fecha, precio o relevancia
 
-# Tareas
 tareas micro servicio usuario
 - CRUD usuario 
 

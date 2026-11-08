@@ -1,6 +1,9 @@
 package org.example.evento.service;
 
 import lombok.AllArgsConstructor;
+import org.example.evento.client.UsuarioFeingClient;
+import org.example.evento.client.usuario.dto.response.UsuarioResponseDTO;
+import org.example.evento.client.utils.Rol;
 import org.example.evento.config.CacheConfig;
 import org.example.evento.dto.request.BusquedaEventoDTO;
 import org.example.evento.dto.request.EventoRequestDTO;
@@ -20,6 +23,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -38,14 +42,24 @@ public class EventoService {
     private final LugarService lugarService;
     private final EventoMapper mapper;
     private final MongoTemplate mongoTemplate;
+    private final UsuarioFeingClient  usuarioFeingClient;
 
     /*-------------------------- MÉTODOS PARA EL CRUD --------------------------*/
     /* Todo evento se crea en BORRADOR. El lugar tiene que existir antes. */
-    public EventoResponseDTO save(EventoRequestDTO request) {
+    public EventoResponseDTO save(EventoRequestDTO request, Long  usuarioId) {
+        ResponseEntity<UsuarioResponseDTO> response = usuarioFeingClient.getById(usuarioId);
+        UsuarioResponseDTO usuario = response.getBody();
+        if(usuario == null){
+            throw new IllegalArgumentException("Usuario no encontrado");
+        }
+        if(usuario.getRol() != Rol.ORGANIZADOR){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no es un organizador");
+        }
         Lugar lugar = lugarService.buscar(request.getIdLugar());
         validarPrecios(request.getPrecios(), lugar);
         Evento evento = new Evento();
         mapper.copiarDatos(request, evento);
+        evento.setIdOrganizador(usuarioId);
         evento.setEstado(EstadoEvento.BORRADOR);
         return mapper.convertToDTO(repository.save(evento), lugar.getNombre());
     }
@@ -184,9 +198,25 @@ public class EventoService {
             @CacheEvict(value = CacheConfig.EVENTOS, key = "#idEvento"),
             @CacheEvict(value = CacheConfig.BUSQUEDAS, allEntries = true)
     })
-    public EventoResponseDTO cambiarEstado(String idEvento, EstadoEvento nuevo) {
+    public EventoResponseDTO cambiarEstado(String idEvento, EstadoEvento nuevo, Long usuarioId) {
+        ResponseEntity<UsuarioResponseDTO> response = usuarioFeingClient.getById(usuarioId);
+        UsuarioResponseDTO usuario = response.getBody();
+        if (usuario == null) {
+            throw new IllegalArgumentException("Usuario no encontrado");
+        }
         Evento evento = buscar(idEvento);
         EstadoEvento actual = evento.getEstado();
+        boolean esAdmin = (usuario.getRol() == Rol.ADMINISTRADOR);
+        boolean esOrganizadorDueño = (usuario.getRol() == Rol.ORGANIZADOR && evento.getIdOrganizador().equals(usuarioId));
+        if (nuevo == EstadoEvento.CANCELADO || nuevo == EstadoEvento.SUSPENDIDO) {
+            if (!esAdmin) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permisos para cancelar este evento");
+            }
+        } else {
+            if (!esOrganizadorDueño && !esAdmin) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permisos para modificar este evento");
+            }
+        }
         if (!transicionValida(actual, nuevo)) {
             throw new IllegalStateException("No se puede pasar de " + actual + " a " + nuevo);
         }
@@ -207,6 +237,7 @@ public class EventoService {
             case BORRADOR -> nuevo == EstadoEvento.PUBLICADO || nuevo == EstadoEvento.CANCELADO;
             case PUBLICADO -> nuevo == EstadoEvento.AGOTADO || nuevo == EstadoEvento.FINALIZADO || nuevo == EstadoEvento.CANCELADO;
             case AGOTADO -> nuevo == EstadoEvento.PUBLICADO || nuevo == EstadoEvento.FINALIZADO || nuevo == EstadoEvento.CANCELADO;
+            case SUSPENDIDO -> nuevo == EstadoEvento.PUBLICADO || nuevo == EstadoEvento.CANCELADO || nuevo == EstadoEvento.FINALIZADO;
             case CANCELADO, FINALIZADO -> false;
         };
     }

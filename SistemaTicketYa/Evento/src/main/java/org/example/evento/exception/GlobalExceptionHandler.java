@@ -102,6 +102,8 @@ public class GlobalExceptionHandler {
                 return "Solicitud inválida";
             case CONFLICT:
                 return "Conflicto en la solicitud";
+            case FORBIDDEN:
+                return "Acceso denegado";
             default:
                 return estado.getReasonPhrase();
         }

@@ -23,8 +23,7 @@ public class EventoRequestDTO {
     private String descripcion;
     @NotNull(message = "El tipo es obligatorio")
     private TipoEvento tipo;
-    @NotNull(message = "El organizador es obligatorio")
-    private Long idOrganizador;
+
     private List<String> participantes;
     @NotNull(message = "La fecha y hora son obligatorias")
     @Future(message = "La fecha debe ser futura")

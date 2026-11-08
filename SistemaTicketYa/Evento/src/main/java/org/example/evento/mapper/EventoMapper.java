@@ -34,7 +34,7 @@ public class EventoMapper {
         evento.setNombre(dto.getNombre());
         evento.setDescripcion(dto.getDescripcion());
         evento.setTipo(dto.getTipo());
-        evento.setIdOrganizador(dto.getIdOrganizador());
+//        evento.setIdOrganizador(dto.getIdOrganizador());
         evento.setParticipantes(dto.getParticipantes() == null ? new ArrayList<>() : dto.getParticipantes());
         evento.setFechaHora(dto.getFechaHora());
         evento.setIdLugar(dto.getIdLugar());
