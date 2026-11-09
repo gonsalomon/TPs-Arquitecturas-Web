@@ -47,20 +47,31 @@ public class ReservaService {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("El sector solicitado no existe."));
 
-        boolean asientosValidos = request.getAsientos().stream()
-                .allMatch(asiento -> asiento > 0 && asiento <= sectorSolicitado.getCapacidad());
+        // Sector no numerado (zona): Orden no manda asientos
+        List<Long> asientos = request.getAsientos() == null ? List.of() : request.getAsientos();
+        request.setAsientos(asientos);
+
+        // Numerado: los asientos van de 1 a filas x asientosPorFila (capacidad solo existe en las zonas)
+        Integer maximo = (sectorSolicitado.getFilas() != null && sectorSolicitado.getAsientosPorFila() != null)
+                ? sectorSolicitado.getFilas() * sectorSolicitado.getAsientosPorFila()
+                : sectorSolicitado.getCapacidad();
+        boolean asientosValidos = asientos.stream()
+                .allMatch(asiento -> asiento > 0 && maximo != null && asiento <= maximo);
 
         if (!asientosValidos) {
             throw new IllegalArgumentException("Uno o más asientos seleccionados no son válidos o exceden la capacidad para este sector.");
         }
 
 
-        Float precioTotal = evento.getPrecio() * request.getAsientos().size();
+        Float precioTotal = evento.getPrecio() * asientos.size();
 
         // 5. VALIDACIÓN INTERNA (Asientos ocupados)
-        List<String> estadosActivos = List.of(EstadoReserva.PENDIENTE.name(), EstadoReserva.CONFIRMADA.name());
+        List<EstadoReserva> estadosActivos = List.of(EstadoReserva.PENDIENTE, EstadoReserva.CONFIRMADA);
 
-        long asientosOcupados = repository.contarAsientosOcupados(request.getIdEvento(), estadosActivos, request.getAsientos());
+        // "IN ()" vacío no es SQL válido: en una zona no hay asientos que chequear
+        long asientosOcupados = asientos.isEmpty()
+                ? 0
+                : repository.contarAsientosOcupados(request.getIdEvento(), estadosActivos, asientos);
 
         if (asientosOcupados > 0) {
             throw new IllegalStateException("Los asientos solicitados ya están ocupados.");

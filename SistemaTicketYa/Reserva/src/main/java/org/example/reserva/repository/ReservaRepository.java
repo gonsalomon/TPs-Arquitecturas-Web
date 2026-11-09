@@ -28,7 +28,7 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
             "AND a IN :asientosSolicitados")
     long contarAsientosOcupados(
             @Param("idEvento") String idEvento, // O String, dependiendo de tu tipo de dato
-            @Param("estados") List<String> estados,
+            @Param("estados") List<EstadoReserva> estados,   // r.estado es un enum: se compara con enums
             @Param("asientosSolicitados") List<Long> asientosSolicitados
     );
 
