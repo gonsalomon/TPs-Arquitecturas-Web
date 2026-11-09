@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 // Cliente para el microservicio de Usuarios
-@FeignClient(name = "usuario-client", url = "http://localhost:8081/api/usuarios", primary = false)
+@FeignClient(name = "usuario-client", url = "http://localhost:8081/api/usuarios")
 public interface UsuarioClient {
     @GetMapping("/{id}")
     UsuarioExternoDTO obtenerUsuario(@PathVariable("id") Long id);

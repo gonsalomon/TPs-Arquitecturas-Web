@@ -12,6 +12,7 @@ import org.example.pago.utils.Estado;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,8 +36,8 @@ public class PagoService {
         Pago nuevoPago = mapper.convertToEntity(request);
         nuevoPago.setFecha_emision(LocalDateTime.now());
 
-        // Simula una lógica simple de aprobación
-        if (request.getMonto() != null && request.getMonto() > 0) {
+        // lógica simple de aprobación
+        if (request.getMonto() != null && request.getMonto().compareTo(BigDecimal.ZERO) > 0) {
             nuevoPago.setEstado(Estado.ACEPTADO);
         } else {
             nuevoPago.setEstado(Estado.RECHAZADO);
@@ -44,9 +45,6 @@ public class PagoService {
 
         // 3. Guarda en base de datos local de Pagos
         Pago pagoGuardado = repository.save(nuevoPago);
-
-        // 4. Notifica al Orquestador (Orden) del resultado
-        ordenClient.notificarResultadoPago(request.getIdReserva(), pagoGuardado.getEstado().name());
 
         return mapper.convertToDTO(pagoGuardado);
     }

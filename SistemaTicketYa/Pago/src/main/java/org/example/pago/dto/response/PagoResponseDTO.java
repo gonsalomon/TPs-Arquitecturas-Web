@@ -4,6 +4,7 @@ import lombok.*;
 import org.example.pago.utils.Estado;
 import org.example.pago.utils.MetodoPago;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 
@@ -16,5 +17,6 @@ public class PagoResponseDTO {
     private Long idReserva;
     private Estado estado;
     private MetodoPago metodoPago;
+    private BigDecimal monto;
     private LocalDateTime fecha_emision;
 }

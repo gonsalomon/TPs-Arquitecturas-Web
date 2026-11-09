@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -13,4 +15,5 @@ public class PagoCrearRequestDTO {
     private Long idReserva;
     private Long idCliente;
     private String metodoPago;
+    private BigDecimal monto;
 }

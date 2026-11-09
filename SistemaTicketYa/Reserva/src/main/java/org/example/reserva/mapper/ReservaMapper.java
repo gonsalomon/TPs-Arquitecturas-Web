@@ -17,8 +17,7 @@ public class ReservaMapper {
         return new Reserva(
                 requestDTO.getIdCliente(),
                 requestDTO.getIdEvento(),
-                requestDTO.getSector(),
-                requestDTO.getAsientos()
+                requestDTO.getSector()
         );
     }
 

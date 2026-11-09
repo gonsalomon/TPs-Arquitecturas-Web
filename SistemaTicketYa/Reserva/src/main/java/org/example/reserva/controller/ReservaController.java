@@ -4,6 +4,7 @@ import org.example.reserva.dto.request.ReservaRequestDTO;
 import org.example.reserva.dto.response.ReservaResponseDTO;
 import org.example.reserva.service.ReservaService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -61,5 +62,11 @@ public class ReservaController {
 
         reservaService.actualizarEstado(id, nuevoEstado);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(value = "/{id}/qr", produces = MediaType.IMAGE_PNG_VALUE)
+    public ResponseEntity<byte[]> descargarQR(@PathVariable Long id) {
+        byte[] imagenQr = reservaService.generarQRReserva(id);
+        return ResponseEntity.ok(imagenQr);
     }
 }

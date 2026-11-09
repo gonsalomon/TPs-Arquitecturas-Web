@@ -14,6 +14,11 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,36 +35,31 @@ public class ReservaService {
 
     @Transactional
     public ReservaResponseDTO crearReserva(ReservaRequestDTO request) {
-        // 1. VALIDACIÓN EXTERNA: Verificar que el usuario exista
-        // Si el usuario no existe, Feign arrojará una excepción 404 (FeignException.NotFound)
+        // 1 y 2. VALIDACIÓN EXTERNA (Usuario y Evento)
         UsuarioExternoDTO usuario = usuarioClient.obtenerUsuario(request.getIdCliente());
-
-        // 2. VALIDACIÓN EXTERNA: Verificar que el evento exista
         EventoExternoDTO evento = eventosClient.obtenerEvento(request.getIdEvento());
 
-        // 3. VALIDACIÓN EXTERNA: Obtener el lugar, verificar el sector y sus asientos
+        // 3. VALIDACIÓN EXTERNA (Lugar y Sector)
         LugarExternoDTO lugar = eventosClient.obtenerLugar(evento.getIdLugar());
 
         SectorExternoDTO sectorSolicitado = lugar.getSectores().stream()
                 .filter(s -> s.getNombre().equalsIgnoreCase(request.getSector()))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("El sector solicitado no existe en este lugar."));
+                .orElseThrow(() -> new IllegalArgumentException("El sector solicitado no existe."));
 
-        // Validar que los asientos pedidos realmente pertenezcan a este sector físicamente
-        boolean asientosValidos = sectorSolicitado.getAsientosPermitidos().containsAll(request.getAsientos());
+        boolean asientosValidos = request.getAsientos().stream()
+                .allMatch(asiento -> asiento > 0 && asiento <= sectorSolicitado.getCapacidad());
+
         if (!asientosValidos) {
-            throw new IllegalArgumentException("Uno o más asientos seleccionados no pertenecen al sector " + request.getSector());
+            throw new IllegalArgumentException("Uno o más asientos seleccionados no son válidos o exceden la capacidad para este sector.");
         }
 
-        // 4. CÁLCULO DE PRECIO: (Cantidad de asientos * Precio del sector)
-        Float precioSector = sectorSolicitado.getPrecio();
-        Float precioTotal = precioSector * request.getAsientos().size();
 
-        // 5. VALIDACIÓN INTERNA: Chequear que los asientos no estén ocupados por otra reserva
-        List<String> estadosActivos = List.of(
-                EstadoReserva.PENDIENTE.name(),
-                EstadoReserva.CONFIRMADA.name()
-        );
+        Float precioTotal = evento.getPrecio() * request.getAsientos().size();
+
+        // 5. VALIDACIÓN INTERNA (Asientos ocupados)
+        List<String> estadosActivos = List.of(EstadoReserva.PENDIENTE.name(), EstadoReserva.CONFIRMADA.name());
+
         long asientosOcupados = repository.contarAsientosOcupados(request.getIdEvento(), estadosActivos, request.getAsientos());
 
         if (asientosOcupados > 0) {
@@ -134,6 +134,33 @@ public class ReservaService {
             // Guardamos los cambios masivamente
             repository.saveAll(reservasExpiradas);
             System.out.println("Se liberaron " + reservasExpiradas.size() + " reservas vencidas.");
+        }
+    }
+
+    public byte[] generarQRReserva(Long idReserva) {
+        // 1. Validar que la reserva exista y esté pagada
+        Reserva reserva = repository.findById(idReserva)
+                .orElseThrow(() -> new IllegalArgumentException("Reserva no encontrada"));
+
+        if (!"CONFIRMADA".equalsIgnoreCase(reserva.getEstado().name())) {
+            throw new IllegalStateException("Solo se pueden generar QRs para reservas confirmadas y pagadas.");
+        }
+
+        // 2. Armar el contenido del QR (ejemplo: JSON o cadena de validación)
+        String contenidoQr = String.format("TicketYa | Reserva: %d | Cliente: %s | Evento: %d | Asientos: %s",
+                reserva.getIdReserva(), reserva.getIdCliente(), reserva.getIdEvento(), reserva.getAsientos());
+
+        // 3. Generar la imagen usando ZXing
+        try {
+            QRCodeWriter qrCodeWriter = new QRCodeWriter();
+            BitMatrix bitMatrix = qrCodeWriter.encode(contenidoQr, BarcodeFormat.QR_CODE, 300, 300);
+
+            ByteArrayOutputStream pngOutputStream = new ByteArrayOutputStream();
+            MatrixToImageWriter.writeToStream(bitMatrix, "PNG", pngOutputStream);
+
+            return pngOutputStream.toByteArray();
+        } catch (Exception e) {
+            throw new RuntimeException("Error al generar el código QR", e);
         }
     }
 }

@@ -12,4 +12,5 @@ public interface EventosClient {
 
     @GetMapping("/lugares/{id}")
     LugarExternoDTO obtenerLugar(@PathVariable("id") String id);
+
 }

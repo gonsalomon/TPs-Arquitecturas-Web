@@ -3,6 +3,7 @@ package org.example.reserva.dto.response;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.example.reserva.dto.request.AsientoRequestDTO;
 import org.example.reserva.utils.EstadoReserva;
 
 import java.time.LocalDateTime;

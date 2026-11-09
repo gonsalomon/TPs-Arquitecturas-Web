@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ItemEmitirDTO {
-    private String sector;
+    private String sectorId;
     private Integer fila;
     private Integer asiento;
     private BigDecimal precio;

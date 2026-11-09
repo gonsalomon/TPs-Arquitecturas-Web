@@ -15,6 +15,7 @@ public class PagoMapper {
                 pago.getIdReserva(),
                 pago.getEstado(),
                 pago.getMetodoPago(),
+                pago.getMonto(),
                 pago.getFecha_emision()
         );
     }

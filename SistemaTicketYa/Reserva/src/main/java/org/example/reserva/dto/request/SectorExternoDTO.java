@@ -9,6 +9,8 @@ import lombok.*;
 @NoArgsConstructor
 public class SectorExternoDTO {
     private String nombre;
-    private float precio;
-    private List<Long> asientosPermitidos;
+    private String tipo;
+    private Integer filas;
+    private Integer asientosPorFila;
+    private Integer capacidad;
 }

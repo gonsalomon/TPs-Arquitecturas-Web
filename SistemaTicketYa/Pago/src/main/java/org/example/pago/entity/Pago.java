@@ -5,6 +5,7 @@ import lombok.*;
 import org.example.pago.utils.Estado;
 import org.example.pago.utils.MetodoPago;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -33,12 +34,12 @@ public class Pago {
     private MetodoPago metodoPago;
 
     @Column
-    private Float monto;
+    private BigDecimal monto;
 
     @Column
     private LocalDateTime fecha_emision;
 
-    @Column
+    @Column(nullable = true)
     private LocalDateTime fecha_reembolso;
 
     public Pago(Long reserva, Long idCliente, MetodoPago metodoPago){

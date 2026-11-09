@@ -4,6 +4,8 @@ import lombok.*;
 import jakarta.validation.constraints.NotNull;
 import org.example.pago.utils.MetodoPago;
 
+import java.math.BigDecimal;
+
 
 @Getter
 @Setter
@@ -20,5 +22,5 @@ public class PagoRequestDTO {
     private MetodoPago metodoPago;
 
     @NotNull(message = "Se necesita un monto valido")
-    private Float monto;
+    private BigDecimal monto;
 }

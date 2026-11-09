@@ -200,7 +200,7 @@ public class OrdenService {
         PagoExternoDTO pago;
         try {
             PagoCrearRequestDTO pagoRequest = new PagoCrearRequestDTO(
-                    orden.getIdReserva(), orden.getClienteId(), request.getMedioPago().name());
+                    orden.getIdReserva(), orden.getClienteId(), request.getMedioPago().name(), orden.getTotal());
             pago = pagoClient.realizarPago(pagoRequest);
         } catch (IllegalStateException e) {
             // 409 de Pago hoy agrupa "ya pagada", "vencida" y "límite excedido" (ver design.md,
