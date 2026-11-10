@@ -3,7 +3,7 @@
 Microservicio que coordina la compra de entradas del TPE TicketYa: valida el evento, reserva
 los lugares, cobra con Pago, emite las entradas con Entrada y deshace lo hecho si el pago se
 rechaza o la reserva vence. Ver el diseño completo en
-`openspec/changes/orden-flujo-compra/design.md`.
+[`design.md`](../openspec/changes/archive/2026-11-06-orden-flujo-compra/design.md).
 
 ## Levantar la base
 
@@ -53,10 +53,8 @@ servicios:
     url: http://localhost:8085
 ```
 
-Hoy Reserva prueba su propia integración con Evento y Usuario con mocks (`EventosClientMock`,
-`UsuarioClientMock`); mientras esos mocks sigan activos, cualquier prueba end-to-end de Orden
-contra un evento real va a fallar en el paso de Reserva. Ver la decisión 9 de `design.md` para
-el detalle y los cambios pendientes en cada servicio.
+Ver la [decisión 9 del `design.md`](../openspec/changes/archive/2026-11-06-orden-flujo-compra/design.md#9-cambios-pendientes-en-otros-servicios)
+para el detalle de los cambios pendientes en cada servicio.
 
 ## Endpoints
 
@@ -69,6 +67,13 @@ el detalle y los cambios pendientes en cada servicio.
 
 Todos requieren el header `X-Usuario-Id` (numérico, sin autenticación en esta entrega). Swagger
 UI disponible en `http://localhost:8087/swagger-ui.html` con la app levantada.
+
+## Colección Postman
+
+- Colección del microservicio: [`Orden.postman_collection.json`](Orden.postman_collection.json)
+- Colección completa del sistema (todos los microservicios): [`REST API SistemaTicketYa - CRUD, test & variable`](../REST%20API%20SistemaTicketYa-%20CRUD,%20test%20%26%20variable.postman_collection.json)
+
+Importar en Postman con **Import → File**. La colección de Orden apunta a `http://localhost:8087` y usa el header `X-Usuario-Id`; la global cubre los puertos 8081–8087.
 
 ## Estados de la orden
 
@@ -85,4 +90,4 @@ liberan los asientos.
 
 ## Diagrama de secuencia — compra de una entrada numerada
 
-Ver la sección "11. Diagrama de secuencia" de `openspec/changes/orden-flujo-compra/design.md`.
+Ver la sección ["11. Diagrama de secuencia"](../openspec/changes/archive/2026-11-06-orden-flujo-compra/design.md#diagrama-de-secuencia) del `design.md`.

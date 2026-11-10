@@ -175,6 +175,7 @@ Para que la integración real funcione con Orden como coordinador, se piden esto
 
 Todos requieren `X-Usuario-Id` (falta → 400). Excepciones de negocio propias (`EventoNoDisponibleException`, `AsientoNoDisponibleException`, `LimiteEntradasExcedidoException`, `OrdenVencidaException`, `ServicioNoDisponibleException`, `AccesoDenegadoException`) se agregan al `GlobalExceptionHandler` con el mismo formato de cuerpo que ms-usuario.
 
+<a id="diagrama-de-secuencia"></a>
 ### 11. Diagrama de secuencia — compra de una entrada numerada
 
 ```mermaid
