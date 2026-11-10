@@ -294,7 +294,7 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8083/api/eventos?usuarioId=3",
+              "raw": "http://localhost:8083/api/eventos?usuarioId=1",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -307,7 +307,7 @@
               "query": [
                 {
                   "key": "usuarioId",
-                  "value": "3"
+                  "value": "1"
                 }
               ]
             }
@@ -348,7 +348,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n        \"nombre\": \"Recital de Rock Estelar\",\r\n        \"descripcion\": \"Una noche a puro rock con las mejores bandas del país.\",\r\n        \"tipo\": \"RECITAL\",\r\n        \"idOrganizador\": 2,\r\n        \"participantes\": [\r\n            \"Banda A\",\r\n            \"Banda B\"\r\n        ],\r\n        \"fechaHora\": \"2026-12-15T21:00:00\",\r\n        \"idLugar\": \"6aefe5ad2b81f513fccee8d7\",\r\n        \"nombreLugar\": \"teatro\",\r\n        \"precios\": [\r\n            {\r\n                \"sector\": \"platea\",\r\n                \"precio\": 35000.0\r\n            }\r\n        ],\r\n        \"estado\": \"PUBLICADO\"\r\n    }",
+              "raw": "{\r\n        \"nombre\": \"Show de bandas\",\r\n        \"descripcion\": \"Tarde de mates y musica\",\r\n        \"tipo\": \"RECITAL\",\r\n        \"idOrganizador\": 1,\r\n        \"participantes\": [\r\n            \"Banda C\"\r\n        ],\r\n        \"fechaHora\": \"2026-12-15T21:00:00\",\r\n        \"idLugar\": \"6af397d05232d6512eca04f8\",\r\n        \"nombreLugar\": \"estadio\",\r\n        \"precios\": [\r\n            {\r\n                \"sector\": \"palco\",\r\n                \"precio\": 15000.0\r\n            }\r\n        ],\r\n        \"estado\": \"PUBLICADO\"\r\n    }",
               "options": {
                 "raw": {
                   "language": "json"
@@ -356,7 +356,7 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8083/api/eventos/6af11a5fc202f2022202a26d/estado?usuarioId=2",
+              "raw": "http://localhost:8083/api/eventos/6af11a5fc202f2022202a26d/estado?usuarioId=1",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -371,7 +371,7 @@
               "query": [
                 {
                   "key": "usuarioId",
-                  "value": "2"
+                  "value": "1"
                 }
               ]
             }
@@ -409,6 +409,33 @@
                 {
                   "key": "usuarioId",
                   "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Filtros",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8083/api/eventos/buscar?ciudad=buenos aires",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8083",
+              "path": [
+                "api",
+                "eventos",
+                "buscar"
+              ],
+              "query": [
+                {
+                  "key": "ciudad",
+                  "value": "buenos aires"
                 }
               ]
             }
