@@ -89,7 +89,7 @@ public class OrdenService {
             throw new AsientoNoDisponibleException("Uno o más asientos ya están ocupados por otra orden");
         }
 
-        ReservaExternaDTO reserva = reservarEnReserva(orden, numerosDeAsiento);
+        ReservaExternaDTO reserva = reservarEnReserva(orden, numerosDeAsiento, sector.getCapacidad());
 
         orden.setIdReserva(reserva.getIdReserva());
         orden.setFechaVencimiento(reserva.getFechaVencimiento());
@@ -141,10 +141,10 @@ public class OrdenService {
         return null;
     }
 
-    private ReservaExternaDTO reservarEnReserva(Orden orden, List<Long> numerosDeAsiento) {
+    private ReservaExternaDTO reservarEnReserva(Orden orden, List<Long> numerosDeAsiento, Integer cantidad) {
         try {
             ReservaCrearRequestDTO reservaRequest = new ReservaCrearRequestDTO(
-                    orden.getClienteId(), orden.getEventoId(), orden.getSector(), numerosDeAsiento);
+                    orden.getClienteId(), orden.getEventoId(), orden.getSector(), numerosDeAsiento, cantidad);
             return reservaClient.crearReserva(reservaRequest);
         } catch (IllegalStateException | IllegalArgumentException e) {
             rechazarPorFalloDeReserva(orden);

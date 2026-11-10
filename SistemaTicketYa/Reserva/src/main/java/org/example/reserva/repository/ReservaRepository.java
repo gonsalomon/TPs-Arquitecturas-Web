@@ -27,9 +27,16 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
             "AND r.estado IN :estados " +
             "AND a IN :asientosSolicitados")
     long contarAsientosOcupados(
-            @Param("idEvento") String idEvento, // O String, dependiendo de tu tipo de dato
-            @Param("estados") List<String> estados,
+            @Param("idEvento") String idEvento,
+            @Param("estados") List<EstadoReserva> estados,
             @Param("asientosSolicitados") List<Long> asientosSolicitados
+    );
+
+    @Query("SELECT COALESCE(SUM(r.cantidad), 0) FROM Reserva r WHERE r.idEvento = :idEvento AND r.sector = :sector AND r.estado IN :estados")
+    long contarEntradasVendidasPorSector(
+            @Param("idEvento") String idEvento,
+            @Param("sector") String sector,
+            @Param("estados") List<EstadoReserva> estados
     );
 
     List<Reserva> findByEstadoAndFechaVencimientoBefore(EstadoReserva estado, LocalDateTime fechaActual);

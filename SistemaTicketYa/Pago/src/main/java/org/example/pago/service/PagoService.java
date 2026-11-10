@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import org.example.pago.dto.request.PagoRequestDTO;
 import org.example.pago.dto.response.PagoResponseDTO;
 import org.example.pago.entity.Pago;
-import org.example.pago.feignClients.OrdenClient;
 import org.example.pago.mapper.PagoMapper;
 import org.example.pago.repository.PagoRepository;
 import org.example.pago.utils.Estado;
@@ -21,7 +20,6 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class PagoService {
     private final PagoMapper mapper;
-    private final OrdenClient ordenClient;
     private final PagoRepository repository;
 
     @Transactional

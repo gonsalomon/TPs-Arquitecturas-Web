@@ -16,4 +16,5 @@ public class ReservaCrearRequestDTO {
     private String idEvento;
     private String sector;
     private List<Long> asientos;
+    private Integer cantidad;
 }

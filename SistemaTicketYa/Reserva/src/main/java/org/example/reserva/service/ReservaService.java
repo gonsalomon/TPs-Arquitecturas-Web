@@ -6,7 +6,6 @@ import org.example.reserva.dto.request.*;
 import org.example.reserva.dto.response.ReservaResponseDTO;
 import org.example.reserva.entity.Reserva;
 import org.example.reserva.feignClients.EventosClient;
-import org.example.reserva.feignClients.UsuarioClient;
 import org.example.reserva.mapper.ReservaMapper;
 import org.example.reserva.repository.ReservaRepository;
 import org.example.reserva.utils.EstadoReserva;
@@ -20,6 +19,7 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,18 +28,12 @@ import java.util.stream.Collectors;
 public class ReservaService {
     private final ReservaMapper mapper;
     private final ReservaRepository repository;
-    private final UsuarioClient usuarioClient;
     private final EventosClient eventosClient;
-
-    private static final int LIMITE_ENTRADAS_POR_CLIENTE = 20;
 
     @Transactional
     public ReservaResponseDTO crearReserva(ReservaRequestDTO request) {
-        // 1 y 2. VALIDACIÓN EXTERNA (Usuario y Evento)
-        UsuarioExternoDTO usuario = usuarioClient.obtenerUsuario(request.getIdCliente());
+        // 1 y 2. VALIDACIÓN EXTERNA (Evento y Lugar)
         EventoExternoDTO evento = eventosClient.obtenerEvento(request.getIdEvento());
-
-        // 3. VALIDACIÓN EXTERNA (Lugar y Sector)
         LugarExternoDTO lugar = eventosClient.obtenerLugar(evento.getIdLugar());
 
         SectorExternoDTO sectorSolicitado = lugar.getSectores().stream()
@@ -47,27 +41,65 @@ public class ReservaService {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("El sector solicitado no existe."));
 
-        boolean asientosValidos = request.getAsientos().stream()
-                .allMatch(asiento -> asiento > 0 && asiento <= sectorSolicitado.getCapacidad());
+        // 3. PREPARACIÓN DE VARIABLES SEGURAS
+        List<EstadoReserva> estadosActivos = List.of(EstadoReserva.PENDIENTE, EstadoReserva.CONFIRMADA);
+        List<Long> asientosPedidos = request.getAsientos() != null ? request.getAsientos() : new ArrayList<>();
 
-        if (!asientosValidos) {
-            throw new IllegalArgumentException("Uno o más asientos seleccionados no son válidos o exceden la capacidad para este sector.");
+        // Obtenemos la cantidad de forma segura contra nulos
+        int cantidadPedida = request.getCantidad() != null ? request.getCantidad() : 0;
+
+        // Definimos la cantidad final
+        int cantidadEntradas = asientosPedidos.isEmpty() ? cantidadPedida : asientosPedidos.size();
+
+        if (cantidadEntradas <= 0) {
+            throw new IllegalArgumentException("Debe solicitar al menos una entrada (cantidad mayor a 0 o enviar asientos).");
         }
 
+        // 4. VALIDACIÓN DIVIDIDA POR TIPO DE SECTOR
+        if ("NUMERADO".equalsIgnoreCase(sectorSolicitado.getTipo())) {
 
-        Float precioTotal = evento.getPrecio() * request.getAsientos().size();
+            // A. Validar límites físicos del asiento (asumiendo que filas * asientosPorFila da el maximo, o usando capacidad)
+            long maxAsientoFisico = (sectorSolicitado.getFilas() != null && sectorSolicitado.getAsientosPorFila() != null)
+                    ? sectorSolicitado.getFilas() * sectorSolicitado.getAsientosPorFila()
+                    : sectorSolicitado.getCapacidad();
 
-        // 5. VALIDACIÓN INTERNA (Asientos ocupados)
-        List<String> estadosActivos = List.of(EstadoReserva.PENDIENTE.name(), EstadoReserva.CONFIRMADA.name());
+            boolean asientosValidos = asientosPedidos.stream()
+                    .allMatch(asiento -> asiento > 0 && asiento <= maxAsientoFisico);
 
-        long asientosOcupados = repository.contarAsientosOcupados(request.getIdEvento(), estadosActivos, request.getAsientos());
+            if (!asientosValidos) {
+                throw new IllegalArgumentException("Uno o más asientos seleccionados no existen en este sector.");
+            }
 
-        if (asientosOcupados > 0) {
-            throw new IllegalStateException("Los asientos solicitados ya están ocupados.");
+            // B. Validar disponibilidad
+            long asientosOcupados = repository.contarAsientosOcupados(request.getIdEvento(), estadosActivos, asientosPedidos);
+            if (asientosOcupados > 0) {
+                throw new IllegalStateException("Los asientos solicitados ya están ocupados.");
+            }
+
+        } else {
+            // Lógica para CAMPO / SIN ASIENTOS (NO_NUMERADO)
+            // Validar que la nueva compra no exceda la capacidad máxima del sector
+            long entradasYaVendidas = repository.contarEntradasVendidasPorSector(
+                    request.getIdEvento(),
+                    request.getSector(),
+                    estadosActivos
+            );
+
+            if ((entradasYaVendidas + cantidadEntradas) > sectorSolicitado.getCapacidad()) {
+                throw new IllegalStateException("No hay capacidad suficiente en este sector. Disponibles: " +
+                        (sectorSolicitado.getCapacidad() - entradasYaVendidas));
+            }
         }
+
+        // 5. CÁLCULO DE PRECIO (Usando la variable 'cantidadEntradas')
+        Float precioTotal = evento.getPrecio() * cantidadEntradas;
 
         // 6. PERSISTENCIA
         Reserva nuevaReserva = mapper.convertToEntity(request);
+
+        // Forzamos el guardado de los campos clave por si el mapper los ignora
+        nuevaReserva.setAsientos(asientosPedidos);
+        nuevaReserva.setCantidad(cantidadEntradas);
         nuevaReserva.setMonto(precioTotal);
         nuevaReserva.setEstado(EstadoReserva.PENDIENTE);
         nuevaReserva.setFecha_inicio(LocalDateTime.now());

@@ -48,6 +48,9 @@ public class Reserva {
     @Column
     private LocalDateTime fechaVencimiento;
 
+    @Column
+    private Integer cantidad;
+
     public Reserva(Long idCliente, String idEvento, String sector){
         this.idCliente = idCliente;
         this.idEvento = idEvento;
