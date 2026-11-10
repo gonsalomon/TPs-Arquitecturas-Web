@@ -57,13 +57,13 @@ public class EntradaController {
 
     // Orden -> Entrada when an event is cancelled. Returns the affected tickets (to refund and notify).
     @PatchMapping("/evento/{eventoId}/reintegro")
-    public ResponseEntity<List<EntradaDTO>> reintegroPorEvento(@PathVariable String eventoId) {
+    public ResponseEntity<List<EntradaEmitidaDTO>> reintegroPorEvento(@PathVariable String eventoId) {
         return ResponseEntity.ok(service.reintegroPorEvento(eventoId));
     }
 
     // Orden -> Entrada as a compensation when a later step of a purchase fails
     @PatchMapping("/orden/{ordenId}/reintegro")
-    public ResponseEntity<List<EntradaDTO>> reintegroPorOrden(@PathVariable Long ordenId) {
+    public ResponseEntity<List<EntradaEmitidaDTO>> reintegroPorOrden(@PathVariable Long ordenId) {
         return ResponseEntity.ok(service.reintegroPorOrden(ordenId));
     }
 

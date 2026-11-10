@@ -67,7 +67,7 @@ public class EntradaService {
     public List<EntradaEmitidaDTO> emitir(EmitirEntradasRequest req) {
         List<Entrada> previas = repo.findByOrdenId(req.ordenId());
         if (!previas.isEmpty()) {
-            return mapper.toDtos(previas);                       // payment retry: same tickets, no new rows
+            return mapper.toEmitidaDtos(previas);                       // payment retry: same tickets, no new rows
         }
 
         for (ItemEntradaRequest it : req.items()) {
@@ -113,12 +113,12 @@ public class EntradaService {
     // ---------------------------------------------------------------- queries
 
     @Transactional(readOnly = true)
-    public EntradaDTO obtenerPorId(Long id) {
-        return mapper.toDto(buscarOFalla(id));
+    public EntradaEmitidaDTO obtenerPorId(Long id) {
+        return mapper.toEmitidaDto(buscarOFalla(id));
     }
 
     @Transactional(readOnly = true)
-    public List<EntradaDTO> buscar(Long clienteId, String eventoId) {
+    public List<EntradaEmitidaDTO> buscar(Long clienteId, String eventoId) {
         if (clienteId == null && (eventoId == null || eventoId.isBlank())) {
             throw new IllegalArgumentException("Debe indicar clienteId o eventoId");
         }
@@ -130,7 +130,7 @@ public class EntradaService {
         } else {
             r = repo.findByEventoId(eventoId);
         }
-        return mapper.toDtos(r);
+        return mapper.toEmitidaDtos(r);
     }
 
     @Transactional(readOnly = true)
@@ -149,18 +149,18 @@ public class EntradaService {
 
     // Event cancelled: every VALIDA ticket of the event goes to REINTEGRO. Returns them so Orden can refund and notify.
     @Transactional
-    public List<EntradaDTO> reintegroPorEvento(String eventoId) {
+    public List<EntradaEmitidaDTO> reintegroPorEvento(String eventoId) {
         List<Entrada> afectadas = repo.findByEventoIdAndEstado(eventoId, EstadoEntrada.VALIDA);
         afectadas.forEach(e -> aplicarCambio(e, EstadoEntrada.REINTEGRO, MotivoCambio.EVENTO_CANCELADO));
-        return mapper.toDtos(afectadas);
+        return mapper.toEmitidaDtos(afectadas);
     }
 
     // Compensation: Orden undoes an issuance. Returns the tickets that changed.
     @Transactional
-    public List<EntradaDTO> reintegroPorOrden(Long ordenId) {
+    public List<EntradaEmitidaDTO> reintegroPorOrden(Long ordenId) {
         List<Entrada> afectadas = repo.findByOrdenIdAndEstado(ordenId, EstadoEntrada.VALIDA);
         afectadas.forEach(e -> aplicarCambio(e, EstadoEntrada.REINTEGRO, MotivoCambio.ANULACION_ORDEN));
-        return mapper.toDtos(afectadas);
+        return mapper.toEmitidaDtos(afectadas);
     }
 
     // ---------------------------------------------------------------- helpers
