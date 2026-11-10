@@ -14,11 +14,16 @@ public class ReservaMapper {
 
 
     public Reserva convertToEntity(ReservaRequestDTO requestDTO) {
-        return new Reserva(
+        Reserva reserva = new Reserva(
                 requestDTO.getIdCliente(),
                 requestDTO.getIdEvento(),
                 requestDTO.getSector()
         );
+        // sin esto los asientos no se guardaban y Reserva nunca veía un asiento ocupado
+        reserva.setAsientos(requestDTO.getAsientos() == null
+                ? new java.util.ArrayList<>()
+                : new java.util.ArrayList<>(requestDTO.getAsientos()));
+        return reserva;
     }
 
     public ReservaResponseDTO convertToDTO(Reserva reserva) {
