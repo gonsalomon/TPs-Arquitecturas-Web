@@ -1,9 +1,11 @@
 package org.example.entrada.service;
 
-import org.example.entrada.dto.CambioEstadoRequest;
-import org.example.entrada.dto.EmitirEntradasRequest;
-import org.example.entrada.dto.EntradaDTO;
-import org.example.entrada.dto.ItemEntradaRequest;
+import org.example.entrada.client.PagoFeignClient;
+import org.example.entrada.client.ReservaFeignClient;
+import org.example.entrada.client.UsuarioFeignClient;
+import org.example.entrada.client.usuario.response.dto.UsuarioResponseDTO;
+import org.example.entrada.client.utils.Rol;
+import org.example.entrada.dto.*;
 import org.example.entrada.entity.Entrada;
 import org.example.entrada.exception.AsientoNoDisponibleException;
 import org.example.entrada.exception.DevolucionFueraDePlazoException;
@@ -11,12 +13,15 @@ import org.example.entrada.exception.LimiteEntradasExcedidoException;
 import org.example.entrada.mapper.EntradaMapper;
 import org.example.entrada.repository.EntradaRepository;
 import org.example.entrada.utils.EstadoEntrada;
+import org.example.entrada.utils.EstadoEvento;
 import org.example.entrada.utils.MotivoCambio;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -36,13 +41,22 @@ public class EntradaService {
     private final EntradaRepository repo;
     private final EntradaMapper mapper;
     private final int maxPorCliente;
+    private final UsuarioFeignClient usuarioFeignClient;
+    private final PagoFeignClient  pagoFeignClient;
+    private final ReservaFeignClient reservaFeignClient;
 
     public EntradaService(EntradaRepository repo,
                           EntradaMapper mapper,
-                          @Value("${entrada.max-por-cliente:6}") int maxPorCliente) {
+                          @Value("${entrada.max-por-cliente:6}") int maxPorCliente,
+                          UsuarioFeignClient usuarioFeignClient,
+                          PagoFeignClient  pagoFeignClient,
+                          ReservaFeignClient reservaFeignClient) {
         this.repo = repo;
         this.mapper = mapper;
         this.maxPorCliente = maxPorCliente;
+        this.usuarioFeignClient = usuarioFeignClient;
+        this.pagoFeignClient = pagoFeignClient;
+        this.reservaFeignClient = reservaFeignClient;
     }
 
     // ---------------------------------------------------------------- issuance
@@ -165,12 +179,32 @@ public class EntradaService {
                     && LocalDateTime.now().isAfter(e.getFechaEvento().minusHours(HORAS_LIMITE_DEVOLUCION))) {
                 throw new DevolucionFueraDePlazoException("La devolución debe solicitarse hasta 72 horas antes del evento");
             }
+            //si no pasaron 72 hs devolver la teca y notificar
         }
         e.cambiarEstado(nuevo);
+        //actualizar la entrada
     }
 
     private Entrada buscarOFalla(Long id) {
+        //controlar que la entrada pertenece al cliente
         return repo.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Entrada no encontrada"));
+    }
+
+    public void revisarSolicitud (RevisionEntradaRequestDTO revisionDTO, Long idUsuario) {
+        ResponseEntity<UsuarioResponseDTO> response = usuarioFeignClient.getById(idUsuario);
+        UsuarioResponseDTO usuario = response.getBody();
+        if (usuario == null) {
+            throw new IllegalArgumentException("Usuario no encontrado");
+        }
+        boolean esAdmin = (usuario.getRol() == Rol.ADMINISTRADOR);
+        if(!esAdmin) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permisos para revisar la entrada");
+        }
+
+        if(revisionDTO.getEstado().equals(EstadoEvento.APROBADO)) {
+            pagoFeignClient.reembolsarPago(revisionDTO.getIdReserva());
+            reservaFeignClient.actualizarEstadoReserva(revisionDTO.getIdReserva(), "PENDIENTE");
+        }
     }
 }

@@ -4,23 +4,17 @@ import jakarta.validation.Valid;
 import org.example.entrada.dto.CambioEstadoRequest;
 import org.example.entrada.dto.EmitirEntradasRequest;
 import org.example.entrada.dto.EntradaDTO;
+import org.example.entrada.dto.RevisionEntradaRequestDTO;
 import org.example.entrada.service.EntradaService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/entradas")
+@RequestMapping("/api/entradas")
 public class EntradaController {
 
     private final EntradaService service;
@@ -70,5 +64,12 @@ public class EntradaController {
     @PatchMapping("/orden/{ordenId}/reintegro")
     public ResponseEntity<List<EntradaDTO>> reintegroPorOrden(@PathVariable Long ordenId) {
         return ResponseEntity.ok(service.reintegroPorOrden(ordenId));
+    }
+
+    //endpoint para que el admin apruebe o rechace la solicitud
+    @PostMapping("/revision")
+    public ResponseEntity<Void> revisarSolicitud (@RequestBody RevisionEntradaRequestDTO revisionDTO, @RequestHeader Long idUsuario) {
+        service.revisarSolicitud(revisionDTO,idUsuario);
+        return ResponseEntity.ok().build();
     }
 }

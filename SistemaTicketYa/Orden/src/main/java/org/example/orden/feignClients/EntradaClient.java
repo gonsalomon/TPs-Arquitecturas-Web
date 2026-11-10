@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
-@FeignClient(name = "entrada-client", url = "${servicios.entrada.url}")
+@FeignClient(name = "entrada-client", url = "${servicios.entrada.url}/api/entradas")
 public interface EntradaClient {
 
-    @PostMapping("/entradas")
+    @PostMapping()
     List<EntradaEmitidaDTO> emitir(@RequestBody EmitirEntradasRequestDTO request);
 }

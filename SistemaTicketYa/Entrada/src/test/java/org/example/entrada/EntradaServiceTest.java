@@ -1,5 +1,8 @@
-package org.example.entrada.service;
+package org.example.entrada;
 
+import org.example.entrada.client.PagoFeignClient;
+import org.example.entrada.client.ReservaFeignClient;
+import org.example.entrada.client.UsuarioFeignClient;
 import org.example.entrada.dto.CambioEstadoRequest;
 import org.example.entrada.dto.EmitirEntradasRequest;
 import org.example.entrada.dto.EntradaDTO;
@@ -9,6 +12,7 @@ import org.example.entrada.exception.DevolucionFueraDePlazoException;
 import org.example.entrada.exception.LimiteEntradasExcedidoException;
 import org.example.entrada.mapper.EntradaMapper;
 import org.example.entrada.repository.EntradaRepository;
+import org.example.entrada.service.EntradaService;
 import org.example.entrada.utils.EstadoEntrada;
 import org.example.entrada.utils.MotivoCambio;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,12 +39,18 @@ import static org.mockito.Mockito.when;
 class EntradaServiceTest {
 
     private EntradaRepository repo;
+    private UsuarioFeignClient usuarioFeignClient;
+    private PagoFeignClient pagoFeignClient;
+    private ReservaFeignClient reservaFeignClient;
     private EntradaService service;
 
     @BeforeEach
     void setUp() {
         repo = mock(EntradaRepository.class);
-        service = new EntradaService(repo, new EntradaMapper(), 6);
+        usuarioFeignClient = mock(UsuarioFeignClient.class);
+        pagoFeignClient = mock(PagoFeignClient.class);
+        reservaFeignClient = mock(ReservaFeignClient.class);
+        service = new EntradaService(repo, new EntradaMapper(), 6,usuarioFeignClient, pagoFeignClient, reservaFeignClient);
     }
 
     private Entrada entradaValida(LocalDateTime fechaEvento) {

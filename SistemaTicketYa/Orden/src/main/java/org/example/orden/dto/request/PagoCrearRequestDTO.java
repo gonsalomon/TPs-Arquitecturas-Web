@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.orden.utils.MedioPago;
 
 import java.math.BigDecimal;
 
@@ -14,6 +15,6 @@ import java.math.BigDecimal;
 public class PagoCrearRequestDTO {
     private Long idReserva;
     private Long idCliente;
-    private String metodoPago;
+    private MedioPago metodoPago;
     private BigDecimal monto;
 }

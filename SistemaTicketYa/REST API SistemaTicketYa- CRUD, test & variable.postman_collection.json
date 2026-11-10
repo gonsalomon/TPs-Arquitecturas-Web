@@ -33,7 +33,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"nombre\": \"Maria\",\r\n  \"apellido\": \"Cabrera\",\r\n  \"email\": \"fdjksais@example.com\",\r\n  \"rol\": \"Organizador\"\r\n}",
+              "raw": "{\r\n  \"nombre\": \"Santiago\",\r\n  \"apellido\": \"Sosa\",\r\n  \"email\": \"oikujytrfeds@example.com\",\r\n  \"rol\": \"ORGANIZADOR\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -154,7 +154,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n        \"id\": 1,\n        \"nombre\": \"Maria\",\n        \"apellido\": \"Cabrera\",\n        \"email\": \"dasdwee@example.com\",\n        \"rol\": \"Cliente\"\n    }",
+              "raw": "{\n        \"id\": 2,\n        \"nombre\": \"Maria\",\n        \"apellido\": \"Cabrera\",\n        \"email\": \"dasdwee@example.com\",\n        \"rol\": \"ADMINISTRADOR\"\n    }",
               "options": {
                 "raw": {
                   "language": "json"
@@ -162,7 +162,7 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8081/api/usuarios/1",
+              "raw": "http://localhost:8081/api/usuarios/2",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -171,7 +171,7 @@
               "path": [
                 "api",
                 "usuarios",
-                "1"
+                "2"
               ]
             },
             "description": "This is a PUT request and it is used to overwrite an existing piece of data. For instance, after you create an entity with a POST request, you may want to modify that later. You can do that using a PUT request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful PUT request typically returns a `200 OK`, `201 Created`, or `204 No Content` response code."
@@ -263,7 +263,19 @@
           "name": "Obtener lugar",
           "request": {
             "method": "GET",
-            "header": []
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8083/api/lugares",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8083",
+              "path": [
+                "api",
+                "lugares"
+              ]
+            }
           },
           "response": []
         },
@@ -274,7 +286,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"nombre\": \"Recital de Rock Estelar\",\r\n  \"descripcion\": \"Una noche a puro rock con las mejores bandas del país.\",\r\n  \"tipo\": \"RECITAL\",\r\n  \"participantes\": [\"Banda A\", \"Banda B\"],\r\n  \"fechaHora\": \"2026-12-15T21:00:00\",\r\n  \"idLugar\": \"65e41234f1a2b3c4d5e6f7a8\",\r\n  \"precios\": [\r\n    {\r\n      \"sector\": \"Campo\",\r\n      \"precio\": 15000.00\r\n    },\r\n    {\r\n      \"sector\": \"Platea Preferencial\",\r\n      \"precio\": 35000.00\r\n    }\r\n  ]\r\n}",
+              "raw": "{\r\n  \"nombre\": \"Recital de Rock Estelar\",\r\n  \"descripcion\": \"Una noche a puro rock con las mejores bandas del país.\",\r\n  \"tipo\": \"RECITAL\",\r\n  \"participantes\": [\"Banda A\", \"Banda B\"],\r\n  \"fechaHora\": \"2026-12-15T21:00:00\",\r\n  \"idLugar\": \"6aefe5ad2b81f513fccee8d7\",\r\n  \"precios\": [\r\n    {\r\n      \"sector\": \"platea\",\r\n      \"precio\": 35000.00\r\n    }\r\n  ]\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -282,7 +294,7 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8083/api/eventos?usuarioId=2",
+              "raw": "http://localhost:8083/api/eventos?usuarioId=3",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -295,7 +307,7 @@
               "query": [
                 {
                   "key": "usuarioId",
-                  "value": "2"
+                  "value": "3"
                 }
               ]
             }
@@ -304,9 +316,445 @@
         },
         {
           "name": "Obtener eventos",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
           "request": {
             "method": "GET",
-            "header": []
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"nombre\": \"Maria\",\r\n  \"apellido\": \"Cabrera\",\r\n  \"email\": \"dasdwee@example.com\",\r\n  \"rol\": \"Cliente\"\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8083/api/eventos",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8083",
+              "path": [
+                "api",
+                "eventos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Modificar evento por administrador",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n        \"nombre\": \"Recital de Rock Estelar\",\r\n        \"descripcion\": \"Una noche a puro rock con las mejores bandas del país.\",\r\n        \"tipo\": \"RECITAL\",\r\n        \"idOrganizador\": 2,\r\n        \"participantes\": [\r\n            \"Banda A\",\r\n            \"Banda B\"\r\n        ],\r\n        \"fechaHora\": \"2026-12-15T21:00:00\",\r\n        \"idLugar\": \"6aefe5ad2b81f513fccee8d7\",\r\n        \"nombreLugar\": \"teatro\",\r\n        \"precios\": [\r\n            {\r\n                \"sector\": \"platea\",\r\n                \"precio\": 35000.0\r\n            }\r\n        ],\r\n        \"estado\": \"PUBLICADO\"\r\n    }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8083/api/eventos/6af11a5fc202f2022202a26d/estado?usuarioId=2",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8083",
+              "path": [
+                "api",
+                "eventos",
+                "6af11a5fc202f2022202a26d",
+                "estado"
+              ],
+              "query": [
+                {
+                  "key": "usuarioId",
+                  "value": "2"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Modificar evento por organizador",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n        \"nombre\": \"Recital de Rock Estelar\",\r\n        \"descripcion\": \"Una noche a puro rock con las mejores bandas del país.\",\r\n        \"tipo\": \"RECITAL\",\r\n        \"idOrganizador\": 2,\r\n        \"participantes\": [\r\n            \"Banda A\",\r\n            \"Banda B\"\r\n        ],\r\n        \"fechaHora\": \"2026-12-15T21:00:00\",\r\n        \"idLugar\": \"6aefe5ad2b81f513fccee8d7\",\r\n        \"nombreLugar\": \"teatro\",\r\n        \"precios\": [\r\n            {\r\n                \"sector\": \"platea\",\r\n                \"precio\": 35000.0\r\n            }\r\n        ],\r\n        \"estado\": \"PUBLICADO\"\r\n    }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8083/api/eventos/6aefe6392b81f513fccee8d8/estado?usuarioId=1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8083",
+              "path": [
+                "api",
+                "eventos",
+                "6aefe6392b81f513fccee8d8",
+                "estado"
+              ],
+              "query": [
+                {
+                  "key": "usuarioId",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Notificacion",
+      "item": [
+        {
+          "name": "Crear notificacion",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"tipo\": \"CONFIRMACION_COMPRA\",\r\n    \"canal\": \"EMAIL\",\r\n    \"email\": \"usuario@gmail.com\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8086/api/notificaciones/notificar",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8086",
+              "path": [
+                "api",
+                "notificaciones",
+                "notificar"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Orden",
+      "item": [
+        {
+          "name": "Obtener ordenes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "1",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8087/api/ordenes",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8087",
+              "path": [
+                "api",
+                "ordenes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Creacion orden",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "1",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"eventoId\": \"6af11a5fc202f2022202a26d\",\r\n    \"sector\": \"platea\",\r\n    \"asientos\": [\r\n        {\r\n            \"fila\": 1,\r\n            \"asiento\": 5\r\n        },\r\n        {\r\n            \"fila\": 1,\r\n            \"asiento\": 6\r\n        }\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8087/api/ordenes",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8087",
+              "path": [
+                "api",
+                "ordenes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Pago orden",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "1",
+                "type": "text"
+              },
+              {
+                "key": "clienteId",
+                "value": "1",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"medioPago\": \"TARJETA_CREDITO\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8087/api/ordenes/1/pago",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8087",
+              "path": [
+                "api",
+                "ordenes",
+                "1",
+                "pago"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Reserva",
+      "item": [
+        {
+          "name": "Obtener reservas",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"nombre\": \"Maria\",\r\n  \"apellido\": \"Cabrera\",\r\n  \"email\": \"dasdwee@example.com\",\r\n  \"rol\": \"Cliente\"\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8084/api/reservas",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8084",
+              "path": [
+                "api",
+                "reservas"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Creacion reserva",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"idCliente\": 1,\r\n  \"idEvento\": \"6af11a5fc202f2022202a26d\",\r\n  \"sector\": \"platea\",\r\n  \"asientos\": [\r\n    1\r\n  ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8084/api/reservas",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8084",
+              "path": [
+                "api",
+                "reservas"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Entrada",
+      "item": [
+        {
+          "name": "Obtener entradas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8085/api/entradas/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8085",
+              "path": [
+                "api",
+                "entradas",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Creacion entrada",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"ordenId\" : 1,\r\n    \"eventoId\" : \"6aefe6392b81f513fccee8d8\",\r\n    \"clienteId\" : 1,\r\n    \"fechaEvento\" : \"2026-12-15T21:00:00\",\r\n    \"items\" : [\r\n        {\r\n            \"sectorId\" : \"6aefe5ad2b81f513fccee8d7\",\r\n            \"fila\": 1,\r\n            \"asiento\": 5,\r\n            \"precio\": 35000.0\r\n        }\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8085/api/entradas",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8085",
+              "path": [
+                "api",
+                "entradas"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Revision Administrador",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "idUsuario",
+                "value": "2",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"estado\" : \"APROBADO\",\r\n    \"idReserva\" : 1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8085/api/entradas/revision",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8085",
+              "path": [
+                "api",
+                "entradas",
+                "revision"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Pago",
+      "item": [
+        {
+          "name": "Obtener pagos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8082/api/pagos",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8082",
+              "path": [
+                "api",
+                "pagos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Creacion reembolso",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8082/api/pagos/reserva/2/reembolso",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8082",
+              "path": [
+                "api",
+                "pagos",
+                "reserva",
+                "2",
+                "reembolso"
+              ]
+            }
           },
           "response": []
         }
