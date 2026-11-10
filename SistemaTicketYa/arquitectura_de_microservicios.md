@@ -31,7 +31,7 @@ El presente documento describe la arquitectura de microservicios propuesta para 
 
 ## 5. Microservicio de Reserva (`Reservas`)
 * **Bloqueos Temporales:** Controla el bloqueo temporal (ej. 10 minutos) de asientos numerados específicos o cupos en zonas generales durante el proceso de compra.
-* **Prevención de Doble Venta:** Implementa mecanismos de concurrencia e idempotencia (apoyándose en una caché en memoria como Redis) para asegurar que un mismo lugar jamás se venda dos veces.
+* **Prevención de Doble Venta:** Implementa mecanismos de concurrencia e idempotencia para asegurar que un mismo lugar jamás se venda dos veces.
 * **Liberación Automática:** Libera los lugares asignados de forma inmediata si la reserva expira o el pago es rechazado.
 
 ---
