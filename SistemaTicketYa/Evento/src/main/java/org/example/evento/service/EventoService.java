@@ -235,10 +235,8 @@ public class EventoService {
     private boolean transicionValida(EstadoEvento actual, EstadoEvento nuevo) {
         return switch (actual) {
             case BORRADOR -> nuevo == EstadoEvento.PUBLICADO || nuevo == EstadoEvento.CANCELADO;
-            case PUBLICADO -> nuevo == EstadoEvento.AGOTADO || nuevo == EstadoEvento.FINALIZADO
-                    || nuevo == EstadoEvento.CANCELADO || nuevo == EstadoEvento.SUSPENDIDO;
-            case AGOTADO -> nuevo == EstadoEvento.PUBLICADO || nuevo == EstadoEvento.FINALIZADO
-                    || nuevo == EstadoEvento.CANCELADO || nuevo == EstadoEvento.SUSPENDIDO;
+            case PUBLICADO -> nuevo == EstadoEvento.AGOTADO || nuevo == EstadoEvento.FINALIZADO || nuevo == EstadoEvento.CANCELADO;
+            case AGOTADO -> nuevo == EstadoEvento.PUBLICADO || nuevo == EstadoEvento.FINALIZADO || nuevo == EstadoEvento.CANCELADO;
             case SUSPENDIDO -> nuevo == EstadoEvento.PUBLICADO || nuevo == EstadoEvento.CANCELADO || nuevo == EstadoEvento.FINALIZADO;
             case CANCELADO, FINALIZADO -> false;
         };
