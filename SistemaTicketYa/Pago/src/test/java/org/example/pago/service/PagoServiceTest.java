@@ -3,7 +3,6 @@ package org.example.pago.service;
 import org.example.pago.dto.request.PagoRequestDTO;
 import org.example.pago.dto.response.PagoResponseDTO;
 import org.example.pago.entity.Pago;
-import org.example.pago.feignClients.OrdenClient;
 import org.example.pago.mapper.PagoMapper;
 import org.example.pago.repository.PagoRepository;
 import org.example.pago.utils.Estado;
@@ -25,14 +24,14 @@ import static org.mockito.Mockito.*;
 class PagoServiceTest {
 
     @Mock private PagoRepository repository;
-    @Mock private OrdenClient ordenClient;
+
 
     private PagoService service;
     private final MetodoPago metodo = MetodoPago.values()[0];
 
     @BeforeEach
     void setUp() {
-        service = new PagoService(new PagoMapper(), ordenClient, repository);
+        service = new PagoService(new PagoMapper(), repository);
         lenient().when(repository.save(any(Pago.class))).thenAnswer(inv -> inv.getArgument(0));
     }
 
