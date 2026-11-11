@@ -714,7 +714,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"estado\" : \"APROBADO\",\r\n    \"idReserva\" : 1\r\n}",
+              "raw": "{\r\n    \"estado\" : \"APROBADO\",\r\n    \"idReserva\" : 1,\r\n    \"idEntrada\" : 1\r\n}",
               "options": {
                 "raw": {
                   "language": "json"

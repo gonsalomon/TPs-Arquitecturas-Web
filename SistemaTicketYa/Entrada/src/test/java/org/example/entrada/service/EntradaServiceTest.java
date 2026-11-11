@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -375,22 +376,58 @@ class EntradaServiceTest {
         when(usuarioClient.getById(id)).thenReturn(ResponseEntity.ok(new UsuarioResponseDTO(id, "N", "A", "x@mail.com", rol)));
     }
 
-    @Test
-    void unAdministradorApruebaLaDevolucionYSeReembolsaElPago() {
-        usuarioConRol(1L, Rol.ADMINISTRADOR);
-
-        service.revisarSolicitud(new RevisionEntradaRequestDTO(EstadoEvento.APROBADO, 12L), 1L);
-
-        verify(pagoClient).reembolsarPago(12L);
-        verify(reservaClient).actualizarEstadoReserva(eq(12L), anyString());
+    private Entrada entradaValida(LocalDateTime fechaEvento) {
+        Entrada e = entrada(fechaEvento);
+        e.cambiarEstado(EstadoEntrada.VALIDA);                 // calcula la clave del asiento
+        return e;
     }
 
     @Test
-    void siSeRechazaLaDevolucionNoSeReembolsaNada() {
+    void aprobarLaDevolucionAnulaLaEntradaLiberaElAsientoYReembolsa() {
+        usuarioConRol(1L, Rol.ADMINISTRADOR);
+        Entrada e = entradaValida(LocalDateTime.now().plusDays(5));
+        when(repo.findById(50L)).thenReturn(Optional.of(e));
+
+        service.revisarSolicitud(new RevisionEntradaRequestDTO(EstadoEvento.APROBADO, 12L, 50L), 1L);
+
+        assertEquals(EstadoEntrada.REINTEGRO, e.getEstado());
+        assertNull(e.getClaveAsientoActivo());                 // el asiento se puede volver a vender
+        InOrder orden = inOrder(repo, pagoClient, reservaClient);
+        orden.verify(repo).save(e);                            // primero se guarda la entrada anulada
+        orden.verify(pagoClient).reembolsarPago(12L);          // después se devuelve la plata
+        orden.verify(reservaClient).actualizarEstadoReserva(eq(12L), anyString());
+    }
+
+    @Test
+    void aprobarFueraDePlazoNoReembolsaNiLiberaNada() {
+        usuarioConRol(1L, Rol.ADMINISTRADOR);
+        Entrada e = entradaValida(LocalDateTime.now().plusHours(71));
+        when(repo.findById(50L)).thenReturn(Optional.of(e));
+
+        assertThrows(DevolucionFueraDePlazoException.class,
+                () -> service.revisarSolicitud(new RevisionEntradaRequestDTO(EstadoEvento.APROBADO, 12L, 50L), 1L));
+
+        assertEquals(EstadoEntrada.VALIDA, e.getEstado());
+        verify(repo, never()).save(any());
+        verifyNoInteractions(pagoClient, reservaClient);
+    }
+
+    @Test
+    void aprobarSinIndicarLaEntradaEsInvalido() {
         usuarioConRol(1L, Rol.ADMINISTRADOR);
 
-        service.revisarSolicitud(new RevisionEntradaRequestDTO(EstadoEvento.RECHAZADO, 12L), 1L);
+        assertThrows(IllegalArgumentException.class,
+                () -> service.revisarSolicitud(new RevisionEntradaRequestDTO(EstadoEvento.APROBADO, 12L, null), 1L));
+        verifyNoInteractions(pagoClient, reservaClient);
+    }
 
+    @Test
+    void siSeRechazaLaDevolucionNoSeTocaNada() {
+        usuarioConRol(1L, Rol.ADMINISTRADOR);
+
+        service.revisarSolicitud(new RevisionEntradaRequestDTO(EstadoEvento.RECHAZADO, 12L, 50L), 1L);
+
+        verify(repo, never()).save(any());
         verifyNoInteractions(pagoClient, reservaClient);
     }
 
@@ -399,7 +436,7 @@ class EntradaServiceTest {
         usuarioConRol(7L, Rol.CLIENTE);
 
         ResponseStatusException ex = assertThrows(ResponseStatusException.class,
-                () -> service.revisarSolicitud(new RevisionEntradaRequestDTO(EstadoEvento.APROBADO, 12L), 7L));
+                () -> service.revisarSolicitud(new RevisionEntradaRequestDTO(EstadoEvento.APROBADO, 12L, 50L), 7L));
         assertEquals(HttpStatus.FORBIDDEN, ex.getStatusCode());
         verifyNoInteractions(pagoClient, reservaClient);
     }
@@ -409,7 +446,7 @@ class EntradaServiceTest {
         when(usuarioClient.getById(99L)).thenReturn(ResponseEntity.ok(null));
 
         assertThrows(IllegalArgumentException.class,
-                () -> service.revisarSolicitud(new RevisionEntradaRequestDTO(EstadoEvento.APROBADO, 12L), 99L));
+                () -> service.revisarSolicitud(new RevisionEntradaRequestDTO(EstadoEvento.APROBADO, 12L, 50L), 99L));
         verifyNoInteractions(pagoClient, reservaClient);
     }
 }

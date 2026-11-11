@@ -203,7 +203,16 @@ public class EntradaService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permisos para revisar la entrada");
         }
 
-        if(revisionDTO.getEstado().equals(EstadoEvento.APROBADO)) {
+        if(revisionDTO.getEstado() == EstadoEvento.APROBADO) {
+            if (revisionDTO.getIdEntrada() == null) {
+                throw new IllegalArgumentException("Para aprobar una devolución hay que indicar idEntrada");
+            }
+            // 1. Anular la entrada PRIMERO: controla las 72 h y libera el asiento.
+            //    Si está fuera de plazo lanza DevolucionFueraDePlazoException (422) y no se reembolsa nada.
+            Entrada entrada = buscarOFalla(revisionDTO.getIdEntrada());
+            aplicarCambio(entrada, EstadoEntrada.REINTEGRO, MotivoCambio.DEVOLUCION);
+            repo.save(entrada);   // este método no es @Transactional: hay que guardar explícitamente
+            // 2. Reintegrar el dinero y 3. liberar la reserva (queda PENDIENTE vencida y el job la pasa a VENCIDA)
             pagoFeignClient.reembolsarPago(revisionDTO.getIdReserva());
             reservaFeignClient.actualizarEstadoReserva(revisionDTO.getIdReserva(), "PENDIENTE");
         }

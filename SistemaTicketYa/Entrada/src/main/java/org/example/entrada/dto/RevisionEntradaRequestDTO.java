@@ -8,4 +8,5 @@ import org.example.entrada.utils.EstadoEvento;
 public class RevisionEntradaRequestDTO {
     private EstadoEvento estado;
     private Long idReserva;
+    private Long idEntrada;   // entrada a devolver: obligatoria para aprobar
 }
