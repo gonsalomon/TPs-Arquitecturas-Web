@@ -203,3 +203,21 @@ Para utilizarla:
 
 **Se recomienda comenzar por la carpeta Usuario y continuar con las operaciones de Evento, Orden, Pago y Entrada.**
 
+
+## Documentación técnica
+
+| Documento | Contenido |
+|---|---|
+| [Diagramas de arquitectura](docs/diagramas.md) | Diagrama de módulos, diagramas entidad-relación por microservicio, relaciones entre servicios y entidades solapadas |
+| [Diagrama de secuencia de la compra](openspec/changes/archive/2026-11-06-orden-flujo-compra/design.md#11-diagrama-de-secuencia--compra-de-una-entrada-numerada) | Compra de una entrada numerada, incluyendo pago rechazado y reserva vencida |
+| [Arquitectura de microservicios](arquitectura_de_microservicios.md) | Responsabilidad y endpoints de cada microservicio |
+| [Orden](Orden/README.md) | Flujo de compra, estados de la orden y cómo correr sus tests |
+| [Búsqueda y cache de Evento](Evento/CACHE_Y_BUSQUEDA.md) | Filtros de búsqueda y decisiones de cache |
+| Swagger | Con cada microservicio levantado: `http://localhost:<puerto>/swagger-ui.html` |
+
+## Tests
+
+En cada microservicio: `./mvnw test` (o desde IntelliJ, *Run All Tests* sobre `src/test/java`).
+
+- **Lógica de negocio (unitarios con Mockito):** compra y límite por cliente (Orden), emisión, reintegros y devoluciones (Entrada), eventos, estados y búsqueda (Evento), reservas y capacidad de zonas (Reserva), pagos (Pago), usuarios (Usuario).
+- **No doble venta:** `Orden/src/test/.../OrdenConcurrenciaTest` lanza muchas compras simultáneas del mismo asiento y verifica que solo una resulta exitosa (requiere la base de Orden levantada).
