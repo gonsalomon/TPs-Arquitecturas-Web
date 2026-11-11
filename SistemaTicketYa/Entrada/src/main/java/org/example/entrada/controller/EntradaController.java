@@ -5,6 +5,7 @@ import org.example.entrada.dto.CambioEstadoRequest;
 import org.example.entrada.dto.EmitirEntradasRequest;
 import org.example.entrada.dto.EntradaDTO;
 import org.example.entrada.dto.RevisionEntradaRequestDTO;
+import org.example.entrada.dto.response.EntradaEmitidaDTO;
 import org.example.entrada.service.EntradaService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,18 +26,18 @@ public class EntradaController {
 
     // Orden -> Entrada, after Pago approved the payment. Idempotent by ordenId. Internal: do not expose through the Gateway.
     @PostMapping
-    public ResponseEntity<List<EntradaDTO>> emitir(@Valid @RequestBody EmitirEntradasRequest request) {
+    public ResponseEntity<List<EntradaEmitidaDTO>> emitir(@Valid @RequestBody EmitirEntradasRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.emitir(request));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EntradaDTO> obtener(@PathVariable Long id) {
+    public ResponseEntity<EntradaEmitidaDTO> obtener(@PathVariable Long id) {
         return ResponseEntity.ok(service.obtenerPorId(id));
     }
 
     // GET /entradas?clienteId=1&eventoId=6720ab... (both optional, at least one required)
     @GetMapping
-    public ResponseEntity<List<EntradaDTO>> buscar(@RequestParam(required = false) Long clienteId,
+    public ResponseEntity<List<EntradaEmitidaDTO>> buscar(@RequestParam(required = false) Long clienteId,
                                                    @RequestParam(required = false) String eventoId) {
         return ResponseEntity.ok(service.buscar(clienteId, eventoId));
     }
@@ -56,13 +57,13 @@ public class EntradaController {
 
     // Orden -> Entrada when an event is cancelled. Returns the affected tickets (to refund and notify).
     @PatchMapping("/evento/{eventoId}/reintegro")
-    public ResponseEntity<List<EntradaDTO>> reintegroPorEvento(@PathVariable String eventoId) {
+    public ResponseEntity<List<EntradaEmitidaDTO>> reintegroPorEvento(@PathVariable String eventoId) {
         return ResponseEntity.ok(service.reintegroPorEvento(eventoId));
     }
 
     // Orden -> Entrada as a compensation when a later step of a purchase fails
     @PatchMapping("/orden/{ordenId}/reintegro")
-    public ResponseEntity<List<EntradaDTO>> reintegroPorOrden(@PathVariable Long ordenId) {
+    public ResponseEntity<List<EntradaEmitidaDTO>> reintegroPorOrden(@PathVariable Long ordenId) {
         return ResponseEntity.ok(service.reintegroPorOrden(ordenId));
     }
 
