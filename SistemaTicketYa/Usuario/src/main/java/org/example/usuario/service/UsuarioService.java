@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.example.usuario.dto.request.UsuarioRequestDTO;
 import org.example.usuario.dto.response.UsuarioResponseDTO;
+import org.example.usuario.dto.response.UsuarioTokenResponseDTO;
 import org.example.usuario.entity.Usuario;
 import org.example.usuario.mapper.UsuarioMapper;
 import org.example.usuario.repository.UsuarioRepository;
@@ -51,7 +52,7 @@ public class UsuarioService {
         usuarioEditado.setNombre(request.getNombre());
         usuarioEditado.setApellido(request.getApellido());
         usuarioEditado.setEmail(request.getEmail());
-        usuarioEditado.setRol(request.getRol());
+        usuarioEditado.setCiudad(request.getCiudad());
         repository.save(usuarioEditado);
         return mapper.convertToDTO(usuarioEditado);
     }
@@ -61,5 +62,12 @@ public class UsuarioService {
         Usuario usuario = repository.findById(idUsuario)
                 .orElseThrow(() -> new EntityNotFoundException("No se encontro un usuario con el id: " + idUsuario));
         repository.delete(usuario);
+    }
+
+    public UsuarioTokenResponseDTO findOneWithAuthoritiesByEmailIgnoreCase(String email) {
+        // Busco el usuario con el mail que viene por param (devuelve un opcional de usuario con su lista de roles)
+        Usuario usuario = repository.findOneWithAuthoritiesByEmailIgnoreCase(email)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
+        return UsuarioMapper.convertToUsuarioTokenResponse(usuario);
     }
 }
