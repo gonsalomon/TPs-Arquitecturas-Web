@@ -25,6 +25,8 @@ public class Usuario {
     private String email;
     @Column
     private Rol rol;
+    @Column
+    private String ciudad;
 
     public Usuario(String nombre, String apellido, String email, Rol rol) {
         this.nombre = nombre;

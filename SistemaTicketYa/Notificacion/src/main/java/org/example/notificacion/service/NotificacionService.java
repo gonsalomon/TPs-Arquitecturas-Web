@@ -3,10 +3,14 @@ package org.example.notificacion.service;
 import lombok.AllArgsConstructor;
 import org.example.notificacion.dto.NotificacionRequestDTO;
 import org.example.notificacion.dto.NotificacionResponseDTO;
+import org.example.notificacion.dto.UsuarioDTO;
 import org.example.notificacion.entity.Notificacion;
 import org.example.notificacion.repository.NotificacionRepository;
+import org.example.notificacion.utils.NotificacionTipo;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -30,5 +34,29 @@ public class NotificacionService {
                 guardada.getEmail(),
                 guardada.getEstado()
         );
+    }
+
+    @Transactional
+    public List<NotificacionResponseDTO> findAll(){
+        return notificacionRepository.findAll()
+                .stream()
+                .map(notificacion -> new NotificacionResponseDTO(
+                        notificacion.getId(),
+                        notificacion.getTipo(),
+                        notificacion.getCanal(),
+                        notificacion.getEmail(),
+                        notificacion.getEstado()
+                ))
+                .toList();
+    }
+
+    @Transactional
+    public List<UsuarioDTO> findAllCanceladas() {
+        return notificacionRepository.findByTipo(NotificacionTipo.CANCELACION_EVENTO)
+                .stream()
+                .map(notificacion ->  new UsuarioDTO(
+                    notificacion.getEmail()
+                ))
+                .toList();
     }
 }
