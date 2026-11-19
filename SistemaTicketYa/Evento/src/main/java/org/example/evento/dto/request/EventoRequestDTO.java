@@ -31,4 +31,5 @@ public class EventoRequestDTO {
     @NotBlank(message = "El lugar es obligatorio")
     private String idLugar;
     private List<@Valid PrecioSectorDTO> precios;
+    private Boolean altaDemanda;
 }

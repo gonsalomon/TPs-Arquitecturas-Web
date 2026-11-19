@@ -25,4 +25,6 @@ public class CrearOrdenRequestDTO {
 
     /** Para sectores no numerados: cantidad de lugares pedidos. */
     private Integer cantidad;
+
+    private String tokenFila;
 }

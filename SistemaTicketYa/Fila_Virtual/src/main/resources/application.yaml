@@ -1,0 +1,32 @@
+spring:
+    application:
+        name: Fila_Virtual
+    datasource:
+        url: jdbc:mysql://localhost:3310/fila_virtual_db?createDatabaseIfNotExist=true
+        username: root
+        password: ""
+    jpa:
+        hibernate:
+            ddl-auto: update
+        show-sql: true
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.MySQLDialect
+    main:
+        allow-bean-definition-overriding: true
+
+server:
+    port: 8088
+
+clientes:
+    evento:
+        url: http://localhost:8083
+
+fila:
+    tanda:
+        tamano: 2
+    turno:
+        duracion-minutos: 2
+    scheduler:
+        intervalo-ms: 10000
+    validar-evento-externo: true

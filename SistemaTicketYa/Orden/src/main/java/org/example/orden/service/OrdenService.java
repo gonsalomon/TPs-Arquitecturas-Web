@@ -1,6 +1,8 @@
 package org.example.orden.service;
 
 import feign.FeignException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import lombok.RequiredArgsConstructor;
 import org.example.orden.dto.request.*;
 import org.example.orden.dto.response.*;
@@ -44,6 +46,8 @@ public class OrdenService {
     private final EntradaClient entradaClient;
     private final NotificacionClient notificacionClient;
     private final UsuarioClient usuarioClient;
+    private final FilaVirtualClient filaVirtualClient;
+    private static final Logger log = LoggerFactory.getLogger(OrdenService.class);
 
     @Value("${orden.limite-entradas-por-evento}")
     private int limiteEntradasPorEvento;
@@ -55,6 +59,11 @@ public class OrdenService {
         EventoExternoDTO evento = obtenerEvento(request.getEventoId());
         if (!PUBLICADO.equals(evento.getEstado())) {
             throw new EventoNoDisponibleException("El evento no está publicado");
+        }
+
+        boolean esAltaDemanda = Boolean.TRUE.equals(evento.getAltaDemanda());
+        if (esAltaDemanda) {
+            validarAccesoFilaVirtual(clienteId, request.getEventoId(), request.getTokenFila());
         }
 
         PrecioSectorExternoDTO precioSector = evento.getPrecios().stream()
@@ -90,6 +99,7 @@ public class OrdenService {
 
         ReservaExternaDTO reserva = reservarEnReserva(orden, numerosDeAsiento, sector.getCapacidad());
 
+        orden.setAltaDemanda(esAltaDemanda);
         orden.setIdReserva(reserva.getIdReserva());
         orden.setFechaVencimiento(reserva.getFechaVencimiento());
         ordenRepository.save(orden);
@@ -229,6 +239,10 @@ public class OrdenService {
 
         confirmarReserva(orden.getIdReserva());
 
+        if (Boolean.TRUE.equals(orden.getAltaDemanda())) {
+            completarTurnoEnFila(orden.getClienteId(), orden.getEventoId());
+        }
+
         return reintentarEmision(orden);
     }
 
@@ -346,6 +360,32 @@ public class OrdenService {
             );
             notificacionClient.notificar(notificacionRequestDTO);
 
+        }
+    }
+
+    private void validarAccesoFilaVirtual(Long clienteId, String eventoId, String tokenFila) {
+        if (tokenFila == null || tokenFila.isBlank()) {
+            throw new AccesoFilaDenegadoException(
+                    "Este evento es de alta demanda. Debés ingresar a la fila virtual y enviar tu tokenFila.");
+        }
+
+        try {
+            ValidacionFilaDTO validacion = filaVirtualClient.validarAcceso(clienteId, eventoId, tokenFila);
+            if (!validacion.isHabilitado()) {
+                throw new AccesoFilaDenegadoException(validacion.getMotivo());
+            }
+        } catch (FeignException e) {
+            throw new ServicioNoDisponibleException("El servicio de fila virtual no está disponible");
+        }
+    }
+
+    private void completarTurnoEnFila(Long clienteId, String eventoId) {
+        try {
+            filaVirtualClient.completarTurno(clienteId, eventoId);
+        } catch (Exception e) {
+            // Loggear advertencia sin lanzar excepción para no hacer rollback de la compra confirmada
+            log.warn("Orden confirmada, pero no se pudo liberar el turno en Fila_virtual (cliente={}, evento={}): {}",
+                    clienteId, eventoId, e.getMessage());
         }
     }
 }

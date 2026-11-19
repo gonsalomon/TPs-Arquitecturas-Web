@@ -1,0 +1,996 @@
+{
+  "info": {
+    "_postman_id": "2e7eda3c-72a7-404b-85ba-93bc2100b80c",
+    "name": "SistemaTicketYa - Encolamiento Fila Virtual",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "55889808",
+    "_collection_link": "https://go.postman.co/collection/55889808-2e7eda3c-72a7-404b-85ba-93bc2100b80c?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "01. Crear Usuario Admin",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Usuario ADMIN creado\", () => {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+              "    const json = pm.response.json();",
+              "    pm.collectionVariables.set(\"adminId\", json.id ?? json.idUsuario);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"nombre\": \"Admin Test\",\r\n  \"email\": \"admin_fila_{{$timestamp}}@test.com\",\r\n  \"password\": \"Password123!\",\r\n  \"rol\": \"ADMINISTRADOR\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{url_usuario}}/api/usuarios",
+          "host": [
+            "{{url_usuario}}"
+          ],
+          "path": [
+            "api",
+            "usuarios"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "02. Crear Usuario Organizador",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Usuario ORGANIZADOR creado\", () => {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+              "    const json = pm.response.json();",
+              "    pm.collectionVariables.set(\"organizadorId\", json.id ?? json.idUsuario);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"nombre\": \"Organizador Test\",\r\n  \"email\": \"organizador_fila_{{$timestamp}}@test.com\",\r\n  \"password\": \"Password123!\",\r\n  \"rol\": \"ORGANIZADOR\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{url_usuario}}/api/usuarios",
+          "host": [
+            "{{url_usuario}}"
+          ],
+          "path": [
+            "api",
+            "usuarios"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "03. Crear Cliente 1",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Cliente 1 creado\", () => {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+              "    const json = pm.response.json();",
+              "    pm.collectionVariables.set(\"cliente1Id\", json.id ?? json.idUsuario);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"nombre\": \"Cliente Uno\",\r\n  \"email\": \"cliente1_{{$timestamp}}@test.com\",\r\n  \"password\": \"Password123!\",\r\n  \"rol\": \"CLIENTE\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{url_usuario}}/api/usuarios",
+          "host": [
+            "{{url_usuario}}"
+          ],
+          "path": [
+            "api",
+            "usuarios"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "04. Crear Cliente 2",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Cliente 2 creado\", () => {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+              "    const json = pm.response.json();",
+              "    pm.collectionVariables.set(\"cliente2Id\", json.id ?? json.idUsuario);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"nombre\": \"Cliente Dos\",\r\n  \"email\": \"cliente2_{{$timestamp}}@test.com\",\r\n  \"password\": \"Password123!\",\r\n  \"rol\": \"CLIENTE\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{url_usuario}}/api/usuarios",
+          "host": [
+            "{{url_usuario}}"
+          ],
+          "path": [
+            "api",
+            "usuarios"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "05. Crear Cliente 3 (Esperara en fila)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Cliente 3 creado\", () => {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+              "    const json = pm.response.json();",
+              "    pm.collectionVariables.set(\"cliente3Id\", json.id ?? json.idUsuario);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"nombre\": \"Cliente Tres\",\r\n  \"email\": \"cliente3_{{$timestamp}}@test.com\",\r\n  \"password\": \"Password123!\",\r\n  \"rol\": \"CLIENTE\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{url_usuario}}/api/usuarios",
+          "host": [
+            "{{url_usuario}}"
+          ],
+          "path": [
+            "api",
+            "usuarios"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "06. Crear Lugar",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Lugar creado\", () => {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+              "    const json = pm.response.json();",
+              "    pm.collectionVariables.set(\"lugarId\", json.id ?? json.idLugar);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-Usuario-Id",
+            "value": "{{adminId}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"nombre\": \"Estadio Fila Test {{$timestamp}}\",\r\n  \"direccion\": \"Av. Siempre Viva 123\",\r\n  \"ciudad\": \"Tandil\",\r\n  \"latitud\": -37.32167,\r\n  \"longitud\": -59.13316,\r\n  \"sectores\": [\r\n    {\r\n      \"nombre\": \"Platea VIP\",\r\n      \"tipo\": \"NUMERADO\",\r\n      \"filas\": 10,\r\n      \"asientosPorFila\": 20,\r\n      \"capacidad\": 200\r\n    },\r\n    {\r\n      \"nombre\": \"Campo General\",\r\n      \"tipo\": \"NO_NUMERADO\",\r\n      \"capacidad\": 500\r\n    }\r\n  ]\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{url_evento}}/api/lugares",
+          "host": [
+            "{{url_evento}}"
+          ],
+          "path": [
+            "api",
+            "lugares"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "07. Crear Evento Alta Demanda",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Evento alta demanda creado\", () => {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+              "    const json = pm.response.json();",
+              "    pm.expect(json.altaDemanda).to.eql(true);",
+              "    pm.collectionVariables.set(\"eventoAltaId\", json.id ?? json.idEvento);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"nombre\": \"Recital Alta Demanda Fila {{$timestamp}}\",\r\n  \"descripcion\": \"Venta controlada mediante fila virtual con espera\",\r\n  \"tipo\": \"RECITAL\",\r\n  \"idOrganizador\": {{organizadorId}},\r\n  \"fechaHora\": \"2027-12-15T21:00:00\",\r\n  \"idLugar\": \"{{lugarId}}\",\r\n  \"altaDemanda\": true,\r\n  \"participantes\": [\"Banda Internacional\"],\r\n  \"precios\": [\r\n    { \"sector\": \"Platea VIP\", \"precio\": 50000.0 },\r\n    { \"sector\": \"Campo General\", \"precio\": 25000.0 }\r\n  ]\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{url_evento}}/api/eventos?usuarioId={{organizadorId}}",
+          "host": [
+            "{{url_evento}}"
+          ],
+          "path": [
+            "api",
+            "eventos"
+          ],
+          "query": [
+            {
+              "key": "usuarioId",
+              "value": "{{organizadorId}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "08. Publicar Evento de Alta Demanda",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Evento de alta demanda publicado\", () => {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+              "    if (pm.response.text()) {",
+              "        const json = pm.response.json();",
+              "        pm.expect(json.estado).to.eql(\"PUBLICADO\");",
+              "    }",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "X-Usuario-Id",
+            "value": "{{organizadorId}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"usuarioId\": {{organizadorId}},\r\n  \"estado\": \"PUBLICADO\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{url_evento}}/api/eventos/{{eventoAltaId}}/estado?usuarioId={{organizadorId}}",
+          "host": [
+            "{{url_evento}}"
+          ],
+          "path": [
+            "api",
+            "eventos",
+            "{{eventoAltaId}}",
+            "estado"
+          ],
+          "query": [
+            {
+              "key": "usuarioId",
+              "value": "{{organizadorId}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "09. Cliente 1 ingresa a la Fila (Cupo 1/2 - HABILITADO)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Cliente 1 habilitado en fila virtual con tokenAcceso\", () => {",
+              "    pm.response.to.have.status(200);",
+              "    const json = pm.response.json();",
+              "    pm.expect(json.estado).to.eql(\"HABILITADO\");",
+              "    pm.expect(json.tokenAcceso).to.be.a(\"string\").and.not.be.empty;",
+              "    pm.collectionVariables.set(\"tokenFila1\", json.tokenAcceso);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-Usuario-Id",
+            "value": "{{cliente1Id}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"eventoId\": \"{{eventoAltaId}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{url_fila}}/api/fila/ingresar",
+          "host": [
+            "{{url_fila}}"
+          ],
+          "path": [
+            "api",
+            "fila",
+            "ingresar"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "10. Cliente 2 ingresa a la Fila (Cupo 2/2 - HABILITADO)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Cliente 2 habilitado en fila virtual (tanda llena)\", () => {",
+              "    pm.response.to.have.status(200);",
+              "    const json = pm.response.json();",
+              "    pm.expect(json.estado).to.eql(\"HABILITADO\");",
+              "    pm.expect(json.tokenAcceso).to.be.a(\"string\").and.not.be.empty;",
+              "    pm.collectionVariables.set(\"tokenFila2\", json.tokenAcceso);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-Usuario-Id",
+            "value": "{{cliente2Id}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"eventoId\": \"{{eventoAltaId}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{url_fila}}/api/fila/ingresar",
+          "host": [
+            "{{url_fila}}"
+          ],
+          "path": [
+            "api",
+            "fila",
+            "ingresar"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "11. Cliente 3 ingresa a la Fila (EN_ESPERA)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Cliente 3 queda EN_ESPERA en posicion 1 y sin token\", () => {\n    pm.response.to.have.status(200);\n    const json = pm.response.json();\n    pm.expect(json.estado).to.eql(\"EN_ESPERA\");\n    pm.expect(json.posicionActual).to.eql(1);\n    pm.expect(json.tokenAcceso).to.be.null;\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-Usuario-Id",
+            "value": "{{cliente3Id}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"eventoId\": \"{{eventoAltaId}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{url_fila}}/api/fila/ingresar",
+          "host": [
+            "{{url_fila}}"
+          ],
+          "path": [
+            "api",
+            "fila",
+            "ingresar"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "12. Cliente 3 intenta crear Orden estando EN_ESPERA (403)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Bloquea la orden de Cliente 3 mientras esta EN_ESPERA (403 Forbidden)\", () => {",
+              "    pm.response.to.have.status(403);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-Usuario-Id",
+            "value": "{{cliente3Id}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"eventoId\": \"{{eventoAltaId}}\",\r\n  \"sector\": \"Platea VIP\",\r\n  \"asientos\": [\r\n    { \"fila\": 1, \"asiento\": 5 }\r\n  ]\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{url_orden}}/api/ordenes",
+          "host": [
+            "{{url_orden}}"
+          ],
+          "path": [
+            "api",
+            "ordenes"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "13. Cliente 1 crea Orden Alta Demanda",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Orden de Cliente 1 creada con token valido\", () => {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+              "    const json = pm.response.json();",
+              "    pm.expect(json.idReserva).to.not.be.null;",
+              "    pm.collectionVariables.set(\"ordenCliente1Id\", json.idOrden ?? json.id);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-Usuario-Id",
+            "value": "{{cliente1Id}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"eventoId\": \"{{eventoAltaId}}\",\r\n  \"sector\": \"Platea VIP\",\r\n  \"asientos\": [\r\n    { \"fila\": 1, \"asiento\": 1 },\r\n    { \"fila\": 1, \"asiento\": 2 }\r\n  ],\r\n  \"tokenFila\": \"{{tokenFila1}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{url_orden}}/api/ordenes",
+          "host": [
+            "{{url_orden}}"
+          ],
+          "path": [
+            "api",
+            "ordenes"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "14. Cliente 1 paga Orden (Libera cupo en la Fila)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Pago de Cliente 1 aprobado, entradas emitidas y turno completado\", () => {",
+              "    pm.response.to.have.status(200);",
+              "    const json = pm.response.json();",
+              "    pm.expect(json.estado).to.be.oneOf([\"CONFIRMADA\", \"PAGADA\"]);",
+              "    pm.expect(json.idPago).to.not.be.null;",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-Usuario-Id",
+            "value": "{{cliente1Id}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"medioPago\": \"TARJETA_CREDITO\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{url_orden}}/api/ordenes/{{ordenCliente1Id}}/pago",
+          "host": [
+            "{{url_orden}}"
+          ],
+          "path": [
+            "api",
+            "ordenes",
+            "{{ordenCliente1Id}}",
+            "pago"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "15. Verificar cierre de turno de Cliente 1 (409)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"El turno de Cliente 1 ya no esta activo tras completar la compra (409)\", () => {",
+              "    pm.response.to.have.status(409);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-Usuario-Id",
+            "value": "{{cliente1Id}}"
+          }
+        ],
+        "url": {
+          "raw": "{{url_fila}}/api/fila/eventos/{{eventoAltaId}}/estado",
+          "host": [
+            "{{url_fila}}"
+          ],
+          "path": [
+            "api",
+            "fila",
+            "eventos",
+            "{{eventoAltaId}}",
+            "estado"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "16. Cliente 3 consulta estado en Fila (Promovido a HABILITADO)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Cliente 3 fue promovido a HABILITADO con tokenAcceso\", () => {",
+              "    pm.response.to.have.status(200);",
+              "    const json = pm.response.json();",
+              "    pm.expect(json.estado).to.eql(\"HABILITADO\");",
+              "    pm.expect(json.tokenAcceso).to.be.a(\"string\").and.not.be.empty;",
+              "    pm.collectionVariables.set(\"tokenFila3\", json.tokenAcceso);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-Usuario-Id",
+            "value": "{{cliente3Id}}"
+          }
+        ],
+        "url": {
+          "raw": "{{url_fila}}/api/fila/eventos/{{eventoAltaId}}/estado",
+          "host": [
+            "{{url_fila}}"
+          ],
+          "path": [
+            "api",
+            "fila",
+            "eventos",
+            "{{eventoAltaId}}",
+            "estado"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "17. Cliente 3 crea Orden Alta Demanda (con tokenFila3)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Orden de Cliente 3 creada tras liberarse un cupo\", () => {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+              "    const json = pm.response.json();",
+              "    pm.expect(json.idReserva).to.not.be.null;",
+              "    pm.collectionVariables.set(\"ordenCliente3Id\", json.idOrden ?? json.id);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-Usuario-Id",
+            "value": "{{cliente3Id}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"eventoId\": \"{{eventoAltaId}}\",\r\n  \"sector\": \"Platea VIP\",\r\n  \"asientos\": [\r\n    { \"fila\": 1, \"asiento\": 5 }\r\n  ],\r\n  \"tokenFila\": \"{{tokenFila3}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{url_orden}}/api/ordenes",
+          "host": [
+            "{{url_orden}}"
+          ],
+          "path": [
+            "api",
+            "ordenes"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "18. Cliente 3 paga Orden Alta Demanda",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Pago de Cliente 3 aprobado y orden confirmada\", () => {",
+              "    pm.response.to.have.status(200);",
+              "    const json = pm.response.json();",
+              "    pm.expect(json.estado).to.be.oneOf([\"CONFIRMADA\", \"PAGADA\"]);",
+              "    pm.expect(json.idPago).to.not.be.null;",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-Usuario-Id",
+            "value": "{{cliente3Id}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"medioPago\": \"TARJETA_CREDITO\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{url_orden}}/api/ordenes/{{ordenCliente3Id}}/pago",
+          "host": [
+            "{{url_orden}}"
+          ],
+          "path": [
+            "api",
+            "ordenes",
+            "{{ordenCliente3Id}}",
+            "pago"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "19. Verificar Entradas de Cliente 3",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Se emitio 1 entrada numerada en Platea VIP para Cliente 3\", () => {",
+              "    pm.response.to.have.status(200);",
+              "    const entradas = pm.response.json();",
+              "    pm.expect(entradas).to.be.an(\"array\").with.lengthOf(1);",
+              "    entradas.forEach(e => {",
+              "        pm.expect(e.sector ?? e.sectorId).to.eql(\"Platea VIP\");",
+              "    });",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{url_entrada}}/api/entradas?clienteId={{cliente3Id}}&eventoId={{eventoAltaId}}",
+          "host": [
+            "{{url_entrada}}"
+          ],
+          "path": [
+            "api",
+            "entradas"
+          ],
+          "query": [
+            {
+              "key": "clienteId",
+              "value": "{{cliente3Id}}"
+            },
+            {
+              "key": "eventoId",
+              "value": "{{eventoAltaId}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "20. Verificar cierre de turno de Cliente 3 (409)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"El turno de Cliente 3 ya no esta activo tras completar la compra (409)\", () => {",
+              "    pm.response.to.have.status(409);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-Usuario-Id",
+            "value": "{{cliente3Id}}"
+          }
+        ],
+        "url": {
+          "raw": "{{url_fila}}/api/fila/eventos/{{eventoAltaId}}/estado",
+          "host": [
+            "{{url_fila}}"
+          ],
+          "path": [
+            "api",
+            "fila",
+            "eventos",
+            "{{eventoAltaId}}",
+            "estado"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "url_usuario",
+      "value": "http://localhost:8082"
+    },
+    {
+      "key": "url_evento",
+      "value": "http://localhost:8083"
+    },
+    {
+      "key": "url_entrada",
+      "value": "http://localhost:8085"
+    },
+    {
+      "key": "url_orden",
+      "value": "http://localhost:8087"
+    },
+    {
+      "key": "url_fila",
+      "value": "http://localhost:8088"
+    },
+    {
+      "key": "adminId",
+      "value": ""
+    },
+    {
+      "key": "organizadorId",
+      "value": ""
+    },
+    {
+      "key": "cliente1Id",
+      "value": ""
+    },
+    {
+      "key": "cliente2Id",
+      "value": ""
+    },
+    {
+      "key": "cliente3Id",
+      "value": ""
+    },
+    {
+      "key": "lugarId",
+      "value": ""
+    },
+    {
+      "key": "eventoAltaId",
+      "value": ""
+    },
+    {
+      "key": "tokenFila1",
+      "value": ""
+    },
+    {
+      "key": "tokenFila2",
+      "value": ""
+    },
+    {
+      "key": "tokenFila3",
+      "value": ""
+    },
+    {
+      "key": "ordenCliente1Id",
+      "value": ""
+    },
+    {
+      "key": "ordenCliente3Id",
+      "value": ""
+    }
+  ]
+}

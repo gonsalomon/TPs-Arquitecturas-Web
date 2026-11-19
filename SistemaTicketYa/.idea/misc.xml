@@ -12,6 +12,7 @@
         <option value="$PROJECT_DIR$/Gateway/pom.xml" />
         <option value="$PROJECT_DIR$/Evento/pom.xml" />
         <option value="$PROJECT_DIR$/Entrada/pom.xml" />
+        <option value="$PROJECT_DIR$/Fila_Virtual/pom.xml" />
       </list>
     </option>
   </component>

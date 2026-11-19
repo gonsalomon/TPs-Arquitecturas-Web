@@ -18,4 +18,6 @@ public class EventoExternoDTO {
     private LocalDateTime fechaHora;
     private String idLugar;
     private List<PrecioSectorExternoDTO> precios;
+    private Boolean altaDemanda;
+    private String tokenFila;
 }
