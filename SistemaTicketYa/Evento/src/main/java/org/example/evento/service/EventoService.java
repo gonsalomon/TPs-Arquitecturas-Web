@@ -1,6 +1,7 @@
 package org.example.evento.service;
 
 import lombok.AllArgsConstructor;
+import org.example.evento.client.OrdenFeignClient;
 import org.example.evento.client.UsuarioFeingClient;
 import org.example.evento.client.usuario.dto.response.UsuarioResponseDTO;
 import org.example.evento.client.utils.Rol;
@@ -43,6 +44,7 @@ public class EventoService {
     private final EventoMapper mapper;
     private final MongoTemplate mongoTemplate;
     private final UsuarioFeingClient  usuarioFeingClient;
+    private final OrdenFeignClient  ordenFeignClient;
 
     /*-------------------------- MÉTODOS PARA EL CRUD --------------------------*/
     /* Todo evento se crea en BORRADOR. El lugar tiene que existir antes. */
@@ -208,17 +210,22 @@ public class EventoService {
         EstadoEvento actual = evento.getEstado();
         boolean esAdmin = (usuario.getRol() == Rol.ADMINISTRADOR);
         boolean esOrganizadorDueño = (usuario.getRol() == Rol.ORGANIZADOR && evento.getIdOrganizador().equals(usuarioId));
+        if (!transicionValida(actual, nuevo)) {
+            throw new IllegalStateException("No se puede pasar de " + actual + " a " + nuevo);
+        }
         if (nuevo == EstadoEvento.CANCELADO || nuevo == EstadoEvento.SUSPENDIDO) {
             if (!esAdmin) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permisos para cancelar este evento");
+            }
+            // si es un admin y se cancelo el evento
+            if(nuevo == EstadoEvento.CANCELADO){
+                //orden orquesta la cancelacion (reintegro y notificacion)
+                ordenFeignClient.cancelacionEvento(idEvento);
             }
         } else {
             if (!esOrganizadorDueño && !esAdmin) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permisos para modificar este evento");
             }
-        }
-        if (!transicionValida(actual, nuevo)) {
-            throw new IllegalStateException("No se puede pasar de " + actual + " a " + nuevo);
         }
         if (nuevo == EstadoEvento.PUBLICADO) {
             Lugar lugar = lugarService.buscar(evento.getIdLugar());

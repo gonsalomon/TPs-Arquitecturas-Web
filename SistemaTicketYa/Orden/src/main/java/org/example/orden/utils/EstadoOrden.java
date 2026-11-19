@@ -5,7 +5,8 @@ public enum EstadoOrden {
     PAGO_APROBADO,
     CONFIRMADA,
     RECHAZADA,
-    VENCIDA;
+    VENCIDA,
+    CANCELADA;
 
     public boolean esActiva() {
         return this == PENDIENTE_PAGO || this == PAGO_APROBADO || this == CONFIRMADA;

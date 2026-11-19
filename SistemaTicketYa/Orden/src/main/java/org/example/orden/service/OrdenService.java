@@ -7,10 +7,7 @@ import org.example.orden.dto.response.*;
 import org.example.orden.entity.ItemOrden;
 import org.example.orden.entity.Orden;
 import org.example.orden.exception.*;
-import org.example.orden.feignClients.EntradaClient;
-import org.example.orden.feignClients.EventoClient;
-import org.example.orden.feignClients.PagoClient;
-import org.example.orden.feignClients.ReservaClient;
+import org.example.orden.feignClients.*;
 import org.example.orden.mapper.OrdenMapper;
 import org.example.orden.repository.OrdenRepository;
 import org.example.orden.utils.ConversorAsientos;
@@ -45,6 +42,8 @@ public class OrdenService {
     private final ReservaClient reservaClient;
     private final PagoClient pagoClient;
     private final EntradaClient entradaClient;
+    private final NotificacionClient notificacionClient;
+    private final UsuarioClient usuarioClient;
 
     @Value("${orden.limite-entradas-por-evento}")
     private int limiteEntradasPorEvento;
@@ -183,6 +182,7 @@ public class OrdenService {
             case VENCIDA -> throw new OrdenVencidaException("La orden ya venció");
             case PAGO_APROBADO -> reintentarEmision(orden);
             case PENDIENTE_PAGO -> procesarPago(orden, request);
+            case CANCELADA -> throw new IllegalArgumentException("El evento fue cancelado");
         };
     }
 
@@ -321,6 +321,31 @@ public class OrdenService {
             throw e;
         } catch (FeignException e) {
             throw new ServicioNoDisponibleException("El servicio de eventos no está disponible");
+        }
+    }
+
+//    cancelacion
+    public void cancelacionEvento(String idEvento){
+        List<Orden> ordenes = ordenRepository.findByEventoId(idEvento);
+        for(int i=0; i<ordenes.size(); i++){
+            Orden orden = ordenes.get(i);
+            Long idPago = orden.getIdPago();
+            PagoExternoDTO pago = pagoClient.obtenerPagoPorId(idPago);
+            //reintegro
+            Long idReserva = pago.getIdReserva();
+            pagoClient.reembolsarPago(idReserva);
+            //cancelar las ordenes
+            orden.setEstado(EstadoOrden.CANCELADA);
+            ordenRepository.save(orden);
+            //notificar
+            UsuarioResponseDTO usuario = usuarioClient.getById(orden.getClienteId());
+            NotificacionRequestDTO notificacionRequestDTO = new NotificacionRequestDTO(
+                    "CANCELACION_EVENTO",
+                    "EMAIL",
+                    usuario.getEmail()
+            );
+            notificacionClient.notificar(notificacionRequestDTO);
+
         }
     }
 }

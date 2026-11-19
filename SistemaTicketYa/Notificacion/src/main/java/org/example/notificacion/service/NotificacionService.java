@@ -32,16 +32,3 @@ public class NotificacionService {
         );
     }
 }
-/* private NotificacionTipo tipo;
-    private NotificacionCanal canal;
-    private String email;
-    private Long clienteId;
-    private Long eventoId;
-    private String ciudad;
-
-    private Long id;
-    private NotificacionTipo tipo;
-    private NotificacionCanal canal;
-    private String email;
-    private String mensaje;
-    private String estado;*/

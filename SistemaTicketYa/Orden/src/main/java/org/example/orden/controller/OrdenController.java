@@ -79,4 +79,11 @@ public class OrdenController {
             @RequestParam(required = false) String eventoId) {
         return ResponseEntity.ok(service.listar(clienteId, eventoId));
     }
+
+    @PutMapping ("/{idEvento}/cancelacion")
+    public ResponseEntity<Void> cancelacionEvento(@PathVariable String idEvento){
+        service.cancelacionEvento(idEvento);
+        return ResponseEntity.ok().build();
+    }
+
 }

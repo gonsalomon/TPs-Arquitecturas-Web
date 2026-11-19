@@ -23,6 +23,10 @@ public class PagoController {
         List<PagoResponseDTO> pagos = pagoService.obtenerTodosLosPagos();
         return ResponseEntity.ok(pagos);
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<PagoResponseDTO> obtenerPagoPorId(@PathVariable Long id){
+        return ResponseEntity.ok(pagoService.getPagoPorId(id));
+    }
 
     @PostMapping
     public ResponseEntity<?> realizarPago(@RequestBody PagoRequestDTO request) {

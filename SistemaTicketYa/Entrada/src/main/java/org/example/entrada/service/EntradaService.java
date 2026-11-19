@@ -212,7 +212,7 @@ public class EntradaService {
             Entrada entrada = buscarOFalla(revisionDTO.getIdEntrada());
             aplicarCambio(entrada, EstadoEntrada.REINTEGRO, MotivoCambio.DEVOLUCION);
             repo.save(entrada);   // este método no es @Transactional: hay que guardar explícitamente
-            // 2. Reintegrar el dinero y 3. liberar la reserva (queda PENDIENTE vencida y el job la pasa a VENCIDA)
+            // 2. Reintegrar el dinero y 3. liberar la reserva (queda PENDIENTE y el job la pasa a VENCIDA)
             pagoFeignClient.reembolsarPago(revisionDTO.getIdReserva());
             reservaFeignClient.actualizarEstadoReserva(revisionDTO.getIdReserva(), "PENDIENTE");
         }

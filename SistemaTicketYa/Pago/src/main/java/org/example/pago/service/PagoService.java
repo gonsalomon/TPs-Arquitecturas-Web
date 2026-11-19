@@ -71,4 +71,7 @@ public class PagoService {
         return mapper.convertToDTO(pagoActualizado);
     }
 
+    public PagoResponseDTO getPagoPorId(Long id) {
+        return mapper.convertToDTO(repository.findById(id).get());
+    }
 }

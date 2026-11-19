@@ -30,4 +30,6 @@ public interface OrdenRepository extends JpaRepository<Orden, Long> {
     List<Orden> findByClienteIdAndEventoIdOrderByFechaCreacionDesc(Long clienteId, String eventoId);
 
     Optional<Orden> findByIdOrdenAndClienteId(Long idOrden, Long clienteId);
+
+    List<Orden> findByEventoId(String idEvento);
 }
