@@ -54,6 +54,15 @@ public class GlobalExceptionHandler {
         return cuerpo(HttpStatus.INTERNAL_SERVER_ERROR, "Error interno del servidor", ex.getMessage());
     }
 
+    @ExceptionHandler(AccesoFilaDenegadoException.class)
+    public ResponseEntity<Map<String, Object>> handleAccesoFilaDenegado(AccesoFilaDenegadoException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of(
+                "error", "Acceso denegado",
+                "message", ex.getMessage(),
+                "timestamp", LocalDateTime.now().toString()
+        ));
+    }
+
     private String mensajeDe(Exception ex) {
         if (ex instanceof MissingRequestHeaderException e) {
             return "Falta el header obligatorio " + e.getHeaderName();

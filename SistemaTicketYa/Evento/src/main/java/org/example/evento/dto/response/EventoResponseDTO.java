@@ -25,4 +25,5 @@ public class EventoResponseDTO {
     private String nombreLugar;
     private List<PrecioSector> precios;
     private EstadoEvento estado;
+    private Boolean altaDemanda;
 }

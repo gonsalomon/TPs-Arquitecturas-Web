@@ -1,0 +1,16 @@
+services:
+  mysql-fila-virtual:
+    image: mysql:8.0
+    container_name: mysql-fila-virtual
+    restart: unless-stopped
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_ROOT_PASSWORD: ""
+      MYSQL_DATABASE: fila_virtual
+    ports:
+      - "3310:3306"
+    volumes:
+      - fila_virtual_data:/var/lib/mysql
+
+volumes:
+  fila_virtual_data:

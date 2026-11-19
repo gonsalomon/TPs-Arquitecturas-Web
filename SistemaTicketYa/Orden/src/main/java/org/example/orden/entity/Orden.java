@@ -71,6 +71,9 @@ public class Orden {
     @OneToMany(mappedBy = "orden", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ItemOrden> items = new ArrayList<>();
 
+    @Column(name = "alta_demanda")
+    private Boolean altaDemanda = false;
+
     public Orden(Long clienteId, String eventoId, String sector, LocalDateTime fechaEvento) {
         this.clienteId = clienteId;
         this.eventoId = eventoId;

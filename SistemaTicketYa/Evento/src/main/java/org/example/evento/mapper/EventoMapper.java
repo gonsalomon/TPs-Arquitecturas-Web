@@ -25,7 +25,8 @@ public class EventoMapper {
                 evento.getIdLugar(),
                 nombreLugar,
                 evento.getPrecios(),
-                evento.getEstado()
+                evento.getEstado(),
+                evento.getAltaDemanda()
         );
     }
 
@@ -39,6 +40,7 @@ public class EventoMapper {
         evento.setFechaHora(dto.getFechaHora());
         evento.setIdLugar(dto.getIdLugar());
         evento.setPrecios(convertPrecios(dto.getPrecios()));
+        evento.setAltaDemanda(dto.getAltaDemanda());
     }
 
     private List<PrecioSector> convertPrecios(List<PrecioSectorDTO> precios) {

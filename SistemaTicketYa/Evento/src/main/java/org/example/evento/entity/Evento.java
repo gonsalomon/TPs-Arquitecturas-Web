@@ -31,4 +31,5 @@ public class Evento {
     private String idLugar;                  // referencia al Lugar
     private List<PrecioSector> precios = new ArrayList<>();
     private EstadoEvento estado = EstadoEvento.BORRADOR;
+    private Boolean altaDemanda = false;
 }
