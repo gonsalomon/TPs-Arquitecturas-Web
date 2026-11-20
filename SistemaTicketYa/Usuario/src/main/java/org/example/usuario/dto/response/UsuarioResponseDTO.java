@@ -3,7 +3,6 @@ package org.example.usuario.dto.response;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.example.usuario.utils.Rol;
 
 import java.util.Set;
 
