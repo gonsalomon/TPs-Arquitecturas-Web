@@ -45,11 +45,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/authenticate").permitAll()
 
 
-                        .requestMatchers(HttpMethod.PATCH,"/api/eventos/{idEvento}").hasAuthority(AuthorityConstant.ADMINISTRADOR)
-                        .requestMatchers(HttpMethod.PATCH,"/api/eventos/{idEvento}").hasAuthority(AuthorityConstant.ORGANIZADOR)
-                        .requestMatchers(HttpMethod.GET,"/api/entradas/revision").hasAuthority(AuthorityConstant.ADMINISTRADOR)
-
-
                         .anyRequest().authenticated()
                 )
                 .httpBasic( Customizer.withDefaults() )
