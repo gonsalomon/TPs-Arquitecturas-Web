@@ -4,5 +4,6 @@ package org.example.entrada.utils;
 public enum MotivoCambio {
     DEVOLUCION,         // client refund approved by an administrator
     EVENTO_CANCELADO,   // the event was cancelled
-    ANULACION_ORDEN     // compensation: Orden undoes an issuance because a later step failed
+    ANULACION_ORDEN,     // compensation: Orden undoes an issuance because a later step failed
+    VALIDACION_ENTRADA
 }

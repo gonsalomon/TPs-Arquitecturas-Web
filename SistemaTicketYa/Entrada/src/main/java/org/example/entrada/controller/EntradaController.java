@@ -1,11 +1,9 @@
 package org.example.entrada.controller;
 
 import jakarta.validation.Valid;
-import org.example.entrada.dto.CambioEstadoRequest;
-import org.example.entrada.dto.EmitirEntradasRequest;
-import org.example.entrada.dto.EntradaDTO;
-import org.example.entrada.dto.RevisionEntradaRequestDTO;
+import org.example.entrada.dto.*;
 import org.example.entrada.dto.response.EntradaEmitidaDTO;
+import org.example.entrada.dto.response.ValidarEntradaResponse;
 import org.example.entrada.service.EntradaService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -72,5 +70,11 @@ public class EntradaController {
     public ResponseEntity<Void> revisarSolicitud (@RequestBody RevisionEntradaRequestDTO revisionDTO, @RequestHeader Long idUsuario) {
         service.revisarSolicitud(revisionDTO,idUsuario);
         return ResponseEntity.ok().build();
+    }
+
+    //endpoint para que el personal valide el QR
+    @PatchMapping("/validar")
+    public ResponseEntity<ValidarEntradaResponse> validar (@Valid @RequestBody ValidarEntradaRequest request) {
+        return ResponseEntity.ok(service.validarEntrada(request.getCodigoQr(),request.getEventoId()));
     }
 }

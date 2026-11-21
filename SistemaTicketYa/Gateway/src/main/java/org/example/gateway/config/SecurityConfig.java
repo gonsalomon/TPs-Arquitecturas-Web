@@ -44,6 +44,16 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/authenticate").permitAll()
 
+                        .requestMatchers(HttpMethod.PATCH, "/api/eventos/{id}/estado").hasAnyAuthority(AuthorityConstant.ADMINISTRADOR, AuthorityConstant.ORGANIZADOR)
+                        .requestMatchers(HttpMethod.PATCH, "/api/entradas/validar").hasAuthority(AuthorityConstant.PERSONAL_DE_ACCESO)
+                        .requestMatchers(HttpMethod.GET, "/api/entradas").hasAuthority(AuthorityConstant.CLIENTE)
+
+                        .requestMatchers("/api/ordenes/**").hasAuthority(AuthorityConstant.CLIENTE)
+                        .requestMatchers("/api/pagos/**").hasAuthority(AuthorityConstant.CLIENTE)
+                        .requestMatchers("/api/reservas/**").hasAuthority(AuthorityConstant.CLIENTE)
+                        .requestMatchers("/api/notificaciones/**").permitAll()
+
+
 
                         .anyRequest().authenticated()
                 )

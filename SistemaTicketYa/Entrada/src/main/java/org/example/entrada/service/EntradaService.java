@@ -7,6 +7,7 @@ import org.example.entrada.client.usuario.response.dto.UsuarioResponseDTO;
 import org.example.entrada.client.utils.Rol;
 import org.example.entrada.dto.*;
 import org.example.entrada.dto.response.EntradaEmitidaDTO;
+import org.example.entrada.dto.response.ValidarEntradaResponse;
 import org.example.entrada.entity.Entrada;
 import org.example.entrada.exception.AsientoNoDisponibleException;
 import org.example.entrada.exception.DevolucionFueraDePlazoException;
@@ -180,10 +181,8 @@ public class EntradaService {
                     && LocalDateTime.now().isAfter(e.getFechaEvento().minusHours(HORAS_LIMITE_DEVOLUCION))) {
                 throw new DevolucionFueraDePlazoException("La devolución debe solicitarse hasta 72 horas antes del evento");
             }
-            //si no pasaron 72 hs devolver la teca y notificar
         }
         e.cambiarEstado(nuevo);
-        //actualizar la entrada
     }
 
     private Entrada buscarOFalla(Long id) {
@@ -216,5 +215,41 @@ public class EntradaService {
             pagoFeignClient.reembolsarPago(revisionDTO.getIdReserva());
             reservaFeignClient.actualizarEstadoReserva(revisionDTO.getIdReserva(), "PENDIENTE");
         }
+    }
+
+    @Transactional
+    public ValidarEntradaResponse validarEntrada (String codigoQr, String eventoId) {
+
+        Entrada entrada = repo.findByCodigoQr(codigoQr)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Código QR inválido"
+                ));
+
+        if (!entrada.getEventoId().equals(eventoId)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "La entrada no corresponde a este evento"
+            );
+        }
+
+        if (entrada.getEstado() != EstadoEntrada.VALIDA) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "La entrada ya fue utilizada o no es válida"
+            );
+        }
+
+        aplicarCambio(
+                entrada,
+                EstadoEntrada.USADA,
+                MotivoCambio.VALIDACION_ENTRADA
+        );
+        return new ValidarEntradaResponse(
+                entrada.getId(),
+                entrada.getEventoId(),
+                entrada.getEstado(),
+                "Entrada validada correctamente"
+        );
     }
 }

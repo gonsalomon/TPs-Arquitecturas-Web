@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import org.example.evento.client.OrdenFeignClient;
 import org.example.evento.client.UsuarioFeingClient;
 import org.example.evento.client.usuario.dto.response.UsuarioResponseDTO;
-import org.example.evento.client.utils.Rol;
 import org.example.evento.config.CacheConfig;
 import org.example.evento.dto.request.BusquedaEventoDTO;
 import org.example.evento.dto.request.EventoRequestDTO;
@@ -54,7 +53,7 @@ public class EventoService {
         if(usuario == null){
             throw new IllegalArgumentException("Usuario no encontrado");
         }
-        if(usuario.getRol() != Rol.ORGANIZADOR){
+        if (!usuario.getAuthorities().contains("ROLE_ORGANIZADOR")) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no es un organizador");
         }
         Lugar lugar = lugarService.buscar(request.getIdLugar());
@@ -208,8 +207,9 @@ public class EventoService {
         }
         Evento evento = buscar(idEvento);
         EstadoEvento actual = evento.getEstado();
-        boolean esAdmin = (usuario.getRol() == Rol.ADMINISTRADOR);
-        boolean esOrganizadorDueño = (usuario.getRol() == Rol.ORGANIZADOR && evento.getIdOrganizador().equals(usuarioId));
+
+        boolean esAdmin = usuario.getAuthorities().contains("ADMINISTRADOR");
+        boolean esOrganizador = usuario.getAuthorities().contains("ORGANIZADOR") && evento.getIdOrganizador().equals(usuarioId);
         if (!transicionValida(actual, nuevo)) {
             throw new IllegalStateException("No se puede pasar de " + actual + " a " + nuevo);
         }
@@ -223,7 +223,7 @@ public class EventoService {
                 ordenFeignClient.cancelacionEvento(idEvento);
             }
         } else {
-            if (!esOrganizadorDueño && !esAdmin) {
+            if (!esOrganizador && !esAdmin) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permisos para modificar este evento");
             }
         }
