@@ -162,7 +162,7 @@ public class OrdenService {
 
     // ---------- Pagar orden ----------
 
-    @Transactional
+    @Transactional(noRollbackFor = ServicioNoDisponibleException.class)
     public OrdenResponseDTO pagar(Long clienteId, Long idOrden, PagarOrdenRequestDTO request) {
         try {
             Orden orden = buscarPropia(clienteId, idOrden);
@@ -244,10 +244,25 @@ public class OrdenService {
 
         orden.cambiarEstado(EstadoOrden.CONFIRMADA);
         ordenRepository.save(orden);
-
+        notificarCompraConfirmada(orden);
         OrdenResponseDTO dto = mapper.convertToDTO(orden);
         dto.setEntradas(entradas);
         return dto;
+    }
+
+    private void notificarCompraConfirmada(Orden orden) {
+        try {
+            UsuarioResponseDTO usuario = usuarioClient.getById(orden.getClienteId());
+            NotificacionRequestDTO notificacion = new NotificacionRequestDTO(
+                    "CONFIRMACION_COMPRA",
+                    "EMAIL",
+                    usuario.getEmail()
+            );
+            notificacionClient.notificar(notificacion);
+        } catch (FeignException e) {
+            System.out.println("Error notificando: " + e.status());
+            System.out.println("Respuesta: " + e.contentUTF8());
+        }
     }
 
     private EmitirEntradasRequestDTO construirSolicitudEmision(Orden orden) {
