@@ -24,10 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -172,7 +169,7 @@ public class OrdenService {
 
     // ---------- Pagar orden ----------
 
-    @Transactional
+    @Transactional(noRollbackFor = ServicioNoDisponibleException.class)
     public OrdenResponseDTO pagar(Long clienteId, Long idOrden, PagarOrdenRequestDTO request) {
         try {
             Orden orden = buscarPropia(clienteId, idOrden);
@@ -258,10 +255,27 @@ public class OrdenService {
 
         orden.cambiarEstado(EstadoOrden.CONFIRMADA);
         ordenRepository.save(orden);
-
+        notificarCompraConfirmada(orden);
         OrdenResponseDTO dto = mapper.convertToDTO(orden);
         dto.setEntradas(entradas);
         return dto;
+    }
+
+    private void notificarCompraConfirmada(Orden orden) {
+        try {
+            UsuarioResponseDTO usuario = usuarioClient.getById(orden.getClienteId());
+            NotificacionRequestDTO notificacion = new NotificacionRequestDTO(
+                    "CONFIRMACION_COMPRA",
+                    "EMAIL",
+                    usuario.getEmail(),
+                    null,
+                    null
+            );
+            notificacionClient.notificar(notificacion);
+        } catch (FeignException e) {
+            System.out.println("Error notificando: " + e.status());
+            System.out.println("Respuesta: " + e.contentUTF8());
+        }
     }
 
     private EmitirEntradasRequestDTO construirSolicitudEmision(Orden orden) {
@@ -339,6 +353,7 @@ public class OrdenService {
     }
 
 //    cancelacion
+    @Transactional
     public void cancelacionEvento(String idEvento){
         List<Orden> ordenes = ordenRepository.findByEventoId(idEvento);
         for(int i=0; i<ordenes.size(); i++){
@@ -350,16 +365,41 @@ public class OrdenService {
             pagoClient.reembolsarPago(idReserva);
             //cancelar las ordenes
             orden.setEstado(EstadoOrden.CANCELADA);
+            orden.setReembolsada(true);
             ordenRepository.save(orden);
             //notificar
             UsuarioResponseDTO usuario = usuarioClient.getById(orden.getClienteId());
             NotificacionRequestDTO notificacionRequestDTO = new NotificacionRequestDTO(
                     "CANCELACION_EVENTO",
                     "EMAIL",
-                    usuario.getEmail()
+                    usuario.getEmail(),
+                    null,
+                    null
             );
             notificacionClient.notificar(notificacionRequestDTO);
-
+        }
+    }
+    //cambio
+    @Transactional
+    public void cambioEnEvento(String idEvento, LocalDateTime fechaAnterior, LocalDateTime fechaNueva) {
+        List<Orden> ordenes = ordenRepository.findByEventoIdAndEstadoIn(
+                idEvento,
+                List.of(EstadoOrden.PENDIENTE_PAGO,EstadoOrden.PAGO_APROBADO,EstadoOrden.CONFIRMADA)
+        );
+        Set<Long> clientesNotificados = new HashSet<>(); //para evitar notificar varias veces a un mismo comprador
+        for (Orden orden : ordenes) {
+            if (!clientesNotificados.add(orden.getClienteId())) {
+                continue;
+            }
+            UsuarioResponseDTO usuario = usuarioClient.getById(orden.getClienteId());
+            NotificacionRequestDTO notificacionRequestDTO = new NotificacionRequestDTO(
+                    "MODIFICACION_EVENTO",
+                    "EMAIL",
+                    usuario.getEmail(),
+                    fechaAnterior,
+                    fechaNueva
+            );
+            notificacionClient.notificar(notificacionRequestDTO);
         }
     }
 

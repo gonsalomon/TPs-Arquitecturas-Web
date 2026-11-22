@@ -13,7 +13,7 @@ spring:
 
 servicios:
   evento:
-    url: http://localhost:8083/api
+    url: http://localhost:8083/api/eventos
   reserva:
     url: http://localhost:8084/api
   pago:

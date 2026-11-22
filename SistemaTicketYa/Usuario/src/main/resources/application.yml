@@ -17,3 +17,7 @@ spring:
     allow-bean-definition-overriding: true
 server:
   port: 8081
+logging:
+  level:
+    org.hibernate.boot.model: DEBUG
+    org.hibernate.tool.schema: DEBUG

@@ -20,14 +20,14 @@ spring:
       client:
         config:
           default:
-            connectTimeout: 2000
-            readTimeout: 5000
+            connectTimeout: 8000
+            readTimeout: 10000
 server:
   port: 8087
 
 servicios:
   evento:
-    url: http://localhost:8083/api
+    url: http://localhost:8083/api/eventos
   reserva:
     url: http://localhost:8084/api
   pago:

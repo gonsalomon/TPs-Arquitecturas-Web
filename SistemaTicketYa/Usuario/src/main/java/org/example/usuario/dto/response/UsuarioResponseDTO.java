@@ -3,7 +3,8 @@ package org.example.usuario.dto.response;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.example.usuario.utils.Rol;
+
+import java.util.Set;
 
 @Getter
 @Setter
@@ -13,5 +14,7 @@ public class UsuarioResponseDTO {
     private String nombre;
     private String apellido;
     private String email;
-    private Rol rol;
+    private String ciudad;
+    private Set<String> authorities;
+    private Set<String> artistasFavoritos;
 }

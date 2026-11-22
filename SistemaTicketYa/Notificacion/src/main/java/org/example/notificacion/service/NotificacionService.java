@@ -16,9 +16,25 @@ import java.util.List;
 @AllArgsConstructor
 public class NotificacionService {
     private final NotificacionRepository notificacionRepository;
+    private final EmailService emailService;
 
     @Transactional
     public NotificacionResponseDTO notificar(NotificacionRequestDTO notificacionDTO) {
+        if (notificacionDTO.getTipo() == NotificacionTipo.MODIFICACION_EVENTO) {
+            emailService.enviarModificacion(
+                    notificacionDTO.getEmail(),
+                    notificacionDTO.getFechaAnterior(),
+                    notificacionDTO.getFechaNueva()
+            );
+        }else if (notificacionDTO.getTipo() == NotificacionTipo.CANCELACION_EVENTO) {
+            emailService.enviarCancelacion(notificacionDTO.getEmail());
+        }else if (notificacionDTO.getTipo() == NotificacionTipo.CONFIRMACION_COMPRA) {
+            emailService.enviarConfirmacionOrden(notificacionDTO.getEmail());
+        }else if (notificacionDTO.getTipo() == NotificacionTipo.PUBLICACION_EVENTO_ARTISTA) {
+            emailService.enviarNuevoEventoArtista(
+                    notificacionDTO.getEmail()
+            );
+        }
         Notificacion notificacion = new Notificacion(
                 null,
                 notificacionDTO.getTipo(),
