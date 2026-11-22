@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.example.evento.dto.request.BusquedaEventoDTO;
 import org.example.evento.dto.request.CambioEstadoDTO;
+import org.example.evento.dto.request.CambioFechaEventoDTO;
 import org.example.evento.dto.request.EventoRequestDTO;
 import org.example.evento.dto.response.EventoResponseDTO;
 import org.example.evento.service.EventoService;
@@ -79,5 +80,10 @@ public class EventoController {
     public ResponseEntity<Void> delete(@PathVariable String id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
+    }
+    @Operation(summary = "Cambiar fecha y hora de un evento")
+    @PatchMapping("/{id}/fecha")
+    public ResponseEntity<EventoResponseDTO> cambiarFecha(@PathVariable String id, @Valid @RequestBody CambioFechaEventoDTO body, @RequestParam Long usuarioId) {
+        return ResponseEntity.ok(service.cambiarFecha(id, body.getFechaHora(), usuarioId));
     }
 }

@@ -1,6 +1,7 @@
 package org.example.orden.repository;
 
 import org.example.orden.entity.Orden;
+import org.example.orden.utils.EstadoOrden;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -32,4 +33,6 @@ public interface OrdenRepository extends JpaRepository<Orden, Long> {
     Optional<Orden> findByIdOrdenAndClienteId(Long idOrden, Long clienteId);
 
     List<Orden> findByEventoId(String idEvento);
+
+    List<Orden> findByEventoIdAndEstadoIn(String eventoId, List<EstadoOrden> estados);
 }

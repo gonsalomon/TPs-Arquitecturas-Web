@@ -1,7 +1,5 @@
 package org.example.orden.feignClients;
 
-
-
 import org.example.orden.dto.request.NotificacionRequestDTO;
 import org.example.orden.dto.response.NotificacionResponseDTO;
 import org.springframework.cloud.openfeign.FeignClient;

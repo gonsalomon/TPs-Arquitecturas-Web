@@ -256,7 +256,9 @@ public class OrdenService {
             NotificacionRequestDTO notificacion = new NotificacionRequestDTO(
                     "CONFIRMACION_COMPRA",
                     "EMAIL",
-                    usuario.getEmail()
+                    usuario.getEmail(),
+                    null,
+                    null
             );
             notificacionClient.notificar(notificacion);
         } catch (FeignException e) {
@@ -340,6 +342,7 @@ public class OrdenService {
     }
 
 //    cancelacion
+    @Transactional
     public void cancelacionEvento(String idEvento){
         List<Orden> ordenes = ordenRepository.findByEventoId(idEvento);
         for(int i=0; i<ordenes.size(); i++){
@@ -357,10 +360,34 @@ public class OrdenService {
             NotificacionRequestDTO notificacionRequestDTO = new NotificacionRequestDTO(
                     "CANCELACION_EVENTO",
                     "EMAIL",
-                    usuario.getEmail()
+                    usuario.getEmail(),
+                    null,
+                    null
             );
             notificacionClient.notificar(notificacionRequestDTO);
-
+        }
+    }
+    //cambio
+    @Transactional
+    public void cambioEnEvento(String idEvento, LocalDateTime fechaAnterior, LocalDateTime fechaNueva) {
+        List<Orden> ordenes = ordenRepository.findByEventoIdAndEstadoIn(
+                idEvento,
+                List.of(EstadoOrden.PENDIENTE_PAGO,EstadoOrden.PAGO_APROBADO,EstadoOrden.CONFIRMADA)
+        );
+        Set<Long> clientesNotificados = new HashSet<>(); //para evitar notificar varias veces a un mismo comprador
+        for (Orden orden : ordenes) {
+            if (!clientesNotificados.add(orden.getClienteId())) {
+                continue;
+            }
+            UsuarioResponseDTO usuario = usuarioClient.getById(orden.getClienteId());
+            NotificacionRequestDTO notificacionRequestDTO = new NotificacionRequestDTO(
+                    "MODIFICACION_EVENTO",
+                    "EMAIL",
+                    usuario.getEmail(),
+                    fechaAnterior,
+                    fechaNueva
+            );
+            notificacionClient.notificar(notificacionRequestDTO);
         }
     }
 }

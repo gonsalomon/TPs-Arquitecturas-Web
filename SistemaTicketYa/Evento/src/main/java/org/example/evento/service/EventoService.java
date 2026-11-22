@@ -15,7 +15,6 @@ import org.example.evento.mapper.EventoMapper;
 import org.example.evento.repository.EventoRepository;
 import org.example.evento.entity.PrecioSector;
 import org.example.evento.utils.EstadoEvento;
-import org.example.evento.utils.OrdenBusqueda;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -28,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +53,7 @@ public class EventoService {
         if(usuario == null){
             throw new IllegalArgumentException("Usuario no encontrado");
         }
-        if (!usuario.getAuthorities().contains("ROLE_ORGANIZADOR")) {
+        if (!usuario.getAuthorities().contains("ORGANIZADOR")) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no es un organizador");
         }
         Lugar lugar = lugarService.buscar(request.getIdLugar());
@@ -194,38 +194,71 @@ public class EventoService {
         return Pattern.quote(texto);
     }
 
+    private UsuarioResponseDTO obtenerUsuario(Long usuarioId) {
+        ResponseEntity<UsuarioResponseDTO> response = usuarioFeingClient.getById(usuarioId);
+        UsuarioResponseDTO usuario = response.getBody();
+        if (usuario == null) {
+            throw new IllegalArgumentException("Usuario no encontrado");
+        }
+        return usuario;
+    }
+
+    private boolean esAdmin(UsuarioResponseDTO usuario) {
+        return usuario.getAuthorities().contains("ADMINISTRADOR");
+    }
+
+    private boolean esOrganizador(UsuarioResponseDTO usuario, Evento evento) {
+        return usuario.getAuthorities().contains("ORGANIZADOR") && evento.getIdOrganizador().equals(usuario.getId());
+    }
+
+    @Caching(evict = {
+            @CacheEvict(value = CacheConfig.EVENTOS, key = "#idEvento"),
+            @CacheEvict(value = CacheConfig.BUSQUEDAS, allEntries = true)
+    })
+    public EventoResponseDTO cambiarFecha(String idEvento, LocalDateTime nuevaFecha, Long usuarioId) {
+        UsuarioResponseDTO usuario = obtenerUsuario(usuarioId);
+        Evento evento = buscar(idEvento);
+        boolean admin = esAdmin(usuario);
+        boolean organizador = esOrganizador(usuario, evento);
+        if(!(admin || organizador)){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"No tienes permisos para modificar este evento");
+        }
+        if (evento.getEstado() != EstadoEvento.PUBLICADO
+                && evento.getEstado() != EstadoEvento.AGOTADO) {
+            throw new IllegalStateException("Solo se puede cambiar la fecha de eventos publicados o agotados");
+        }
+        LocalDateTime fechaAnterior = evento.getFechaHora(); //necesito guardar la fecha original
+        if (fechaAnterior.equals(nuevaFecha)) {
+            throw new IllegalArgumentException("La nueva fecha debe ser diferente a la actual");
+        }
+        evento.setFechaHora(nuevaFecha);
+        Evento eventoGuardado = repository.save(evento);
+        ordenFeignClient.notificarCambioFecha(idEvento,fechaAnterior,nuevaFecha);
+        return toDTO(eventoGuardado);
+    }
     /*-------------------------- CAMBIO DE ESTADO --------------------------*/
     @Caching(evict = {
             @CacheEvict(value = CacheConfig.EVENTOS, key = "#idEvento"),
             @CacheEvict(value = CacheConfig.BUSQUEDAS, allEntries = true)
     })
     public EventoResponseDTO cambiarEstado(String idEvento, EstadoEvento nuevo, Long usuarioId) {
-        ResponseEntity<UsuarioResponseDTO> response = usuarioFeingClient.getById(usuarioId);
-        UsuarioResponseDTO usuario = response.getBody();
-        if (usuario == null) {
-            throw new IllegalArgumentException("Usuario no encontrado");
-        }
+        UsuarioResponseDTO usuario = obtenerUsuario(usuarioId);
         Evento evento = buscar(idEvento);
         EstadoEvento actual = evento.getEstado();
-
-        boolean esAdmin = usuario.getAuthorities().contains("ADMINISTRADOR");
-        boolean esOrganizador = usuario.getAuthorities().contains("ORGANIZADOR") && evento.getIdOrganizador().equals(usuarioId);
+        boolean admin = esAdmin(usuario);
+        boolean organizador = esOrganizador(usuario, evento);
         if (!transicionValida(actual, nuevo)) {
             throw new IllegalStateException("No se puede pasar de " + actual + " a " + nuevo);
         }
         if (nuevo == EstadoEvento.CANCELADO || nuevo == EstadoEvento.SUSPENDIDO) {
-            if (!esAdmin) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permisos para cancelar este evento");
+            if (!admin) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN,"No tienes permisos para cancelar este evento");
             }
-            // si es un admin y se cancelo el evento
-            if(nuevo == EstadoEvento.CANCELADO){
-                //orden orquesta la cancelacion (reintegro y notificacion)
+            if (nuevo == EstadoEvento.CANCELADO) {
                 ordenFeignClient.cancelacionEvento(idEvento);
             }
-        } else {
-            if (!esOrganizador && !esAdmin) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permisos para modificar este evento");
-            }
+        } else if (!organizador && !admin) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"No tienes permisos para modificar este evento");
         }
         if (nuevo == EstadoEvento.PUBLICADO) {
             Lugar lugar = lugarService.buscar(evento.getIdLugar());

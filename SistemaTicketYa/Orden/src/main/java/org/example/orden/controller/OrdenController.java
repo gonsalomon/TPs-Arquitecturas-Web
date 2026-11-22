@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -83,6 +84,15 @@ public class OrdenController {
     @PutMapping ("/{idEvento}/cancelacion")
     public ResponseEntity<Void> cancelacionEvento(@PathVariable String idEvento){
         service.cancelacionEvento(idEvento);
+        return ResponseEntity.ok().build();
+    }
+    @PutMapping("/evento/{idEvento}/cambio-fecha")
+    public ResponseEntity<Void> notificarCambioFecha(
+            @PathVariable String idEvento,
+            @RequestParam LocalDateTime fechaAnterior,
+            @RequestParam LocalDateTime fechaNueva
+    ){
+        service.cambioEnEvento(idEvento,fechaAnterior,fechaNueva);
         return ResponseEntity.ok().build();
     }
 
