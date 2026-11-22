@@ -45,21 +45,23 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/authenticate").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/eventos").hasAuthority(AuthorityConstant.ORGANIZADOR)
-                        .requestMatchers(HttpMethod.POST, "/api/lugares").hasAuthority(AuthorityConstant.ORGANIZADOR)
+                        .requestMatchers(HttpMethod.POST, "/api/eventos/lugares").hasAuthority(AuthorityConstant.ORGANIZADOR)
                         .requestMatchers(HttpMethod.POST, "/api/entradas/revision").hasAuthority(AuthorityConstant.ADMINISTRADOR)
                         .requestMatchers(HttpMethod.PATCH, "/api/eventos/{id}/fecha").hasAuthority(AuthorityConstant.ORGANIZADOR)
                         .requestMatchers(HttpMethod.PATCH, "/api/eventos/{id}/estado").hasAnyAuthority(AuthorityConstant.ADMINISTRADOR, AuthorityConstant.ORGANIZADOR)
                         .requestMatchers(HttpMethod.PATCH, "/api/entradas/validar").hasAuthority(AuthorityConstant.PERSONAL_DE_ACCESO)
                         .requestMatchers(HttpMethod.GET, "/api/entradas").hasAuthority(AuthorityConstant.CLIENTE)
+                        .requestMatchers(HttpMethod.GET, "/api/ordenes/reportes").hasAuthority(AuthorityConstant.ORGANIZADOR)
                         .requestMatchers(HttpMethod.GET, "/api/usuarios/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/eventos/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/lugares/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/eventos/lugares/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/ordenes/**").permitAll()
                         //menos especificos
                         .requestMatchers("/api/ordenes/**").hasAuthority(AuthorityConstant.CLIENTE)
                         .requestMatchers("/api/pagos/**").hasAuthority(AuthorityConstant.CLIENTE)
                         .requestMatchers("/api/reservas/**").hasAuthority(AuthorityConstant.CLIENTE)
                         .requestMatchers("/api/notificaciones/**").permitAll()
+                        .requestMatchers("api/usuarios/**").permitAll()
 
 
 

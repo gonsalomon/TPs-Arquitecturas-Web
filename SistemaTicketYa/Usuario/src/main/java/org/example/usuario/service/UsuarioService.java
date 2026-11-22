@@ -3,6 +3,7 @@ package org.example.usuario.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.example.usuario.dto.request.UsuarioRequestDTO;
+import org.example.usuario.dto.response.NotificacionArtistaDTO;
 import org.example.usuario.dto.response.UsuarioResponseDTO;
 import org.example.usuario.dto.response.UsuarioTokenResponseDTO;
 import org.example.usuario.entity.Authority;
@@ -16,6 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -87,5 +91,20 @@ public class UsuarioService {
         Usuario usuario = repository.findOneWithAuthoritiesByEmailIgnoreCase(email)
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
         return UsuarioMapper.convertToUsuarioTokenResponse(usuario);
+    }
+
+    public List<NotificacionArtistaDTO> buscarDestinatarios(Set<String> artistas, String ciudad) {
+        Set<String> artistasNormalizados = artistas.stream()
+                .filter(Objects::nonNull)
+                .map(a -> a.trim().toLowerCase())
+                .collect(Collectors.toSet());
+        return repository.buscarUsuariosPorArtistasYCiudad(
+                        artistasNormalizados, ciudad.trim()
+                ).stream()
+                .map(u -> new NotificacionArtistaDTO(
+                        u.getIdUsuario(),
+                        u.getEmail()
+                ))
+                .toList();
     }
 }

@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.example.usuario.dto.request.UsuarioRequestDTO;
+import org.example.usuario.dto.response.NotificacionArtistaDTO;
 import org.example.usuario.dto.response.UsuarioResponseDTO;
 import org.example.usuario.service.UsuarioService;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -85,4 +87,8 @@ public class UsuarioController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/notificaciones/artistas")
+    public List<NotificacionArtistaDTO> buscarDestinatarios(@RequestParam Set<String> artistas, @RequestParam String ciudad) {
+        return service.buscarDestinatarios(artistas, ciudad);
+    }
 }

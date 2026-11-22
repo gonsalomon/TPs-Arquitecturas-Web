@@ -30,6 +30,10 @@ public class NotificacionService {
             emailService.enviarCancelacion(notificacionDTO.getEmail());
         }else if (notificacionDTO.getTipo() == NotificacionTipo.CONFIRMACION_COMPRA) {
             emailService.enviarConfirmacionOrden(notificacionDTO.getEmail());
+        }else if (notificacionDTO.getTipo() == NotificacionTipo.PUBLICACION_EVENTO_ARTISTA) {
+            emailService.enviarNuevoEventoArtista(
+                    notificacionDTO.getEmail()
+            );
         }
         Notificacion notificacion = new Notificacion(
                 null,

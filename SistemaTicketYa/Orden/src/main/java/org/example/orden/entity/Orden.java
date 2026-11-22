@@ -65,6 +65,9 @@ public class Orden {
     @Column(name = "fecha_actualizacion")
     private LocalDateTime fechaActualizacion;
 
+    @Column
+    private boolean reembolsada = false;
+
     @Version
     private Long version;
 

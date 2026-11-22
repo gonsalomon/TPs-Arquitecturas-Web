@@ -1,8 +1,11 @@
 package org.example.evento.service;
 
 import lombok.AllArgsConstructor;
+import org.example.evento.client.NotificacionFeignClient;
 import org.example.evento.client.OrdenFeignClient;
 import org.example.evento.client.UsuarioFeingClient;
+import org.example.evento.client.notificacion.dto.NotificacionRequestDTO;
+import org.example.evento.client.usuario.dto.response.NotificacionArtistaDTO;
 import org.example.evento.client.usuario.dto.response.UsuarioResponseDTO;
 import org.example.evento.config.CacheConfig;
 import org.example.evento.dto.request.BusquedaEventoDTO;
@@ -26,13 +29,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
+import java.util.*;
 import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,6 +43,7 @@ public class EventoService {
     private final MongoTemplate mongoTemplate;
     private final UsuarioFeingClient  usuarioFeingClient;
     private final OrdenFeignClient  ordenFeignClient;
+    private final NotificacionFeignClient notificacionFeignClient;
 
     /*-------------------------- MÉTODOS PARA EL CRUD --------------------------*/
     /* Todo evento se crea en BORRADOR. El lugar tiene que existir antes. */
@@ -267,7 +267,35 @@ public class EventoService {
             }
         }
         evento.setEstado(nuevo);
-        return toDTO(repository.save(evento));
+        Evento eventoGuardado = repository.save(evento);
+        if((actual == EstadoEvento.BORRADOR) && (nuevo == EstadoEvento.PUBLICADO)){
+            //si estaba en borrador y el nuevo es publicado notifico
+            notificarSeguidores(eventoGuardado);
+        }
+        return toDTO(eventoGuardado);
+    }
+
+    private void notificarSeguidores(Evento evento) {
+        Lugar lugar = lugarService.buscar(evento.getIdLugar());
+        List<NotificacionArtistaDTO> destinatarios =
+                usuarioFeingClient.buscarDestinatarios(
+                        new HashSet<>(evento.getParticipantes()),
+                        lugar.getCiudad()
+                );
+        for (NotificacionArtistaDTO destinatario : destinatarios) {
+            NotificacionRequestDTO request = new NotificacionRequestDTO(
+                    "PUBLICACION_EVENTO_ARTISTA",
+                    "EMAIL",
+                    destinatario.getEmail(),
+                    null,
+                    null
+            );
+            try {
+                notificacionFeignClient.notificar(request);
+            } catch (Exception e) {
+                // Registrar el error y permitir que la publicación continúe.
+            }
+        }
     }
 
     /* BORRADOR -> PUBLICADO -> AGOTADO / FINALIZADO. Se puede CANCELAR mientras no haya finalizado.

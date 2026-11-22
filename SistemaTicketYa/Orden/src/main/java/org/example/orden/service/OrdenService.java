@@ -22,10 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -354,6 +351,7 @@ public class OrdenService {
             pagoClient.reembolsarPago(idReserva);
             //cancelar las ordenes
             orden.setEstado(EstadoOrden.CANCELADA);
+            orden.setReembolsada(true);
             ordenRepository.save(orden);
             //notificar
             UsuarioResponseDTO usuario = usuarioClient.getById(orden.getClienteId());

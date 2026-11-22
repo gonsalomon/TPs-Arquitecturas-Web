@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -29,4 +30,6 @@ public class UsuarioRequestDTO {
     @NotNull( message = "Los roles son un campo requerido." )
     @NotEmpty( message = "Los roles son un campo requerido." )
     private List<String> authorities;
+
+    private Set<String> artistasFavoritos;
 }

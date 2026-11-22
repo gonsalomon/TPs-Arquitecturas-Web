@@ -24,7 +24,8 @@ public class UsuarioMapper {
                 usuario.getCiudad(),
                 usuario.getAuthorities().stream()
                         .map(Authority::getName)
-                        .collect(Collectors.toSet())
+                        .collect(Collectors.toSet()),
+                usuario.getArtistasFavoritos()
         );
     }
 
@@ -37,7 +38,8 @@ public class UsuarioMapper {
                 usuarioRequestDTO.getEmail(),
                 usuarioRequestDTO.getCiudad(),
                 authorities,
-                usuarioRequestDTO.getPassword()
+                usuarioRequestDTO.getPassword(),
+                usuarioRequestDTO.getArtistasFavoritos()
         );
     }
     public static UsuarioTokenResponseDTO convertToUsuarioTokenResponse(Usuario usuario) {

@@ -16,4 +16,5 @@ public class UsuarioResponseDTO {
     private String email;
     private String ciudad;
     private Set<String> authorities;
+    private Set<String> artistasFavoritos;
 }

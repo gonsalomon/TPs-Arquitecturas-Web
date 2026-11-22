@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/lugares")
+@RequestMapping("/api/eventos/lugares")
 @AllArgsConstructor
 @Tag(name = "Lugares", description = "Estadios, teatros y salas con sus sectores")
 public class LugarController {

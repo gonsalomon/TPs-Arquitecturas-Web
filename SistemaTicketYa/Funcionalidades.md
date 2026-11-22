@@ -7,11 +7,12 @@ FUNCIONALIDAD
 10. El sistema debe registrar las preferencias de los clientes (tipos de evento, artistas
     favoritos, ciudad) y sugerir eventos en función de su historial (similar a “quienes
     compraron entradas para este evento también compraron para…”).
-11. Enviar notificaciones(email o push) al confirmar una compra, ante la cancelación o cambio
-    de un evento, y cuando un artista favorito de un cliente publica un evento en su ciudad.
+
 12. Los organizadores deben poder consultar reportes de sus eventos: entradas vendidas y
     devueltas por sector, porcentaje de ocupación y recaudación.
 # Done
+11. Enviar notificaciones(email o push) al confirmar una compra, ante la cancelación o cambio
+    de un evento, y cuando un artista favorito de un cliente publica un evento en su ciudad.
 8. En el ingreso al evento, el personal de acceso escanea el QR. El sistema valida que la
    entrada exista, corresponda a ese evento y no haya sido usada, y la marca como utilizada
    (un QR no puede ingresar dos veces).

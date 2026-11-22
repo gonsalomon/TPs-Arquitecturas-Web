@@ -33,7 +33,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"nombre\": \"Santiago\",\r\n  \"apellido\": \"Sosa\",\r\n  \"email\": \"sosasantiago@example.com\",\r\n  \"ciudad\" : \"Tandil\",\r\n  \"password\": 1234,\r\n  \"authorities\": [\"ORGANIZADOR\"]\r\n}",
+              "raw": "{\r\n  \"nombre\": \"Santiago\",\r\n  \"apellido\": \"Sosa\",\r\n  \"email\": \"sosasantiago@example.com\",\r\n  \"ciudad\" : \"Tandil\",\r\n  \"password\": 1234,\r\n  \"authorities\": [\"ORGANIZADOR\"],\r\n  \"artistasFavoritos\" : []\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -63,7 +63,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"nombre\": \"Maria\",\r\n  \"apellido\": \"Cabrera\",\r\n  \"email\": \"maria@example.com\",\r\n  \"ciudad\" : \"Tandil\",\r\n  \"password\": \"1234\",\r\n  \"authorities\": [\"ADMINISTRADOR\"]\r\n}",
+              "raw": "{\r\n  \"nombre\": \"Maria\",\r\n  \"apellido\": \"Cabrera\",\r\n  \"email\": \"maria@example.com\",\r\n  \"ciudad\" : \"Tandil\",\r\n  \"password\": \"1234\",\r\n  \"authorities\": [\"ADMINISTRADOR\"],\r\n  \"artistasFavoritos\" : []\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -121,7 +121,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"nombre\": \"Santiago\",\r\n  \"apellido\": \"Gomez\",\r\n  \"email\": \"gomezsantiago@example.com\",\r\n  \"ciudad\" : \"Tandil\",\r\n  \"password\": 1234,\r\n  \"authorities\": [\"CLIENTE\"]\r\n}",
+              "raw": "{\r\n  \"nombre\": \"Santiago\",\r\n  \"apellido\": \"Gomez\",\r\n  \"email\": \"gomezsantiago@example.com\",\r\n  \"ciudad\" : \"Tandil\",\r\n  \"password\": 1234,\r\n  \"authorities\": [\"CLIENTE\"],\r\n  \"artistasFavoritos\" : [\r\n    \"Shakira\",\r\n    \"Maluma\"\r\n  ]\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -150,7 +150,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"nombre\": \"Valeria\",\r\n  \"apellido\": \"Gomez\",\r\n  \"email\": \"gomezvaleria@example.com\",\r\n  \"rol\": \"CLIENTE\"\r\n}",
+              "raw": "{\r\n  \"nombre\": \"Valeria\",\r\n  \"apellido\": \"Gomez\",\r\n  \"email\": \"gomezvaleria@example.com\",\r\n  \"ciudad\" : \"Tandil\",\r\n  \"password\": 1234,\r\n  \"authorities\": [\"CLIENTE\"],\r\n  \"artistasFavoritos\" : [\r\n    \"Shakira\",\r\n    \"Maluma\"\r\n  ]\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -373,11 +373,21 @@
         {
           "name": "Creacion lugar",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOrganizador}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"nombre\" : \"Teatro Colon\",\r\n    \"direccion\" : \"14 de julio\",\r\n    \"ciudad\" : \"tandil\",\r\n    \"latitud\" : 22.8,\r\n    \"longitud\" : 5.5,\r\n    \"sectores\" : [\r\n        {\r\n            \"nombre\" : \"sala\",\r\n            \"tipo\" : \"NO_NUMERADO\",\r\n            \"capacidad\" : 30\r\n        }\r\n    ]\r\n\r\n}",
+              "raw": "{\r\n  \"nombre\": \"Estadio Nacional\",\r\n  \"direccion\": \"Av. Principal 123\",\r\n  \"ciudad\": \"Tandil\",\r\n  \"latitud\": -37.3217,\r\n  \"longitud\": -59.1332,\r\n  \"sectores\": [\r\n    {\r\n      \"nombre\": \"Platea\",\r\n      \"tipo\": \"NUMERADO\",\r\n      \"filas\": 20,\r\n      \"asientosPorFila\": 30,\r\n       \"capacidad\": 600\r\n    },\r\n    {\r\n      \"nombre\": \"Campo\",\r\n      \"tipo\": \"NO_NUMERADO\",\r\n      \"capacidad\": 500\r\n    },\r\n    {\r\n      \"nombre\": \"VIP\",\r\n      \"tipo\": \"NUMERADO\",\r\n      \"filas\": 5,\r\n      \"asientosPorFila\": 10,\r\n       \"capacidad\": 50\r\n    }\r\n  ]\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -385,7 +395,7 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8080/api/lugares",
+              "raw": "http://localhost:8080/api/eventos/lugares",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -393,6 +403,7 @@
               "port": "8080",
               "path": [
                 "api",
+                "eventos",
                 "lugares"
               ]
             }
@@ -405,7 +416,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:8080/api/lugares",
+              "raw": "http://localhost:8080/api/eventos/lugares",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -413,6 +424,7 @@
               "port": "8080",
               "path": [
                 "api",
+                "eventos",
                 "lugares"
               ]
             }
@@ -422,11 +434,21 @@
         {
           "name": "Creacion evento NUMERADO",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOrganizador}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"nombre\": \"U2\",\r\n  \"descripcion\": \"Grupo musical\",\r\n  \"tipo\": \"RECITAL\",\r\n  \"participantes\": [\r\n    \"Banda A\",\r\n    \"Banda B\"\r\n    ],\r\n    \"fechaHora\": \"2026-12-30T21:00:00\",\r\n    \"idLugar\": \"6af390c45232d6512eca04f6\",\r\n    \"nombreLugar\": \"Estadio unico de la Plata\",\r\n    \"precios\": [\r\n        {\r\n            \"sector\": \"platea\",\r\n            \"precio\": 35000.0\r\n        }\r\n    ]\r\n}",
+              "raw": "{\r\n  \"nombre\": \"Concierto de Rock\",\r\n  \"descripcion\": \"Una noche de música en vivo\",\r\n  \"tipo\": \"RECITAL\",\r\n  \"fechaHora\": \"2027-05-20T21:00:00\",\r\n  \"idLugar\": \"6b0366aa04d66d0ce8d52d11\",\r\n  \"participantes\": [\r\n    \"Shakira\",\r\n    \"Artista Invitado\"\r\n  ],\r\n  \"precios\": [\r\n    {\r\n      \"sector\": \"Platea\",\r\n      \"precio\": 25000\r\n    },\r\n    {\r\n      \"sector\": \"Campo\",\r\n      \"precio\": 15000\r\n    },\r\n    {\r\n      \"sector\": \"VIP\",\r\n      \"precio\": 40000\r\n    }\r\n  ]\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -457,6 +479,16 @@
         {
           "name": "Creacion evento NO_NUMERADO",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOrganizador}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
             "header": [],
             "body": {
@@ -533,7 +565,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n        \"nombre\": \"U2\",\r\n        \"descripcion\": \"Grupo musical\",\r\n        \"tipo\": \"RECITAL\",\r\n        \"idOrganizador\": 2,\r\n        \"participantes\": [\r\n            \"Banda A\",\r\n            \"Banda B\"\r\n        ],\r\n        \"fechaHora\": \"2026-12-30T21:00:00\",\r\n        \"idLugar\": \"6af390c45232d6512eca04f6\",\r\n        \"nombreLugar\": \"Estadio unico de la Plata\",\r\n        \"precios\": [\r\n            {\r\n                \"sector\": \"platea\",\r\n                \"precio\": 35000.0\r\n            }\r\n        ],\r\n        \"estado\": \"PUBLICADO\"\r\n    }",
+              "raw": "{\r\n    \"nombre\": \"Concierto de Rock\",\r\n    \"descripcion\": \"Una noche de música en vivo\",\r\n    \"tipo\": \"RECITAL\",\r\n    \"idOrganizador\": 1,\r\n    \"participantes\": [\r\n        \"Shakira\",\r\n        \"Artista Invitado\"\r\n    ],\r\n    \"fechaHora\": \"2027-05-20T21:00:00\",\r\n    \"idLugar\": \"6b0361d43cbe5448e65e34e0\",\r\n    \"nombreLugar\": \"Estadio Municipal\",\r\n    \"precios\": [\r\n        {\r\n            \"sector\": \"Platea\",\r\n            \"precio\": 25000.0\r\n        },\r\n        {\r\n            \"sector\": \"Campo\",\r\n            \"precio\": 15000.0\r\n        },\r\n        {\r\n            \"sector\": \"VIP\",\r\n            \"precio\": 40000.0\r\n        }\r\n    ],\r\n    \"estado\": \"PUBLICADO\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -541,7 +573,7 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8080/api/eventos/6aff0eac6a028420dbc6198a/estado?usuarioId=2",
+              "raw": "http://localhost:8080/api/eventos/6b0366f004d66d0ce8d52d12/estado?usuarioId=1",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -550,13 +582,13 @@
               "path": [
                 "api",
                 "eventos",
-                "6aff0eac6a028420dbc6198a",
+                "6b0366f004d66d0ce8d52d12",
                 "estado"
               ],
               "query": [
                 {
                   "key": "usuarioId",
-                  "value": "2"
+                  "value": "1"
                 }
               ]
             }
@@ -580,7 +612,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"fechaHora\": \"2026-12-24T21:00:00\"\r\n}",
+              "raw": "{\r\n    \"fechaHora\": \"2026-12-26T21:00:00\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -588,7 +620,7 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8080/api/eventos/6aff0eac6a028420dbc6198a/fecha?usuarioId=1",
+              "raw": "http://localhost:8080/api/eventos/6b0362293cbe5448e65e34e1/fecha?usuarioId=1",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -597,7 +629,7 @@
               "path": [
                 "api",
                 "eventos",
-                "6aff0eac6a028420dbc6198a",
+                "6b0362293cbe5448e65e34e1",
                 "fecha"
               ],
               "query": [
@@ -627,7 +659,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n        \"nombre\": \"U2\",\r\n        \"descripcion\": \"Grupo musical\",\r\n        \"tipo\": \"RECITAL\",\r\n        \"idOrganizador\": 1,\r\n        \"participantes\": [\r\n            \"Banda A\",\r\n            \"Banda B\"\r\n        ],\r\n        \"fechaHora\": \"2026-12-30T21:00:00\",\r\n        \"idLugar\": \"6af390c45232d6512eca04f6\",\r\n        \"nombreLugar\": \"Estadio unico de la Plata\",\r\n        \"precios\": [\r\n            {\r\n                \"sector\": \"platea\",\r\n                \"precio\": 35000.0\r\n            }\r\n        ],\r\n        \"estado\": \"CANCELADO\"\r\n    }",
+              "raw": "{\r\n    \"nombre\": \"Concierto de Rock\",\r\n    \"descripcion\": \"Una noche de música en vivo\",\r\n    \"tipo\": \"RECITAL\",\r\n    \"idOrganizador\": 1,\r\n    \"participantes\": [\r\n        \"Shakira\",\r\n        \"Artista Invitado\"\r\n    ],\r\n    \"fechaHora\": \"2026-12-26T21:00:00\",\r\n    \"idLugar\": \"6b0361d43cbe5448e65e34e0\",\r\n    \"nombreLugar\": \"Estadio Municipal\",\r\n    \"precios\": [\r\n        {\r\n            \"sector\": \"Platea\",\r\n            \"precio\": 25000.0\r\n        },\r\n        {\r\n            \"sector\": \"Campo\",\r\n            \"precio\": 15000.0\r\n        },\r\n        {\r\n            \"sector\": \"VIP\",\r\n            \"precio\": 40000.0\r\n        }\r\n    ],\r\n    \"estado\": \"CANCELADO\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -635,7 +667,7 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8080/api/eventos/6aff0eac6a028420dbc6198a/estado?usuarioId=2",
+              "raw": "http://localhost:8080/api/eventos/6b0362293cbe5448e65e34e1/estado?usuarioId=2",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -644,7 +676,7 @@
               "path": [
                 "api",
                 "eventos",
-                "6aff0eac6a028420dbc6198a",
+                "6b0362293cbe5448e65e34e1",
                 "estado"
               ],
               "query": [
@@ -772,13 +804,13 @@
       "name": "Orden",
       "item": [
         {
-          "name": "Obtener ordenes",
+          "name": "Obtener ordenes por cliente",
           "request": {
             "method": "GET",
             "header": [
               {
                 "key": "X-Usuario-Id",
-                "value": "1",
+                "value": "6",
                 "type": "text"
               }
             ],
@@ -814,13 +846,13 @@
             "header": [
               {
                 "key": "X-Usuario-Id",
-                "value": "1",
+                "value": "4",
                 "type": "text"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"eventoId\": \"6aff0eac6a028420dbc6198a\",\r\n    \"sector\": \"platea\",\r\n    \"asientos\": [\r\n        {\r\n            \"fila\": 1,\r\n            \"asiento\": 5\r\n        },\r\n        {\r\n            \"fila\": 1,\r\n            \"asiento\": 6\r\n        }\r\n    ]\r\n}",
+              "raw": "{\r\n    \"eventoId\": \"6b0366f004d66d0ce8d52d12\",\r\n    \"sector\": \"Platea\",\r\n    \"asientos\": [\r\n        {\r\n            \"fila\": 1,\r\n            \"asiento\": 7\r\n        },\r\n        {\r\n            \"fila\": 1,\r\n            \"asiento\": 9\r\n        }\r\n    ]\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -845,17 +877,27 @@
         {
           "name": "Creacion orden NO_NUMERADO",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCliente}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
             "header": [
               {
                 "key": "X-Usuario-Id",
-                "value": "1",
+                "value": "6",
                 "type": "text"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"eventoId\": \"6afe2f24568a69642caedc8b\",\r\n    \"sector\": \"sala\",\r\n    \"cantidad\" : 3\r\n}",
+              "raw": "{\r\n    \"eventoId\": \"6b0366f004d66d0ce8d52d12\",\r\n    \"sector\": \"Campo\",\r\n    \"cantidad\" : 3\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -878,7 +920,7 @@
           "response": []
         },
         {
-          "name": "Pago orden",
+          "name": "Pago orden por usuario",
           "request": {
             "auth": {
               "type": "bearer",
@@ -894,7 +936,7 @@
             "header": [
               {
                 "key": "X-Usuario-Id",
-                "value": "1",
+                "value": "6",
                 "type": "text"
               }
             ],
@@ -908,7 +950,7 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8080/api/ordenes/1/pago",
+              "raw": "http://localhost:8080/api/ordenes/4/pago",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -917,7 +959,7 @@
               "path": [
                 "api",
                 "ordenes",
-                "1",
+                "4",
                 "pago"
               ]
             }
@@ -960,6 +1002,38 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Reporte de Evento",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOrganizador}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/ordenes/reportes/6b0366f004d66d0ce8d52d12",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "ordenes",
+                "reportes",
+                "6b0366f004d66d0ce8d52d12"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -977,7 +1051,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJnb21lenNhbnRpYWdvQGV4YW1wbGUuY29tIiwiYXV0aCI6IkNMSUVOVEUiLCJleHAiOjE3OTUzNzYyNzYsImlhdCI6MTc5NTI4OTg3Nn0.IsnJqRkgVtqHKsz0syK4WLV26_qNrSPrztqHdCT57bQvot33qUhoJo67tHeqbGF2JJWkp5k7VkXJ4H-8M104Tw",
+                  "value": "{{tokenCliente}}",
                   "type": "string"
                 }
               ]
@@ -1050,7 +1124,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJnb21lenNhbnRpYWdvQGV4YW1wbGUuY29tIiwiYXV0aCI6IkNMSUVOVEUiLCJleHAiOjE3OTUzNzE4NzUsImlhdCI6MTc5NTI4NTQ3NX0.3CRtuMHLiXSDKT4_wmcjNbrKwiapFvRKqwEWlClnp_qPgN5JQ4G7FA5UutqYnl_4gi3XCGZwnbrF1aSmZg3jIA",
+                  "value": "{{tokenCliente}}",
                   "type": "string"
                 }
               ]
@@ -1175,7 +1249,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJndXNwdWVibGFAZXhhbXBsZS5jb20iLCJhdXRoIjoiUEVSU09OQUxfREVfQUNDRVNPIiwiZXhwIjoxNzk1MzcxOTIyLCJpYXQiOjE3OTUyODU1MjJ9.WtOt2Vpbo4-gIOpfnauK9KEG3gaTGbND4kEtKEKaxhF_3_25ck34mqn5ODzpEIvnIZcRWcFd9zEhAcDhscP2wA",
+                  "value": "{{tokenPersonalAcceso}}",
                   "type": "string"
                 }
               ]
@@ -1184,7 +1258,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"codigoQr\" : \"186b0495-d750-4bda-869b-6d7b2db8a028\",\r\n    \"eventoId\" : \"6aff0eac6a028420dbc6198a\"\r\n}",
+              "raw": "{\r\n    \"codigoQr\" : \"8f791f41-92de-42a5-bab4-17e5b8f8a659\",\r\n    \"eventoId\" : \"6b0366f004d66d0ce8d52d12\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1220,7 +1294,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJnb21lenNhbnRpYWdvQGV4YW1wbGUuY29tIiwiYXV0aCI6IkNMSUVOVEUiLCJleHAiOjE3OTUzNzYyNzYsImlhdCI6MTc5NTI4OTg3Nn0.IsnJqRkgVtqHKsz0syK4WLV26_qNrSPrztqHdCT57bQvot33qUhoJo67tHeqbGF2JJWkp5k7VkXJ4H-8M104Tw",
+                  "value": "{{tokenCliente}}",
                   "type": "string"
                 }
               ]
@@ -1318,6 +1392,10 @@
     },
     {
       "key": "tokenAdministrador",
+      "value": ""
+    },
+    {
+      "key": "tokenPersonalAcceso",
       "value": ""
     }
   ]

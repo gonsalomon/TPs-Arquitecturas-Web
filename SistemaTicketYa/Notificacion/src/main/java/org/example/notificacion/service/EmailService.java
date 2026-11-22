@@ -72,4 +72,18 @@ public class EmailService {
         );
         mailSender.send(mensaje);
     }
+    public void enviarNuevoEventoArtista(String email) {
+        SimpleMailMessage mensaje = new SimpleMailMessage();
+        mensaje.setTo(email);
+        mensaje.setSubject("Tu artista favorito estara en tu ciudad pronto!");
+        mensaje.setText(
+                "Hola!\n\n" +
+                        "Te informamos que tu artista favorito " +
+                        "realizara un show en los siguientes meses en tu ciudad.\n\n" +
+                        "Si deseás adquirir entradas para el evento, estas " +
+                        "estaran disponibles proximamente en los locales oficiales.\n\n" +
+                        "¡Esperamos que te sumes al evento!\n\n"
+        );
+        mailSender.send(mensaje);
+    }
 }
