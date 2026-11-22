@@ -184,7 +184,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"username\": \"guspuebla@example.com\",\n  \"password\": \"1234\"\n}",
+              "raw": "{\n  \"username\": \"maria@example.com\",\n  \"password\": \"1234\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -519,11 +519,21 @@
         {
           "name": "Modificar evento por organizador",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOrganizador}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "PATCH",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n        \"nombre\": \"Recital de Rock Estelar\",\r\n        \"descripcion\": \"Una noche a puro rock con las mejores bandas del país.\",\r\n        \"tipo\": \"RECITAL\",\r\n        \"idOrganizador\": 2,\r\n        \"participantes\": [\r\n            \"Banda A\",\r\n            \"Banda B\"\r\n        ],\r\n        \"fechaHora\": \"2026-12-15T21:00:00\",\r\n        \"idLugar\": \"6aefe5ad2b81f513fccee8d7\",\r\n        \"nombreLugar\": \"teatro\",\r\n        \"precios\": [\r\n            {\r\n                \"sector\": \"platea\",\r\n                \"precio\": 35000.0\r\n            }\r\n        ],\r\n        \"estado\": \"PUBLICADO\"\r\n    }",
+              "raw": "{\r\n        \"nombre\": \"U2\",\r\n        \"descripcion\": \"Grupo musical\",\r\n        \"tipo\": \"RECITAL\",\r\n        \"idOrganizador\": 2,\r\n        \"participantes\": [\r\n            \"Banda A\",\r\n            \"Banda B\"\r\n        ],\r\n        \"fechaHora\": \"2026-12-30T21:00:00\",\r\n        \"idLugar\": \"6af390c45232d6512eca04f6\",\r\n        \"nombreLugar\": \"Estadio unico de la Plata\",\r\n        \"precios\": [\r\n            {\r\n                \"sector\": \"platea\",\r\n                \"precio\": 35000.0\r\n            }\r\n        ],\r\n        \"estado\": \"PUBLICADO\"\r\n    }",
               "options": {
                 "raw": {
                   "language": "json"
@@ -531,7 +541,7 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8080/api/eventos/6aefe6392b81f513fccee8d8/estado?usuarioId=1",
+              "raw": "http://localhost:8080/api/eventos/6aff0eac6a028420dbc6198a/estado?usuarioId=2",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -540,8 +550,55 @@
               "path": [
                 "api",
                 "eventos",
-                "6aefe6392b81f513fccee8d8",
+                "6aff0eac6a028420dbc6198a",
                 "estado"
+              ],
+              "query": [
+                {
+                  "key": "usuarioId",
+                  "value": "2"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Modificar fecha por organizador",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOrganizador}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"fechaHora\": \"2026-12-24T21:00:00\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/eventos/6aff0eac6a028420dbc6198a/fecha?usuarioId=1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "eventos",
+                "6aff0eac6a028420dbc6198a",
+                "fecha"
               ],
               "query": [
                 {
@@ -561,7 +618,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJtYXJpYUBleGFtcGxlLmNvbSIsImF1dGgiOiJBRE1JTklTVFJBRE9SIiwiZXhwIjoxNzk1MzY4MDExLCJpYXQiOjE3OTUyODE2MTF9.Ucpn-6JRxuZkv07hyRUhrKANbo_YPQCZpzKQhCBR6WsvLPfi58HRw9yKs8MgeDjNvEveUgrlN3VaRwaPKPSDeg",
+                  "value": "{{tokenAdministrador}}",
                   "type": "string"
                 }
               ]
@@ -570,7 +627,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n        \"nombre\": \"U2\",\r\n        \"descripcion\": \"Grupo musical\",\r\n        \"tipo\": \"RECITAL\",\r\n        \"idOrganizador\": 1,\r\n        \"participantes\": [\r\n            \"Banda A\",\r\n            \"Banda B\"\r\n        ],\r\n        \"fechaHora\": \"2026-12-30T21:00:00\",\r\n        \"idLugar\": \"6af390c45232d6512eca04f6\",\r\n        \"nombreLugar\": \"Estadio unico de la Plata\",\r\n        \"precios\": [\r\n            {\r\n                \"sector\": \"platea\",\r\n                \"precio\": 35000.0\r\n            }\r\n        ],\r\n        \"estado\": \"PUBLICADO\"\r\n    }",
+              "raw": "{\r\n        \"nombre\": \"U2\",\r\n        \"descripcion\": \"Grupo musical\",\r\n        \"tipo\": \"RECITAL\",\r\n        \"idOrganizador\": 1,\r\n        \"participantes\": [\r\n            \"Banda A\",\r\n            \"Banda B\"\r\n        ],\r\n        \"fechaHora\": \"2026-12-30T21:00:00\",\r\n        \"idLugar\": \"6af390c45232d6512eca04f6\",\r\n        \"nombreLugar\": \"Estadio unico de la Plata\",\r\n        \"precios\": [\r\n            {\r\n                \"sector\": \"platea\",\r\n                \"precio\": 35000.0\r\n            }\r\n        ],\r\n        \"estado\": \"CANCELADO\"\r\n    }",
               "options": {
                 "raw": {
                   "language": "json"
@@ -686,7 +743,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"tipo\": \"CONFIRMACION_COMPRA\",\r\n    \"canal\": \"EMAIL\",\r\n    \"email\": \"usuario@gmail.com\"\r\n}",
+              "raw": "{\r\n    \"tipo\": \"CONFIRMACION_COMPRA\",\r\n    \"canal\": \"EMAIL\",\r\n    \"email\": \"usuario@gmail.com\",\r\n    \"fechaAnterior\": null,\r\n    \"fechaNueva\": null\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -743,6 +800,16 @@
         {
           "name": "Creacion orden NUMERADO",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCliente}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
             "header": [
               {
@@ -813,15 +880,20 @@
         {
           "name": "Pago orden",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCliente}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
             "header": [
               {
                 "key": "X-Usuario-Id",
-                "value": "1",
-                "type": "text"
-              },
-              {
-                "key": "clienteId",
                 "value": "1",
                 "type": "text"
               }
@@ -856,15 +928,18 @@
           "name": "Cancelacion",
           "request": {
             "method": "PUT",
-            "header": [
-              {
-                "key": "X-Usuario-Id",
-                "value": "1",
-                "type": "text"
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
               }
-            ],
+            },
             "url": {
-              "raw": "http://localhost:8080/api/ordenes/6afe2f24568a69642caedc8b/cancelacion",
+              "raw": "http://localhost:8080/api/ordenes/:idEvento/cancelacion",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -873,8 +948,14 @@
               "path": [
                 "api",
                 "ordenes",
-                "6afe2f24568a69642caedc8b",
+                ":idEvento",
                 "cancelacion"
+              ],
+              "variable": [
+                {
+                  "key": "idEvento",
+                  "value": "6afe2f24568a69642caedc8b"
+                }
               ]
             }
           },
@@ -891,6 +972,16 @@
             "disableBodyPruning": true
           },
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJnb21lenNhbnRpYWdvQGV4YW1wbGUuY29tIiwiYXV0aCI6IkNMSUVOVEUiLCJleHAiOjE3OTUzNzYyNzYsImlhdCI6MTc5NTI4OTg3Nn0.IsnJqRkgVtqHKsz0syK4WLV26_qNrSPrztqHdCT57bQvot33qUhoJo67tHeqbGF2JJWkp5k7VkXJ4H-8M104Tw",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "body": {
@@ -1124,6 +1215,16 @@
         {
           "name": "Obtener pagos",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJnb21lenNhbnRpYWdvQGV4YW1wbGUuY29tIiwiYXV0aCI6IkNMSUVOVEUiLCJleHAiOjE3OTUzNzYyNzYsImlhdCI6MTc5NTI4OTg3Nn0.IsnJqRkgVtqHKsz0syK4WLV26_qNrSPrztqHdCT57bQvot33qUhoJo67tHeqbGF2JJWkp5k7VkXJ4H-8M104Tw",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -1181,6 +1282,7 @@
       "listen": "prerequest",
       "script": {
         "type": "text/javascript",
+        "requests": {},
         "exec": [
           ""
         ]
@@ -1190,6 +1292,7 @@
       "listen": "test",
       "script": {
         "type": "text/javascript",
+        "requests": {},
         "exec": [
           ""
         ]
@@ -1204,6 +1307,18 @@
     {
       "key": "base_url",
       "value": "https://template.postman-echo.com"
+    },
+    {
+      "key": "tokenCliente",
+      "value": ""
+    },
+    {
+      "key": "tokenOrganizador",
+      "value": ""
+    },
+    {
+      "key": "tokenAdministrador",
+      "value": ""
     }
   ]
 }
