@@ -24,6 +24,6 @@ public interface UsuarioFeignClient {
             @RequestParam String ciudad
     );
 
-    @GetMapping("/api/usuarios/{usuarioId}/preferencias")
+    @GetMapping("/{usuarioId}/preferencias")
     PreferenciasExternasDTO obtenerPreferencias(@PathVariable("usuarioId") Long usuarioId);
 }

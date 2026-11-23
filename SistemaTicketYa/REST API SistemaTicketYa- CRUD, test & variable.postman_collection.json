@@ -3077,17 +3077,16 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Entrada Numerada creada correctamente\", function () {",
-                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
-                  "    const raw = pm.response.json();",
-                  "    const item = Array.isArray(raw) ? raw[0] : raw;",
-                  "    if (item) {",
-                  "        const id = item.id ?? item.idEntrada ?? item.entradaId;",
-                  "        if (id !== undefined) pm.collectionVariables.set(\"entradaNumeradaId\", String(id));",
-                  "        const qr = item.codigoQr || item.qr || item.codigo;",
-                  "        if (qr) pm.collectionVariables.set(\"codigoQrEntradaNumerada\", String(qr));",
-                  "    }",
-                  "});"
+                  "pm.test(\"Entrada Numerada creada correctamente\", function () {\n    pm.expect(pm.response.code).to.be.oneOf([200, 201]);\n    const raw = pm.response.json();\n    const item = Array.isArray(raw) ? raw[0] : raw;\n    if (item) {\n        const id = item.id ?? item.idEntrada ?? item.entradaId;\n        if (id !== undefined) pm.collectionVariables.set(\"entradaNumeradaId\", String(id));\n        const qr = item.codigoQr || item.qr || item.codigo;\n        if (qr) pm.collectionVariables.set(\"codigoQrEntradaNumerada\", String(qr));\n    }\n});"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.sendRequest({\r\n    url: pm.collectionVariables.get(\"base_url\") + \"/api/pagos\",\r\n    method: \"GET\",\r\n    header: {\r\n        \"Authorization\": \"Bearer \" + pm.collectionVariables.get(\"tokenCliente1\")\r\n    }\r\n}, function (err, res) {\r\n    if (!err && res.code === 200) {\r\n        const aceptados = res.json().filter(p => (p.estado || \"\").toUpperCase() === \"ACEPTADO\");\r\n        if (aceptados.length >= 2) {\r\n            pm.collectionVariables.set(\"reservaPagadaC1\", String(aceptados[aceptados.length - 3]?.idReserva ?? aceptados[aceptados.length - 2].idReserva));\r\n            pm.collectionVariables.set(\"reservaPagadaC2\", String(aceptados[aceptados.length - 2].idReserva));\r\n        } else if (aceptados.length === 1) {\r\n            pm.collectionVariables.set(\"reservaPagadaC1\", String(aceptados[0].idReserva));\r\n            pm.collectionVariables.set(\"reservaPagadaC2\", String(aceptados[0].idReserva));\r\n        }\r\n    }\r\n});"
                 ]
               }
             }
@@ -3112,7 +3111,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ordenId\": {{ordenNumeradaId}},\n  \"eventoId\": \"{{eventoBajaDemandaId}}\",\n  \"clienteId\": {{cliente1Id}},\n  \"fechaEvento\": \"2027-05-20T21:00:00\",\n  \"items\": [\n    {\n      \"sectorId\": \"{{sectorPlateaId}}\",\n      \"fila\": 2,\n      \"asiento\": {{asientoNum1}},\n      \"precio\": 25000.0\n    }\n  ]\n}",
+              "raw": "{\n  \"ordenId\": {{ordenNumeradaId}},\n  \"eventoId\": \"{{eventoBajaDemandaId}}\",\n  \"clienteId\": {{cliente1Id}},\n  \"idReserva\": {{reservaPagadaC1}},\n  \"fechaEvento\": \"2027-05-20T21:00:00\",\n  \"items\": [\n    {\n      \"sectorId\": \"{{sectorPlateaId}}\",\n      \"fila\": 2,\n      \"asiento\": {{asientoNum1}},\n      \"precio\": 25000.0\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -3182,15 +3181,16 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Entrada No Numerada creada correctamente\", function () {",
-                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
-                  "    const raw = pm.response.json();",
-                  "    const item = Array.isArray(raw) ? raw[0] : raw;",
-                  "    if (item) {",
-                  "        const id = item.id ?? item.idEntrada ?? item.entradaId;",
-                  "        if (id !== undefined) pm.collectionVariables.set(\"entradaNoNumeradaId\", String(id));",
-                  "    }",
-                  "});"
+                  "pm.test(\"Entrada No Numerada creada correctamente\", function () {\n    pm.expect(pm.response.code).to.be.oneOf([200, 201]);\n    const raw = pm.response.json();\n    const item = Array.isArray(raw) ? raw[0] : raw;\n    if (item) {\n        const id = item.id ?? item.idEntrada ?? item.entradaId;\n        if (id !== undefined) pm.collectionVariables.set(\"entradaNoNumeradaId\", String(id));\n    }\n});"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.sendRequest({\r\n    url: pm.collectionVariables.get(\"base_url\") + \"/api/pagos\",\r\n    method: \"GET\",\r\n    header: {\r\n        \"Authorization\": \"Bearer \" + pm.collectionVariables.get(\"tokenCliente2\")\r\n    }\r\n}, function (err, res) {\r\n    if (!err && res.code === 200) {\r\n        const aceptados = res.json().filter(p => (p.estado || \"\").toUpperCase() === \"ACEPTADO\");\r\n        if (aceptados.length >= 2) {\r\n            pm.collectionVariables.set(\"reservaPagadaC1\", String(aceptados[aceptados.length - 3]?.idReserva ?? aceptados[aceptados.length - 2].idReserva));\r\n            pm.collectionVariables.set(\"reservaPagadaC2\", String(aceptados[aceptados.length - 2].idReserva));\r\n        } else if (aceptados.length === 1) {\r\n            pm.collectionVariables.set(\"reservaPagadaC1\", String(aceptados[0].idReserva));\r\n            pm.collectionVariables.set(\"reservaPagadaC2\", String(aceptados[0].idReserva));\r\n        }\r\n    }\r\n});"
                 ]
               }
             }
@@ -3215,7 +3215,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ordenId\": {{ordenNoNumeradaId}},\n  \"eventoId\": \"{{eventoNoNumeradoId}}\",\n  \"clienteId\": {{cliente2Id}},\n  \"fechaEvento\": \"2027-07-10T20:00:00\",\n  \"items\": [\n    {\n      \"sectorId\": \"{{sectorSalaId}}\",\n      \"cantidad\": 2,\n      \"precio\": 5000.0\n    }\n  ]\n}",
+              "raw": "{\n  \"ordenId\": {{ordenNoNumeradaId}},\n  \"eventoId\": \"{{eventoNoNumeradoId}}\",\n  \"clienteId\": {{cliente2Id}},\n  \"idReserva\": {{reservaPagadaC2}},\n  \"fechaEvento\": \"2027-07-10T20:00:00\",\n  \"items\": [\n    {\n      \"sectorId\": \"{{sectorSalaId}}\",\n      \"cantidad\": 2,\n      \"precio\": 5000.0\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -3491,9 +3491,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"GET Listado de Pagos devuelve 200 OK\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
+                  "pm.test(\"GET Listado de Pagos devuelve 200 OK\", function () {\n    pm.response.to.have.status(200);\n    const lista = pm.response.json();\n    const aceptado = [...lista].reverse().find(p => (p.estado || \"\").toUpperCase() === \"ACEPTADO\");\n    pm.expect(aceptado, \"No hay ningún pago ACEPTADO disponible para reembolsar\").to.not.be.undefined;\n    pm.collectionVariables.set(\"reservaPagadaId\", String(aceptado.idReserva));\n});\n"
                 ]
               }
             }
@@ -3551,7 +3549,7 @@
             "method": "POST",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/pagos/reserva/{{reservaId}}/reembolso",
+              "raw": "{{base_url}}/api/pagos/reserva/{{reservaPagadaId}}/reembolso",
               "host": [
                 "{{base_url}}"
               ],
@@ -3559,7 +3557,7 @@
                 "api",
                 "pagos",
                 "reserva",
-                "{{reservaId}}",
+                "{{reservaPagadaId}}",
                 "reembolso"
               ]
             }
@@ -4297,6 +4295,18 @@
     },
     {
       "key": "notificacionId",
+      "value": ""
+    },
+    {
+      "key": "reservaPagadaId",
+      "value": ""
+    },
+    {
+      "key": "reservaPagadaC1",
+      "value": ""
+    },
+    {
+      "key": "reservaPagadaC2",
       "value": ""
     }
   ]
