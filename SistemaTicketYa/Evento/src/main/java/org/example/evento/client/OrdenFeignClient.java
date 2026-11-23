@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
 
-@FeignClient(name = "orden-client", url = "http://localhost:8087/api/ordenes")
+@FeignClient(name = "orden-client", url = "${ORDEN_URL:http://localhost:8087}/api/ordenes")
 public interface OrdenFeignClient {
     @PutMapping("/{idEvento}/cancelacion")
     void cancelacionEvento(@PathVariable String idEvento);

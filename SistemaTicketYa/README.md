@@ -16,7 +16,54 @@ Para ejecutar el proyecto se necesita:
 - MongoDB para la persistencia de eventos.
 - Postman para realizar las pruebas de los endpoints.
 
-## Ejecución del proyecto
+## Ejecución con Docker Compose (recomendada)
+
+Único requisito: **Docker Desktop** (o Docker Engine con el plugin Compose) en ejecución. No hace falta tener Java ni Maven instalados: cada microservicio se compila dentro de su imagen.
+
+Desde la carpeta `SistemaTicketYa`:
+
+```bash
+docker compose up -d --build
+```
+
+Levanta **todo el sistema**: las 8 bases MySQL, MongoDB, los 9 microservicios (uno por contenedor), el API Gateway, el log centralizado y un servidor de correo de prueba.
+
+- La primera vez tarda varios minutos: descarga las imágenes y las dependencias de Maven. Las siguientes son mucho más rápidas.
+- Necesita unos **8 GB de memoria** disponibles para Docker.
+- Si el puerto 3306 ya está ocupado (XAMPP o un MySQL local): `RESERVA_DB_PORT=3316 docker compose up -d --build`.
+
+| Qué | Dónde |
+|---|---|
+| **API (todas las peticiones)** | http://localhost:8080 |
+| Logs de todos los servicios | http://localhost:3000 → *Explore* → Loki → `{servicio="orden"}` |
+| Emails enviados por el sistema | http://localhost:8025 |
+
+Comandos útiles:
+
+```bash
+docker compose ps                  # estado de cada contenedor
+docker compose logs -f orden       # log de un servicio
+docker compose down                # bajar todo
+docker compose down -v             # bajar todo y borrar los datos
+```
+
+Cuando `docker compose ps` muestre los servicios en ejecución, importar la colección de Postman y correrla en orden: usa `http://localhost:8080` como `base_url`.
+
+> Los `docker-compose.yml` que hay dentro de cada microservicio levantan solo la base de ese servicio, para desarrollo local. No usarlos al mismo tiempo que el de la raíz: comparten puertos.
+
+### Prueba de carga
+
+Con el sistema levantado:
+
+```bash
+docker compose --profile carga run --rm k6
+# con otra carga:
+USUARIOS=50 COMPRAS_POR_USUARIO=10 docker compose --profile carga run --rm k6
+```
+
+Simula usuarios concurrentes comprando entradas a través del Gateway con JWT, verifica que un mismo asiento no se venda dos veces y genera el informe en [`pruebas-carga/informe-prueba-de-carga.md`](pruebas-carga/informe-prueba-de-carga.md).
+
+## Ejecución local (sin Docker para los microservicios)
 
 Cada microservicio es un proyecto Spring Boot independiente y debe iniciarse por separado.
 
@@ -33,6 +80,8 @@ Los servicios deben estar levantados antes de comenzar a realizar las peticiones
 | Entrada | 8085 |
 | Notificación | 8086 |
 | Orden | 8087 |
+| Fila virtual | 8088 |
+| API Gateway | 8080 |
 
 ## Orden de ejecución de los endpoints
 
@@ -209,6 +258,8 @@ Para utilizarla:
 | Documento | Contenido |
 |---|---|
 | [Diagramas de arquitectura](docs/diagramas.md) | Diagrama de módulos, diagramas entidad-relación por microservicio, relaciones entre servicios y entidades solapadas |
+| [Decisiones de diseño](docs/decisiones-de-diseno.md) | Tecnologías y por qué MongoDB, patrones usados, consistencia entre servicios, fallos parciales y compensaciones, seguridad con JWT y roles, cache, resiliencia, log centralizado, simplificaciones y limitaciones |
+| [Informe de la prueba de carga](pruebas-carga/informe-prueba-de-carga.md) | Usuarios concurrentes, tiempos de respuesta, errores y verificación de la no doble venta |
 | [Diagrama de secuencia de la compra](openspec/changes/archive/2026-11-06-orden-flujo-compra/design.md#11-diagrama-de-secuencia--compra-de-una-entrada-numerada) | Compra de una entrada numerada, incluyendo pago rechazado y reserva vencida |
 | [Arquitectura de microservicios](arquitectura_de_microservicios.md) | Responsabilidad y endpoints de cada microservicio |
 | [Orden](Orden/README.md) | Flujo de compra, estados de la orden y cómo correr sus tests |

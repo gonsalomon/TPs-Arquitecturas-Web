@@ -1,12 +1,332 @@
+# =====================================================================================
+# TicketYa — sistema completo
+#
+#   docker compose up -d --build        levanta bases, los 9 microservicios, gateway y logs
+#   docker compose ps                   estado de cada contenedor
+#   docker compose logs -f orden        logs de un servicio
+#   docker compose down -v              baja todo y borra los datos
+#
+# Punto de entrada: http://localhost:8080 (API Gateway)
+# Logs centralizados: http://localhost:3000 (Grafana -> Explore -> Loki)
+# Emails enviados:    http://localhost:8025 (Mailpit)
+# Prueba de carga:   docker compose --profile carga run --rm k6
+#
+# Los docker-compose.yml de cada carpeta siguen sirviendo para desarrollo local
+# (levantan solo la base de ese microservicio). NO usarlos junto con este: comparten puertos.
+# =====================================================================================
 name: sistema-ticketya
 
-include:
-  - Usuario/docker-compose.yml
-  - Evento/docker-compose.yml
-  - Entrada/docker-compose.yml
-  - Orden/docker-compose.yml
-  - Fila_Virtual/docker-compose.yml
-  - Gateway/docker-compose.yml
-  - Pago/docker-compose.yml
-  - Reserva/docker-compose.yml
-  - Notificacion/docker-compose.yml
+# ---- Bloques reutilizables -----------------------------------------------------------
+x-mysql: &mysql
+  image: mysql:8.0
+  restart: unless-stopped
+  # Configuración liviana: son 8 MySQL en una misma máquina
+  command: ["--performance-schema=OFF", "--innodb-buffer-pool-size=64M", "--max-connections=200"]
+  healthcheck:
+    test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--silent"]
+    interval: 5s
+    timeout: 5s
+    retries: 30
+    start_period: 30s
+
+x-app: &app
+  restart: on-failure
+
+# Dentro de la red de Docker cada servicio se alcanza por su nombre, no por localhost.
+# Cada microservicio lee estas variables en sus clientes Feign (por defecto usan localhost).
+x-entorno: &entorno
+  USUARIO_URL: http://usuario:8081
+  PAGO_URL: http://pago:8082
+  EVENTO_URL: http://evento:8083
+  RESERVA_URL: http://reserva:8084
+  ENTRADA_URL: http://entrada:8085
+  NOTIFICACION_URL: http://notificacion:8086
+  ORDEN_URL: http://orden:8087
+  FILA_URL: http://fila:8088
+  # Memoria acotada por JVM: son 9 aplicaciones Spring Boot
+  JAVA_TOOL_OPTIONS: "-Xms64m -Xmx384m"
+
+services:
+
+  # ============================ Bases de datos (una por microservicio) ============================
+  mysql-usuario:
+    <<: *mysql
+    container_name: ticketya-mysql-usuario
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: usuarios
+    ports:
+      - "${USUARIO_DB_PORT:-3303}:3306"
+  mysql-pago:
+    <<: *mysql
+    container_name: ticketya-mysql-pago
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: pagos
+    ports:
+      - "${PAGO_DB_PORT:-3304}:3306"
+  mysql-gateway:
+    <<: *mysql
+    container_name: ticketya-mysql-gateway
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: gateway
+    ports:
+      - "${GATEWAY_DB_PORT:-3305}:3306"
+  # Si el puerto 3306 ya está ocupado en la máquina (XAMPP, MySQL local), levantar con:
+  #   RESERVA_DB_PORT=3316 docker compose up -d
+  mysql-reserva:
+    <<: *mysql
+    container_name: ticketya-mysql-reserva
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: reservas
+    ports:
+      - "${RESERVA_DB_PORT:-3306}:3306"
+  mysql-entrada:
+    <<: *mysql
+    container_name: ticketya-mysql-entrada
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: entradas
+    ports:
+      - "${ENTRADA_DB_PORT:-3307}:3306"
+  mysql-notificacion:
+    <<: *mysql
+    container_name: ticketya-mysql-notificacion
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: notificaciones
+    ports:
+      - "${NOTIFICACION_DB_PORT:-3308}:3306"
+  mysql-orden:
+    <<: *mysql
+    container_name: ticketya-mysql-orden
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: ordenes
+    ports:
+      - "${ORDEN_DB_PORT:-3309}:3306"
+  mysql-fila:
+    <<: *mysql
+    container_name: ticketya-mysql-fila
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: fila_virtual_db
+    ports:
+      - "${FILA_DB_PORT:-3310}:3306"
+  # Base NoSQL: catálogo de eventos y lugares
+  mongo-evento:
+    image: mongo:7
+    container_name: ticketya-mongo-evento
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: "1234"
+      MONGO_INITDB_DATABASE: eventos
+    ports:
+      - "${EVENTO_DB_PORT:-27018}:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+
+  # ============================ Microservicios (un contenedor cada uno) ============================
+  usuario:
+    <<: *app
+    build: ./Usuario
+    image: ticketya/usuario
+    container_name: ticketya-usuario
+    environment:
+      <<: *entorno
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-usuario:3306/usuarios?createDatabaseIfNotExist=true
+    ports:
+      - "8081:8081"
+    depends_on:
+      mysql-usuario:
+        condition: service_healthy
+  pago:
+    <<: *app
+    build: ./Pago
+    image: ticketya/pago
+    container_name: ticketya-pago
+    environment:
+      <<: *entorno
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-pago:3306/pagos?createDatabaseIfNotExist=true
+    ports:
+      - "8082:8082"
+    depends_on:
+      mysql-pago:
+        condition: service_healthy
+  evento:
+    <<: *app
+    build: ./Evento
+    image: ticketya/evento
+    container_name: ticketya-evento
+    environment:
+      <<: *entorno
+      SPRING_DATA_MONGODB_URI: mongodb://root:1234@mongo-evento:27017/eventos?authSource=admin
+    ports:
+      - "8083:8083"
+    depends_on:
+      mongo-evento:
+        condition: service_healthy
+  reserva:
+    <<: *app
+    build: ./Reserva
+    image: ticketya/reserva
+    container_name: ticketya-reserva
+    environment:
+      <<: *entorno
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-reserva:3306/reservas?createDatabaseIfNotExist=true
+    ports:
+      - "8084:8084"
+    depends_on:
+      mysql-reserva:
+        condition: service_healthy
+  entrada:
+    <<: *app
+    build: ./Entrada
+    image: ticketya/entrada
+    container_name: ticketya-entrada
+    environment:
+      <<: *entorno
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-entrada:3306/entradas?createDatabaseIfNotExist=true
+    ports:
+      - "8085:8085"
+    depends_on:
+      mysql-entrada:
+        condition: service_healthy
+  notificacion:
+    <<: *app
+    build: ./Notificacion
+    image: ticketya/notificacion
+    container_name: ticketya-notificacion
+    environment:
+      <<: *entorno
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-notificacion:3306/notificaciones?createDatabaseIfNotExist=true
+      # Los emails van a Mailpit (servidor de correo de prueba): se ven en http://localhost:8025
+      SPRING_MAIL_HOST: mailpit
+      SPRING_MAIL_PORT: "1025"
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: "false"
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: "false"
+    ports:
+      - "8086:8086"
+    depends_on:
+      mysql-notificacion:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+  orden:
+    <<: *app
+    build: ./Orden
+    image: ticketya/orden
+    container_name: ticketya-orden
+    environment:
+      <<: *entorno
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-orden:3306/ordenes?createDatabaseIfNotExist=true
+      # Orden lee estas dos URLs desde su application.yml (servicios.*.url)
+      SERVICIOS_ENTRADA_URL: http://entrada:8085
+      SERVICIOS_RESERVA_URL: http://reserva:8084/api
+    ports:
+      - "8087:8087"
+    depends_on:
+      mysql-orden:
+        condition: service_healthy
+  fila:
+    <<: *app
+    build: ./Fila_Virtual
+    image: ticketya/fila
+    container_name: ticketya-fila
+    environment:
+      <<: *entorno
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-fila:3306/fila_virtual_db?createDatabaseIfNotExist=true
+    ports:
+      - "8088:8088"
+    depends_on:
+      mysql-fila:
+        condition: service_healthy
+
+  # Servidor de correo de prueba: recibe los emails de Notificación sin enviarlos a nadie.
+  mailpit:
+    image: axllent/mailpit:v1.21
+    container_name: ticketya-mailpit
+    restart: unless-stopped
+    ports:
+      - "8025:8025"   # bandeja de entrada web
+      - "1025:1025"   # SMTP
+
+  # ============================ API Gateway (único punto de entrada, valida JWT) ============================
+  gateway:
+    <<: *app
+    build: ./Gateway
+    image: ticketya/gateway
+    container_name: ticketya-gateway
+    environment:
+      <<: *entorno
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-gateway:3306/gateway?createDatabaseIfNotExist=true
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql-gateway:
+        condition: service_healthy
+      usuario:
+        condition: service_started
+
+  # ============================ Log centralizado ============================
+  # Promtail lee la salida de TODOS los contenedores y la envía a Loki; Grafana la consulta.
+  # No requiere cambios en los microservicios: cada uno sigue escribiendo su log por consola.
+  loki:
+    image: grafana/loki:3.2.1
+    container_name: ticketya-loki
+    restart: unless-stopped
+    command: ["-config.file=/etc/loki/local-config.yaml"]
+    ports:
+      - "3100:3100"
+
+  promtail:
+    image: grafana/promtail:3.2.1
+    container_name: ticketya-promtail
+    restart: unless-stopped
+    command: ["-config.file=/etc/promtail/config.yml"]
+    volumes:
+      - ./observabilidad/promtail-config.yml:/etc/promtail/config.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - loki
+
+  grafana:
+    image: grafana/grafana:11.3.0
+    container_name: ticketya-grafana
+    restart: unless-stopped
+    environment:
+      # Acceso sin login: es un entorno de demostración
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+    volumes:
+      - ./observabilidad/grafana/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro
+    ports:
+      - "3000:3000"
+    depends_on:
+      - loki
+
+  # ============================ Prueba de carga (solo a pedido) ============================
+  #   docker compose --profile carga run --rm k6
+  # Genera pruebas-carga/informe-prueba-de-carga.md con los resultados.
+  k6:
+    image: grafana/k6:0.54.0
+    profiles: ["carga"]
+    user: root
+    working_dir: /pruebas
+    environment:
+      BASE_URL: http://gateway:8080
+      USUARIOS: ${USUARIOS:-30}
+      COMPRAS_POR_USUARIO: ${COMPRAS_POR_USUARIO:-10}
+    volumes:
+      - ./pruebas-carga:/pruebas
+    command: ["run", "/pruebas/compra.js"]
+    depends_on:
+      - gateway

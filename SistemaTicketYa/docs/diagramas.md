@@ -8,60 +8,78 @@ Todo lo de este documento surge del código de la rama `develop` (entidades, cli
 - [3. Diagramas entidad-relación por microservicio](#3-diagramas-entidad-relación-por-microservicio)
 - [4. Relaciones entre servicios y entidades solapadas](#4-relaciones-entre-servicios-y-entidades-solapadas)
 
+Decisiones tecnológicas, patrones, consistencia y seguridad: [decisiones-de-diseno.md](decisiones-de-diseno.md).
+
 ---
 
 ## 1. Diagrama de módulos
 
 ```mermaid
 flowchart LR
-    C([Cliente / Organizador / Admin<br/>Postman · Frontend])
+    C([Cliente / Organizador / Admin / Personal de acceso<br/>Postman · k6])
 
     subgraph GW[API Gateway :8080]
-        G[Spring Cloud Gateway<br/>ruteo por path /api/**]
+        G[Ruteo por path /api/**<br/>Login y validación de JWT<br/>Autorización por rol]
     end
 
     subgraph US[Usuario :8081]
-        U[Usuarios y roles]
+        U[Usuarios, roles y contraseñas<br/>Preferencias del cliente]
     end
     subgraph EV[Evento :8083]
-        E[Eventos · Lugares · Sectores<br/>búsqueda + cache Caffeine]
+        E[Eventos · Lugares · Sectores<br/>Búsqueda + cache Caffeine<br/>Recomendaciones]
     end
     subgraph OR[Orden :8087]
-        O[Orquesta la compra<br/>límite por cliente · vencimiento]
+        O[Orquesta la compra - saga<br/>Límite por cliente · vencimiento<br/>Reportes del organizador]
     end
     subgraph RE[Reserva :8084]
-        R[Bloqueo temporal de asientos<br/>vence a los 10 min]
+        R[Bloqueo temporal de lugares<br/>vence a los 10 min]
     end
     subgraph PA[Pago :8082]
-        P[Pago simulado · reembolsos]
+        P[Pasarela simulada · reembolsos]
     end
     subgraph EN[Entrada :8085]
-        N[Emisión con QR · validez<br/>devoluciones / reintegros]
+        N[Emisión con QR · validación en el acceso<br/>Devoluciones · historial de compras]
+    end
+    subgraph FI[Fila virtual :8088]
+        F[Turnos por tandas<br/>eventos de alta demanda]
     end
     subgraph NO[Notificación :8086]
-        NT[Avisos por email / push simulados]
+        NT[Avisos por email]
     end
 
-    DBU[(MySQL usuarios<br/>:3303)]
-    DBE[(MongoDB eventos<br/>:27018)]
-    DBO[(MySQL ordenes<br/>:3309)]
-    DBR[(MySQL reservas<br/>:3306)]
-    DBP[(MySQL pagos<br/>:3304)]
-    DBN[(MySQL entradas<br/>:3307)]
-    DBT[(MySQL notificaciones<br/>:3308)]
+    DBU[(MySQL usuarios)]
+    DBE[(MongoDB eventos)]
+    DBO[(MySQL ordenes)]
+    DBR[(MySQL reservas)]
+    DBP[(MySQL pagos)]
+    DBN[(MySQL entradas)]
+    DBF[(MySQL fila_virtual_db)]
+    DBT[(MySQL notificaciones)]
 
-    C -->|HTTP REST| G
-    G --> U & E & O & R & P & N & NT
+    subgraph LOG[Log centralizado]
+        PT[Promtail] --> LK[(Loki)] --> GF[Grafana :3000]
+    end
 
-    E -.->|Feign: valida rol| U
-    O -.->|Feign: evento, lugar, sectores| E
-    O -.->|Feign: crear / confirmar / liberar| R
-    O -.->|Feign: cobrar| P
-    O -.->|Feign: emitir entradas| N
-    R -.->|Feign: evento y lugar| E
-    N -.->|Feign: cliente| U
-    N -.->|Feign: reembolso| P
-    N -.->|Feign: liberar reserva| R
+    C -->|HTTPS + JWT| G
+    G --> U & E & O & R & P & N & F & NT
+    G -.->|Feign: credenciales y roles| U
+
+    E -.->|rol del usuario| U
+    E -.->|cancelación / cambio de fecha| O
+    E -.->|historial y co-compras| N
+    E -.->|artista favorito| NT
+    O -.->|evento, lugar, sectores| E
+    O -.->|crear / confirmar / liberar| R
+    O -.->|cobrar / reembolsar| P
+    O -.->|emitir entradas| N
+    O -.->|validar turno| F
+    O -.->|email del cliente| U
+    O -.->|compra confirmada| NT
+    R -.->|evento y lugar| E
+    F -.->|evento| E
+    N -.->|rol del usuario| U
+    N -.->|reembolso| P
+    N -.->|liberar reserva| R
 
     U --- DBU
     E --- DBE
@@ -69,23 +87,28 @@ flowchart LR
     R --- DBR
     P --- DBP
     N --- DBN
+    F --- DBF
     NT --- DBT
 ```
 
 | Módulo | Responsabilidad | Base | Puerto |
 |---|---|---|---|
-| Gateway | Punto de entrada único, ruteo a cada servicio (JWT en la Entrega 2) | — | 8080 |
-| Usuario | Alta, baja y modificación de usuarios y roles | MySQL `usuarios` | 8081 |
-| Evento | Lugares con sectores, eventos y su ciclo de vida, búsqueda por criterios, cache del catálogo | MongoDB `eventos` | 8083 |
-| Orden | Orquesta la compra: valida evento y límite, reserva, cobra y emite; vence órdenes impagas | MySQL `ordenes` | 8087 |
-| Reserva | Bloquea asientos mientras se paga; vence a los 10 minutos | MySQL `reservas` | 8084 |
-| Pago | Pago simulado y reembolsos | MySQL `pagos` | 8082 |
-| Entrada | Emite entradas con QR, controla que un asiento no se emita dos veces, devoluciones y reintegros | MySQL `entradas` | 8085 |
-| Notificación | Registra y "envía" avisos (simulado) | MySQL `notificaciones` | 8086 |
+| Gateway | Punto de entrada único. Emite el JWT en el login, lo valida en cada petición y autoriza por rol | MySQL `gateway` | 8080 |
+| Usuario | Usuarios, roles, contraseñas (BCrypt) y preferencias del cliente | MySQL `usuarios` | 8081 |
+| Evento | Lugares con sectores, eventos y su ciclo de vida, búsqueda, cache del catálogo y recomendaciones | **MongoDB** `eventos` | 8083 |
+| Orden | Orquesta la compra: valida evento, turno de fila y límite; reserva, cobra y emite. Vence órdenes impagas. Reportes para organizadores | MySQL `ordenes` | 8087 |
+| Reserva | Bloquea asientos o lugares de una zona mientras se paga; vence a los 10 minutos | MySQL `reservas` | 8084 |
+| Pago | Pasarela de pagos simulada y reembolsos | MySQL `pagos` | 8082 |
+| Entrada | Emite entradas con QR, impide emitir dos veces un asiento, valida el QR en el acceso, devoluciones | MySQL `entradas` | 8085 |
+| Fila virtual | Para eventos de alta demanda: encola a los clientes y los habilita a comprar por tandas | MySQL `fila_virtual_db` | 8088 |
+| Notificación | Registra y envía avisos por email | MySQL `notificaciones` | 8086 |
+| Loki + Promtail + Grafana | Log centralizado de todos los contenedores | — | 3000 |
 
 **Comunicación:** síncrona por REST. Entre servicios se usa OpenFeign (líneas punteadas). Cada microservicio tiene **su propia base** y nadie lee la base de otro: los datos ajenos se piden por API.
 
-**Fila virtual** todavía no está implementada (Entrega 2).
+**Seguridad:** el JWT se valida solo en el Gateway; los microservicios confían en la red interna. Detalle de roles por endpoint en [decisiones-de-diseno.md](decisiones-de-diseno.md#5-seguridad-jwt-y-roles).
+
+**Despliegue:** cada módulo corre en su propio contenedor; todo se levanta con el `docker-compose.yml` de la raíz.
 
 ---
 
@@ -104,12 +127,30 @@ Incluye los casos de **pago rechazado** y **reserva vencida**. Está en el dise�
 
 ```mermaid
 erDiagram
+    USUARIO }o--o{ AUTHORITY : "tiene roles"
+    USUARIO ||--o| PREFERENCIAS_USUARIO : "configura"
+    USUARIO ||--o{ USUARIO_ARTISTAS_FAVORITOS : "sigue"
+
     USUARIO {
         bigint id_usuario PK
         varchar nombre
         varchar apellido
         varchar email "unico (validado en el servicio)"
-        enum rol "ADMINISTRADOR, ORGANIZADOR, CLIENTE, PERSONALACCESO"
+        varchar ciudad
+        varchar password "hash BCrypt"
+    }
+    AUTHORITY {
+        varchar name PK "ADMINISTRADOR, ORGANIZADOR, CLIENTE, PERSONAL_DE_ACCESO"
+    }
+    PREFERENCIAS_USUARIO {
+        bigint usuario_id PK "mismo id que USUARIO"
+        varchar ciudad
+        set tipos_evento "RECITAL, TEATRO..."
+        set artistas_favoritos
+    }
+    USUARIO_ARTISTAS_FAVORITOS {
+        bigint usuario_id FK
+        varchar artista
     }
 ```
 
@@ -149,6 +190,7 @@ erDiagram
         datetime fechaHora
         ObjectId idLugar "ref LUGAR"
         enum estado "BORRADOR, PUBLICADO, AGOTADO, SUSPENDIDO, CANCELADO, FINALIZADO"
+        boolean altaDemanda "true = se compra con fila virtual"
     }
     PRECIO_SECTOR {
         string sector "nombre del SECTOR"
@@ -168,7 +210,7 @@ erDiagram
         varchar evento_id "ref Evento"
         varchar sector "nombre del sector en Evento"
         datetime fecha_evento "copia de Evento"
-        enum estado "PENDIENTE_PAGO, PAGO_APROBADO, CONFIRMADA, RECHAZADA, VENCIDA"
+        enum estado "PENDIENTE_PAGO, PAGO_APROBADO, CONFIRMADA, RECHAZADA, VENCIDA, CANCELADA"
         decimal total
         enum medio_pago
         bigint id_reserva "ref Reserva"
@@ -176,6 +218,8 @@ erDiagram
         datetime fecha_creacion
         datetime fecha_vencimiento
         datetime fecha_actualizacion
+        boolean reembolsada "ya se pidió el reintegro (evento cancelado)"
+        boolean alta_demanda "copia de Evento"
         bigint version "bloqueo optimista"
     }
     ITEM_ORDEN {
@@ -201,7 +245,7 @@ erDiagram
         varchar id_evento "ref Evento"
         varchar sector "nombre del sector en Evento"
         float monto
-        int cantidad
+        int cantidad "lugares pedidos (zonas sin numerar)"
         enum estado "PENDIENTE, CONFIRMADA, VENCIDA, CANCELADA, LIBERADA"
         datetime fecha_inicio
         datetime fecha_vencimiento "inicio + 10 min"
@@ -238,6 +282,7 @@ erDiagram
         varchar sector_id "nombre del sector en Evento"
         bigint cliente_id "ref Usuario"
         bigint orden_id "ref Orden"
+        bigint id_reserva "ref Reserva (para liberar al devolver)"
         int fila
         int asiento
         decimal precio "copia de Orden"
@@ -250,18 +295,38 @@ erDiagram
     }
 ```
 
+### Fila virtual — MySQL `fila_virtual_db`
+
+```mermaid
+erDiagram
+    TURNO_FILA {
+        bigint id PK
+        varchar evento_id "ref Evento"
+        bigint cliente_id "ref Usuario"
+        enum estado "EN_ESPERA, HABILITADO, COMPLETADO, EXPIRADO, CANCELADO"
+        varchar token_acceso UK "se envia al crear la orden"
+        datetime fecha_ingreso "define la posicion en la fila"
+        datetime fecha_habilitacion
+        datetime fecha_expiracion "turno + 2 min"
+    }
+```
+
 ### Notificación — MySQL `notificaciones`
 
 ```mermaid
 erDiagram
     NOTIFICACION {
         bigint id PK
-        enum tipo "CONFIRMACION_COMPRA, CANCELACION_EVENTO, MODIFICACION_EVENTO, EVENTO_ARTISTA_FAVORITO"
+        enum tipo "CONFIRMACION_COMPRA, CANCELACION_EVENTO, MODIFICACION_EVENTO, EVENTO_ARTISTA_FAVORITO, PUBLICACION_EVENTO_ARTISTA"
         enum canal "EMAIL, PUSH"
         varchar email "copia de Usuario"
         varchar estado
     }
 ```
+
+### Gateway — MySQL `gateway`
+
+El Gateway no tiene entidades propias: las credenciales y los roles se consultan a Usuario en cada login. La base queda reservada para datos de sesión o auditoría.
 
 ---
 
@@ -292,14 +357,17 @@ flowchart LR
     ENTRADA["Entrada.id"] -- ordenId --> ORDEN
     ENTRADA -- clienteId --> USUARIO
     ENTRADA -- eventoId --> EVENTO
+    ENTRADA -- idReserva --> RESERVA
+    TURNO["TurnoFila.id"] -- clienteId --> USUARIO
+    TURNO -- eventoId --> EVENTO
 ```
 
 | Referencia | Guardada en | Apunta a |
 |---|---|---|
-| id de cliente / organizador | Evento (`idOrganizador`), Orden (`clienteId`), Reserva (`idCliente`), Pago (`idCliente`), Entrada (`clienteId`) | Usuario |
-| id de evento | Orden, Reserva, Entrada | Evento (ObjectId de Mongo, por eso es `String`) |
+| id de cliente / organizador | Evento (`idOrganizador`), Orden (`clienteId`), Reserva (`idCliente`), Pago (`idCliente`), Entrada (`clienteId`), Fila virtual (`clienteId`) | Usuario |
+| id de evento | Orden, Reserva, Entrada, Fila virtual | Evento (ObjectId de Mongo, por eso es `String`) |
 | sector | Orden (`sector`), Reserva (`sector`), Entrada (`sectorId`) | Nombre del sector dentro del Lugar (no tiene id propio) |
-| id de reserva | Orden, Pago | Reserva |
+| id de reserva | Orden, Pago, Entrada | Reserva |
 | id de pago | Orden | Pago |
 | id de orden | Entrada | Orden |
 
@@ -313,7 +381,9 @@ Hay información que se **repite a propósito** en varias bases para que cada se
 | **Precio** | Evento (`PrecioSector`) → Orden (`precio_unitario`, `total`) → Pago (`monto`) → Entrada (`precio`) | Evento al momento de comprar | Se congela el precio pagado aunque el organizador lo cambie después |
 | **Fecha del evento** | Evento → Orden (`fecha_evento`) → Entrada (`fecha_evento`) | Evento | Entrada controla la regla de 72 h de devolución sin llamar a Evento |
 | **Email del usuario** | Usuario → Notificación (`email`) | Usuario | La notificación queda registrada con el destinatario de ese momento |
+| **Alta demanda** | Evento (`altaDemanda`) → Orden (`alta_demanda`) | Evento | Orden sabe si debe cerrar el turno de la fila sin volver a consultar a Evento |
+| **Artistas favoritos y ciudad** | Usuario (`usuario`) y Usuario (`preferencias_usuario`) | Preferencias | Están en dos tablas del mismo servicio: el alta de usuario los pide y las preferencias los actualizan |
 
-**Riesgo del solapamiento:** si un dato cambia en la fuente (por ejemplo, se reprograma la fecha de un evento) las copias quedan desactualizadas. Para la Entrega 2 se propone propagar esos cambios con eventos asíncronos.
+**Riesgo del solapamiento:** si un dato cambia en la fuente las copias quedan desactualizadas. El caso que más importa, el cambio de fecha de un evento, se resuelve de forma explícita: Evento avisa a Orden (`PUT /api/ordenes/evento/{id}/cambio-fecha`) y se notifica a los compradores. La estrategia de consistencia completa está en [decisiones-de-diseno.md](decisiones-de-diseno.md#3-consistencia-entre-servicios).
 
 **Inconsistencias de nombres a unificar:** el cliente se llama `idCliente` en Reserva y Pago, pero `clienteId` en Orden y Entrada; el sector se llama `sector` en Orden y Reserva, y `sectorId` en Entrada.

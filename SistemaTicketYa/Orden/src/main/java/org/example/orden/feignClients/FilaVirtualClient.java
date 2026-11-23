@@ -4,7 +4,7 @@ import org.example.orden.dto.response.ValidacionFilaDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
-@FeignClient(name = "fila-client", url = "http://localhost:8088")
+@FeignClient(name = "fila-client", url = "${FILA_URL:http://localhost:8088}")
 public interface FilaVirtualClient {
 
     @GetMapping("/api/fila/validar")
