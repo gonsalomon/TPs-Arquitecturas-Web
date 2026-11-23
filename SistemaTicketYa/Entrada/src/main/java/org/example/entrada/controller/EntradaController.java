@@ -5,6 +5,7 @@ import org.example.entrada.dto.*;
 import org.example.entrada.dto.response.EntradaEmitidaDTO;
 import org.example.entrada.dto.response.ValidarEntradaResponse;
 import org.example.entrada.service.EntradaService;
+import org.example.entrada.utils.EstadoEntrada;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -76,5 +77,10 @@ public class EntradaController {
     @PatchMapping("/validar")
     public ResponseEntity<ValidarEntradaResponse> validar (@Valid @RequestBody ValidarEntradaRequest request) {
         return ResponseEntity.ok(service.validarEntrada(request.getCodigoQr(),request.getEventoId()));
+    }
+
+    @GetMapping("/{idOrden}/filter")
+    public ResponseEntity<List<EntradaDTO>> getEntradas(@RequestParam EstadoEntrada estado, @PathVariable Long idOrden) {
+        return ResponseEntity.ok(service.getEntradas(estado,idOrden));
     }
 }

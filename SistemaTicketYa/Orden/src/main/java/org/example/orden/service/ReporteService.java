@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.example.orden.dto.response.*;
 import org.example.orden.entity.ItemOrden;
 import org.example.orden.entity.Orden;
+import org.example.orden.feignClients.EntradaClient;
 import org.example.orden.feignClients.EventoClient;
 import org.example.orden.repository.OrdenRepository;
 import org.example.orden.utils.EstadoOrden;
@@ -20,6 +21,7 @@ import java.util.Map;
 public class ReporteService {
     private final OrdenRepository ordenRepository;
     private final EventoClient eventoClient;
+    private final EntradaClient entradaClient;
 
     public ReporteEventoDTO generarReporte(String eventoId) {
 
@@ -57,16 +59,22 @@ public class ReporteService {
 
             for (Orden orden : ordenesSector) {
                 if (orden.getEstado() == EstadoOrden.CONFIRMADA) {
-                    entradasVendidas += orden.getItems().size();
+                    // llamar al get de entradas por el order id y con estado valida, contarlas y sumarlas
+                    List<EntradaDTO> entradas = entradaClient.getEntradas("VALIDA",orden.getIdOrden());
+                    entradasVendidas += entradas.size();
                     totalEntradasVendidas += entradasVendidas;
-                    BigDecimal importe = orden.getItems().stream()
+                    BigDecimal precioUnitario = orden.getItems().stream()
                             .map(ItemOrden::getPrecioUnitario)
                             .reduce(BigDecimal.ZERO, BigDecimal::add);
+                    BigDecimal importe = precioUnitario
+                            .multiply(BigDecimal.valueOf(entradas.size()))
+                            .divide(BigDecimal.valueOf(orden.getItems().size()));
                     recaudacion = recaudacion.add(importe);
-                    totalRecaudacion= totalRecaudacion.add(recaudacion);
-                }
-                if (orden.getEstado() == EstadoOrden.CANCELADA && orden.isReembolsada()) {
-                    entradasDevueltas += orden.getItems().size();
+                    totalRecaudacion= totalRecaudacion.add(importe);
+
+                    // llamar al get de entradas por el order id y con estado reintegro, contarlas y sumarlas
+                    List<EntradaDTO> entradasConReembolso = entradaClient.getEntradas("REINTEGRO",orden.getIdOrden());
+                    entradasDevueltas += entradasConReembolso.size();
                     totalEntradasDevueltas += entradasDevueltas;
                 }
             }

@@ -42,6 +42,9 @@ public class Entrada {
     @Column(name = "sector_id", nullable = false)
     private String sectorId;
 
+    @Column(name = "reserva_id", nullable = false)
+    private Long idReserva;
+
     @Column(name = "cliente_id", nullable = false)
     private Long clienteId;
 

@@ -18,4 +18,5 @@ public class EmitirEntradasRequestDTO {
     private Long clienteId;
     private LocalDateTime fechaEvento;
     private List<ItemEmitirDTO> items;
+    private Long idReserva;
 }

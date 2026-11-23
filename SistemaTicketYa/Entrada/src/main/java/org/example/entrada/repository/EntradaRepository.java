@@ -36,4 +36,5 @@ public interface EntradaRepository extends JpaRepository<Entrada, Long> {
             @Param("codigoQr") String codigoQr
     );
 
+    List<Entrada> findByEstadoAndOrdenId(EstadoEntrada estado, Long ordenId);
 }

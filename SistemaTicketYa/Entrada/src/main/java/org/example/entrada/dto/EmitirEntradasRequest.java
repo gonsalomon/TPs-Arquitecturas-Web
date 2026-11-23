@@ -14,5 +14,6 @@ public record EmitirEntradasRequest(
         @NotBlank String eventoId,
         @NotNull Long clienteId,
         @NotNull LocalDateTime fechaEvento,
-        @NotEmpty @Valid List<ItemEntradaRequest> items
+        @NotEmpty @Valid List<ItemEntradaRequest> items,
+        @NotNull Long idReserva
 ) {}
