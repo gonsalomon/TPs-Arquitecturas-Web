@@ -33,7 +33,7 @@ public class EntradaMapper {
 
         public EntradaEmitidaDTO toEmitidaDto(Entrada e) {
         if (e == null) return null;
-        return new EntradaEmitidaDTO(e.getId(), e.getCodigoQr(), e.getSectorId(), e.getFila(), e.getAsiento());
+        return new EntradaEmitidaDTO(e.getId(), e.getCodigoQr(), e.getSectorId(), e.getFila(), e.getAsiento(),e.getIdReserva());
     }
 
     public List<EntradaEmitidaDTO> toEmitidaDtos(List<Entrada> entradas) {

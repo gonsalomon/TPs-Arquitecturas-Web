@@ -96,6 +96,7 @@ public class EntradaService {
             e.setPrecio(it.precio());
             e.setFechaEvento(req.fechaEvento());
             e.setClaveIdempotencia(req.ordenId() + "-" + i);
+            e.setIdReserva(req.idReserva());
             nuevas.add(e);
         }
 
@@ -252,5 +253,10 @@ public class EntradaService {
                 entrada.getEstado(),
                 "Entrada validada correctamente"
         );
+    }
+
+    public List<EntradaDTO> getEntradas (EstadoEntrada estado, Long idOrden) {
+        List<Entrada> entradas = repo.findByEstadoAndOrdenId(estado,idOrden);
+        return mapper.toDtos(entradas);
     }
 }

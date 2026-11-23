@@ -15,4 +15,5 @@ public class EntradaEmitidaDTO {
     private String sector;
     private Integer fila;
     private Integer asiento;
+    private Long idReserva;
 }

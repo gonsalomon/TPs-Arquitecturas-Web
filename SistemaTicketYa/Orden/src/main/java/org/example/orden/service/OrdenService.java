@@ -283,7 +283,7 @@ public class OrdenService {
                 .map(i -> new ItemEmitirDTO(orden.getSector(), i.getFila(), i.getAsiento(), i.getPrecioUnitario()))
                 .collect(Collectors.toList());
         return new EmitirEntradasRequestDTO(
-                orden.getIdOrden(), orden.getEventoId(), orden.getClienteId(), orden.getFechaEvento(), items);
+                orden.getIdOrden(), orden.getEventoId(), orden.getClienteId(), orden.getFechaEvento(), items, orden.getIdReserva());
     }
 
     private void confirmarReserva(Long idReserva) {

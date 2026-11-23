@@ -92,4 +92,5 @@ public interface EntradaRepository extends JpaRepository<Entrada, Long> {
             @Param("clienteId") Long clienteId,
             @Param("estadoExcluido") EstadoEntrada estadoExcluido
     );
+    List<Entrada> findByEstadoAndOrdenId(EstadoEntrada estado, Long ordenId);
 }

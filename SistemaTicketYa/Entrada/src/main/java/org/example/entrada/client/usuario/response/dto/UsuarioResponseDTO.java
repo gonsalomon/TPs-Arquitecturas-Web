@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.example.entrada.client.utils.Rol;
 
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -15,6 +15,6 @@ public class UsuarioResponseDTO {
     private String nombre;
     private String apellido;
     private String email;
-    private Rol rol;
-    private List<String> authorities;
+    private String ciudad;
+    private Set<String> authorities;
 }
