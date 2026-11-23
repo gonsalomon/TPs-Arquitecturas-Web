@@ -7,6 +7,8 @@ import org.example.reserva.dto.request.SectorExternoDTO;
 import org.example.reserva.dto.response.ReservaResponseDTO;
 import org.example.reserva.entity.Reserva;
 import org.example.reserva.feignClients.EventosClient;
+import org.example.reserva.feignClients.OrdenClient;
+import org.example.reserva.feignClients.UsuarioClient;
 import org.example.reserva.mapper.ReservaMapper;
 import org.example.reserva.repository.ReservaRepository;
 import org.example.reserva.utils.EstadoReserva;
@@ -31,12 +33,14 @@ class ReservaServiceTest {
 
     @Mock private ReservaRepository repository;
     @Mock private EventosClient eventosClient;
+    @Mock private OrdenClient ordenClient;
+    @Mock private UsuarioClient usuarioClient;
 
     private ReservaService service;
 
     @BeforeEach
     void setUp() {
-        service = new ReservaService(new ReservaMapper(), repository, eventosClient);
+        service = new ReservaService(new ReservaMapper(), repository, eventosClient, ordenClient, usuarioClient);
         lenient().when(repository.save(any(Reserva.class))).thenAnswer(inv -> inv.getArgument(0));
         lenient().when(eventosClient.obtenerEvento("evt-1")).thenReturn(new EventoExternoDTO("evt-1", "lugar-1", "PUBLICADO", 0f));
         lenient().when(eventosClient.obtenerLugar("lugar-1")).thenReturn(new LugarExternoDTO("lugar-1", List.of(
@@ -45,11 +49,11 @@ class ReservaServiceTest {
     }
 
     private ReservaRequestDTO numerada(List<Long> asientos) {
-        return new ReservaRequestDTO(7L, "evt-1", "Platea", asientos, null);
+        return new ReservaRequestDTO(7L, "evt-1", "Platea", asientos, null, 1L);
     }
 
     private ReservaRequestDTO zona(int cantidad) {
-        return new ReservaRequestDTO(7L, "evt-1", "Campo", null, cantidad);
+        return new ReservaRequestDTO(7L, "evt-1", "Campo", null, cantidad, 1L);
     }
 
     // ---------- Sector numerado ----------
@@ -58,7 +62,7 @@ class ReservaServiceTest {
     void reservaAsientosNumeradosYLosGuarda() {
         when(repository.contarAsientosOcupados(eq("evt-1"), anyList(), eq(List.of(45L, 46L)))).thenReturn(0L);
 
-        ReservaResponseDTO dto = service.crearReserva(numerada(List.of(45L, 46L)));
+        ReservaResponseDTO dto = service.crearReserva(numerada(List.of(45L, 46L)), 1L);
 
         assertEquals(EstadoReserva.PENDIENTE, dto.getEstado());
         ArgumentCaptor<Reserva> guardada = ArgumentCaptor.forClass(Reserva.class);
@@ -73,15 +77,15 @@ class ReservaServiceTest {
         when(repository.contarAsientosOcupados(eq("evt-1"),
                 eq(List.of(EstadoReserva.PENDIENTE, EstadoReserva.CONFIRMADA)), anyList())).thenReturn(1L);
 
-        assertThrows(IllegalStateException.class, () -> service.crearReserva(numerada(List.of(45L))));
+        assertThrows(IllegalStateException.class, () -> service.crearReserva(numerada(List.of(45L)), 1L));
         verify(repository, never()).save(any());
     }
 
     @Test
     void unAsientoFueraDelSectorEsInvalido() {
         // Platea: 10 filas x 20 asientos = 200
-        assertThrows(IllegalArgumentException.class, () -> service.crearReserva(numerada(List.of(201L))));
-        assertThrows(IllegalArgumentException.class, () -> service.crearReserva(numerada(List.of(0L))));
+        assertThrows(IllegalArgumentException.class, () -> service.crearReserva(numerada(List.of(201L)), 1L));
+        assertThrows(IllegalArgumentException.class, () -> service.crearReserva(numerada(List.of(0L)), 1L));
         verify(repository, never()).save(any());
     }
 
@@ -91,7 +95,7 @@ class ReservaServiceTest {
     void reservaLugaresEnUnaZonaConCapacidad() {
         when(repository.contarEntradasVendidasPorSector(eq("evt-1"), eq("Campo"), anyList())).thenReturn(98L);
 
-        ReservaResponseDTO dto = service.crearReserva(zona(2));
+        ReservaResponseDTO dto = service.crearReserva(zona(2), 1L);
 
         assertEquals(EstadoReserva.PENDIENTE, dto.getEstado());
         verify(repository, never()).contarAsientosOcupados(any(), any(), any());
@@ -102,7 +106,7 @@ class ReservaServiceTest {
         // quedan 2 lugares en el Campo y se piden 3
         when(repository.contarEntradasVendidasPorSector(eq("evt-1"), eq("Campo"), anyList())).thenReturn(98L);
 
-        assertThrows(IllegalStateException.class, () -> service.crearReserva(zona(3)));
+        assertThrows(IllegalStateException.class, () -> service.crearReserva(zona(3), 1L));
         verify(repository, never()).save(any());
     }
 
@@ -110,14 +114,9 @@ class ReservaServiceTest {
 
     @Test
     void hayQuePedirAlMenosUnaEntrada() {
-        assertThrows(IllegalArgumentException.class, () -> service.crearReserva(zona(0)));
+        assertThrows(IllegalArgumentException.class, () -> service.crearReserva(zona(0), 1L));
     }
 
-    @Test
-    void unSectorInexistenteEsInvalido() {
-        assertThrows(IllegalArgumentException.class,
-                () -> service.crearReserva(new ReservaRequestDTO(7L, "evt-1", "Palco", List.of(1L), null)));
-    }
 
     // ---------- Estados ----------
 

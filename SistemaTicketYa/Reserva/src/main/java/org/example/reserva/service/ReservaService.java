@@ -6,12 +6,20 @@ import org.example.reserva.dto.request.*;
 import org.example.reserva.dto.response.ReservaResponseDTO;
 import org.example.reserva.entity.Reserva;
 import org.example.reserva.feignClients.EventosClient;
+import org.example.reserva.feignClients.OrdenClient;
+import org.example.reserva.feignClients.UsuarioClient;
 import org.example.reserva.mapper.ReservaMapper;
 import org.example.reserva.repository.ReservaRepository;
 import org.example.reserva.utils.EstadoReserva;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import feign.FeignException;
+import org.example.reserva.feignClients.OrdenClient;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+import java.util.Objects;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
@@ -29,9 +37,59 @@ public class ReservaService {
     private final ReservaMapper mapper;
     private final ReservaRepository repository;
     private final EventosClient eventosClient;
+    private final OrdenClient ordenClient;
+    private final UsuarioClient usuarioClient;
 
     @Transactional
-    public ReservaResponseDTO crearReserva(ReservaRequestDTO request) {
+    public ReservaResponseDTO crearReserva(ReservaRequestDTO request, Long usuarioIdHeader) {
+        // 0. VALIDACIÓN DE CLIENTE CONTRA USUARIO AUTENTICADO Y ORDEN
+        if (request.getIdCliente() == null || request.getIdCliente() <= 0) {
+            throw new IllegalArgumentException("El idCliente es inválido.");
+        }
+
+        try {
+            ResponseEntity<Object> respuestaUsuario = usuarioClient.obtenerUsuarioPorId(request.getIdCliente());
+            if (respuestaUsuario == null || !respuestaUsuario.getStatusCode().is2xxSuccessful() || respuestaUsuario.getBody() == null) {
+                throw new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "No existe el cliente con ID: " + request.getIdCliente()
+                );
+            }
+        } catch (FeignException.NotFound | FeignException.BadRequest e) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "No existe el cliente con ID: " + request.getIdCliente()
+            );
+        }
+
+        if (usuarioIdHeader != null && !Objects.equals(request.getIdCliente(), usuarioIdHeader)) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "El cliente de la solicitud no coincide con el usuario autenticado."
+            );
+        }
+
+        Long idClienteEfectivo = usuarioIdHeader != null ? usuarioIdHeader : request.getIdCliente();
+
+        if (request.getIdOrden() != null) {
+            OrdenExternoDTO orden;
+            try {
+                orden = ordenClient.obtenerOrden(request.getIdOrden());
+            } catch (FeignException.NotFound e) {
+                throw new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "No se encontró la orden con ID: " + request.getIdOrden()
+                );
+            }
+
+            if (orden == null || !Objects.equals(orden.getClienteId(), idClienteEfectivo)) {
+                throw new ResponseStatusException(
+                        HttpStatus.FORBIDDEN,
+                        "El cliente no corresponde al titular de la orden " + request.getIdOrden()
+                );
+            }
+        }
+
         // 1 y 2. VALIDACIÓN EXTERNA (Evento y Lugar)
         EventoExternoDTO evento = eventosClient.obtenerEvento(request.getIdEvento());
         LugarExternoDTO lugar = eventosClient.obtenerLugar(evento.getIdLugar());

@@ -1,5 +1,6 @@
 package org.example.reserva.controller;
 
+import jakarta.validation.Valid;
 import org.example.reserva.dto.request.ReservaRequestDTO;
 import org.example.reserva.dto.response.ReservaResponseDTO;
 import org.example.reserva.service.ReservaService;
@@ -7,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -34,12 +36,18 @@ public class ReservaController {
     }
 
     @PostMapping
-    public ResponseEntity<?> crearReserva(@RequestBody ReservaRequestDTO request) {
+    public ResponseEntity<?> crearReserva(
+            @Valid @RequestBody ReservaRequestDTO request,
+            @RequestHeader(value = "X-Usuario-Id", required = false) Long usuarioIdHeader) {
         try {
-            ReservaResponseDTO response = reservaService.crearReserva(request);
+            ReservaResponseDTO response = reservaService.crearReserva(request, usuarioIdHeader);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

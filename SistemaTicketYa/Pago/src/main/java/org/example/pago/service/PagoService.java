@@ -33,6 +33,7 @@ public class PagoService {
         // 2. Crea la entidad de pago
         Pago nuevoPago = mapper.convertToEntity(request);
         nuevoPago.setFecha_emision(LocalDateTime.now());
+        nuevoPago.setMonto(request.getMonto());
 
         // lógica simple de aprobación
         if (request.getMonto() != null && request.getMonto().compareTo(BigDecimal.ZERO) > 0) {

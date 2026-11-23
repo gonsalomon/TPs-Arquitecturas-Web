@@ -2972,12 +2972,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Reserva creada correctamente\", function () {",
-                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
-                  "    const json = pm.response.json();",
-                  "    const id = json.id ?? json.idReserva ?? json.reservaId;",
-                  "    if (id !== undefined) pm.collectionVariables.set(\"reservaId\", String(id));",
-                  "});"
+                  "pm.test(\"Reserva creada correctamente\", function () {\n    pm.expect(pm.response.code).to.be.oneOf([200, 201]);\n    const json = pm.response.json();\n    const id = json.id ?? json.idReserva ?? json.reservaId;\n    if (id !== undefined) pm.collectionVariables.set(\"reservaId\", String(id));\n});"
                 ]
               }
             }
@@ -3285,9 +3280,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Revisión de administrador procesada\", function () {",
-                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
-                  "});"
+                  "pm.test(\"Revisión de administrador procesada\", function () {\n    pm.expect(pm.response.code).to.be.oneOf([200, 201]);\n});"
                 ]
               }
             }
@@ -3316,7 +3309,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"estado\": \"APROBADO\",\n  \"idReserva\": {{reservaId}},\n  \"idEntrada\": {{entradaNoNumeradaId}}\n}",
+              "raw": "{\n  \"estado\": \"APROBADO\",\n  \"idReserva\": {{reservaPagadaC2}},\n  \"idEntrada\": {{entradaNoNumeradaId}}\n}",
               "options": {
                 "raw": {
                   "language": "json"
