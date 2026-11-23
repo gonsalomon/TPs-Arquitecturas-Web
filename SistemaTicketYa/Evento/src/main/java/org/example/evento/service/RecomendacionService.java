@@ -3,7 +3,7 @@ package org.example.evento.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.evento.client.EntradaClient;
-import org.example.evento.client.UsuarioFeingClient;
+import org.example.evento.client.UsuarioFeignClient;
 import org.example.evento.dto.response.EventoRecomendadoDTO;
 import org.example.evento.dto.request.PreferenciasExternasDTO;
 import org.example.evento.entity.Evento;
@@ -28,7 +28,7 @@ public class RecomendacionService {
 
     private final EventoRepository eventoRepository;
     private final LugarRepository lugarRepository;
-    private final UsuarioFeingClient usuarioClient;
+    private final UsuarioFeignClient usuarioClient;
     private final EntradaClient entradaClient;
 
     /**

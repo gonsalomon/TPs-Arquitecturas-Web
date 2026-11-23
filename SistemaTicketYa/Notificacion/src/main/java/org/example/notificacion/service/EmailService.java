@@ -1,6 +1,7 @@
 package org.example.notificacion.service;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class EmailService {
@@ -36,8 +38,7 @@ public class EmailService {
                         "Lamentamos las molestias ocasionadas.\n" +
                         "Gracias por tu comprensión."
         );
-
-        mailSender.send(mensaje);
+        enviar(mensaje);
     }
 
     public void enviarCancelacion(String email) {
@@ -54,8 +55,7 @@ public class EmailService {
                         "Se iniciará el proceso correspondiente de reintegro.\n\n" +
                         "Lamentamos las molestias ocasionadas."
         );
-
-        mailSender.send(mensaje);
+        enviar(mensaje);
     }
     public void enviarConfirmacionOrden(String email) {
         SimpleMailMessage mensaje = new SimpleMailMessage();
@@ -70,7 +70,7 @@ public class EmailService {
                         "¡Esperamos que disfrutes del evento!\n\n" +
                         "¡Gracias por tu compra!"
         );
-        mailSender.send(mensaje);
+        enviar(mensaje);
     }
     public void enviarNuevoEventoArtista(String email) {
         SimpleMailMessage mensaje = new SimpleMailMessage();
@@ -84,6 +84,14 @@ public class EmailService {
                         "estaran disponibles proximamente en los locales oficiales.\n\n" +
                         "¡Esperamos que te sumes al evento!\n\n"
         );
-        mailSender.send(mensaje);
+        enviar(mensaje);
+    }
+
+    private void enviar(SimpleMailMessage mensaje) {
+        try {
+            mailSender.send(mensaje);
+        } catch (org.springframework.mail.MailException e) {
+            log.warn("Fallo el envío de mail a {}: {}", java.util.Arrays.toString(mensaje.getTo()), e.getMessage());
+        }
     }
 }

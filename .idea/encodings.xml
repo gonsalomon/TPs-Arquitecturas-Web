@@ -3,6 +3,7 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/SistemaTicketYa/Entrada/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/SistemaTicketYa/Evento/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/SistemaTicketYa/Fila_Virtual/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/SistemaTicketYa/Gateway/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/SistemaTicketYa/Notificacion/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/SistemaTicketYa/Orden/src/main/java" charset="UTF-8" />

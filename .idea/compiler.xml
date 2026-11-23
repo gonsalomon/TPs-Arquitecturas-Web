@@ -31,12 +31,22 @@
         </processorPath>
         <module name="Entrada" />
       </profile>
+      <profile name="Annotation profile for Fila_Virtual" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
+        </processorPath>
+        <module name="Fila_Virtual" />
+      </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="Entrada" options="-parameters" />
       <module name="Evento" options="-parameters" />
+      <module name="Fila_Virtual" options="-parameters" />
       <module name="Gateway" options="-parameters" />
       <module name="Notificacion" options="-parameters" />
       <module name="Orden" options="-parameters" />

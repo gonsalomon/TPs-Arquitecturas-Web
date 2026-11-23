@@ -5,13 +5,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-@SpringBootApplication
 @EnableFeignClients
 @EnableScheduling
+@SpringBootApplication
 public class FilaVirtualApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(FilaVirtualApplication.class, args);
     }
-
 }

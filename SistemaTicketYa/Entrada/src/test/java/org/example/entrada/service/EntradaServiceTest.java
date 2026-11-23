@@ -35,9 +35,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.example.entrada.client.utils.Rol.ADMINISTRADOR;
 import static org.junit.jupiter.api.Assertions.*;
@@ -69,7 +67,7 @@ class EntradaServiceTest {
     }
 
     private EmitirEntradasRequest pedido(ItemEntradaRequest... items) {
-        return new EmitirEntradasRequest(100L, "evt-1", 7L, LocalDateTime.now().plusDays(30), List.of(items));
+        return new EmitirEntradasRequest(100L, "evt-1", 7L, LocalDateTime.now().plusDays(30), List.of(items), 4L);
     }
 
     private Entrada entrada(LocalDateTime fechaEvento) {
@@ -374,7 +372,8 @@ class EntradaServiceTest {
     // ---------------------------------------------------------------- revisión de devoluciones (admin)
 
     private void usuarioConRol(Long id, Rol rol, List<String> authorities) {
-        when(usuarioClient.getById(id)).thenReturn(ResponseEntity.ok(new UsuarioResponseDTO(id, "N", "A", "x@mail.com", rol, authorities)));
+        Set<String> set = new HashSet<>(authorities);
+        when(usuarioClient.getById(id)).thenReturn(ResponseEntity.ok(new UsuarioResponseDTO(id, "N", "A", "x@mail.com", "Tandil", set)));
     }
 
     private Entrada entradaValida(LocalDateTime fechaEvento) {

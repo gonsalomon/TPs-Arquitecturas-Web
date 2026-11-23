@@ -1,6 +1,7 @@
 package org.example.orden.service;
 
 import feign.FeignException;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrdenService {
@@ -94,7 +96,7 @@ public class OrdenService {
             throw new AsientoNoDisponibleException("Uno o más asientos ya están ocupados por otra orden");
         }
 
-        ReservaExternaDTO reserva = reservarEnReserva(orden, numerosDeAsiento, sector.getCapacidad());
+        ReservaExternaDTO reserva = reservarEnReserva(orden, numerosDeAsiento, orden.getItems().size());
 
         orden.setAltaDemanda(esAltaDemanda);
         orden.setIdReserva(reserva.getIdReserva());
@@ -271,7 +273,11 @@ public class OrdenService {
                     null,
                     null
             );
-            notificacionClient.notificar(notificacion);
+            try {
+                notificacionClient.notificar(notificacion);
+            } catch (Exception e) {
+                log.warn("No se pudo enviar la notificación de la orden {}: {}", orden.getIdOrden(), e.getMessage());
+            }
         } catch (FeignException e) {
             System.out.println("Error notificando: " + e.status());
             System.out.println("Respuesta: " + e.contentUTF8());

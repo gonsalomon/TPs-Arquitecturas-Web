@@ -127,6 +127,8 @@ Es necesario conservar el ID de la orden generada, ya que se utilizará en el si
 
 ### 4. Realizar el pago de la orden
 
+###### Importante: Para este paso, son necesarias credenciales válidas de email, o es sólo best-effort. Se necesita alterar application.yml en Notificacion con un mail válido que además tenga 2FA y pueda emitir una contraseña de aplicación (thx Gmail). Sin MAIL_USERNAME ni MAIL_PASSWORD válidos en dicho archivo, se registra un warning y el flujo continúa.
+
 Una vez creada la orden, se debe ejecutar el endpoint de pago correspondiente.
 
 **Endpoint:**

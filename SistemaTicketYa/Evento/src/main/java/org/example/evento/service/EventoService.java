@@ -3,7 +3,7 @@ package org.example.evento.service;
 import lombok.AllArgsConstructor;
 import org.example.evento.client.NotificacionFeignClient;
 import org.example.evento.client.OrdenFeignClient;
-import org.example.evento.client.UsuarioFeingClient;
+import org.example.evento.client.UsuarioFeignClient;
 import org.example.evento.client.notificacion.dto.NotificacionRequestDTO;
 import org.example.evento.client.usuario.dto.response.NotificacionArtistaDTO;
 import org.example.evento.client.usuario.dto.response.UsuarioResponseDTO;
@@ -41,14 +41,14 @@ public class EventoService {
     private final LugarService lugarService;
     private final EventoMapper mapper;
     private final MongoTemplate mongoTemplate;
-    private final UsuarioFeingClient  usuarioFeingClient;
+    private final UsuarioFeignClient usuarioFeignClient;
     private final OrdenFeignClient  ordenFeignClient;
     private final NotificacionFeignClient notificacionFeignClient;
 
     /*-------------------------- MÉTODOS PARA EL CRUD --------------------------*/
     /* Todo evento se crea en BORRADOR. El lugar tiene que existir antes. */
     public EventoResponseDTO save(EventoRequestDTO request, Long  usuarioId) {
-        ResponseEntity<UsuarioResponseDTO> response = usuarioFeingClient.getById(usuarioId);
+        ResponseEntity<UsuarioResponseDTO> response = usuarioFeignClient.getById(usuarioId);
         UsuarioResponseDTO usuario = response.getBody();
         if(usuario == null){
             throw new IllegalArgumentException("Usuario no encontrado");
@@ -195,7 +195,7 @@ public class EventoService {
     }
 
     private UsuarioResponseDTO obtenerUsuario(Long usuarioId) {
-        ResponseEntity<UsuarioResponseDTO> response = usuarioFeingClient.getById(usuarioId);
+        ResponseEntity<UsuarioResponseDTO> response = usuarioFeignClient.getById(usuarioId);
         UsuarioResponseDTO usuario = response.getBody();
         if (usuario == null) {
             throw new IllegalArgumentException("Usuario no encontrado");
@@ -278,7 +278,7 @@ public class EventoService {
     private void notificarSeguidores(Evento evento) {
         Lugar lugar = lugarService.buscar(evento.getIdLugar());
         List<NotificacionArtistaDTO> destinatarios =
-                usuarioFeingClient.buscarDestinatarios(
+                usuarioFeignClient.buscarDestinatarios(
                         new HashSet<>(evento.getParticipantes()),
                         lugar.getCiudad()
                 );

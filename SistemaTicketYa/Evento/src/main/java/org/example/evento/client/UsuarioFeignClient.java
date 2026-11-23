@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 @FeignClient(name = "usuario-service", url = "http://localhost:8081/api/usuarios")
-public interface UsuarioFeingClient {
+public interface UsuarioFeignClient {
 
     @GetMapping ("/{id}")
     ResponseEntity<UsuarioResponseDTO> getById(@PathVariable("id") Long id);
