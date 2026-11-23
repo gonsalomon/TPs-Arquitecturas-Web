@@ -60,6 +60,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/ordenes/**").hasAuthority(AuthorityConstant.CLIENTE)
                         .requestMatchers("/api/pagos/**").hasAuthority(AuthorityConstant.CLIENTE)
                         .requestMatchers("/api/reservas/**").hasAuthority(AuthorityConstant.CLIENTE)
+                        .requestMatchers("/api/fila/**").hasAuthority(AuthorityConstant.CLIENTE)
                         .requestMatchers("/api/notificaciones/**").permitAll()
                         .requestMatchers("api/usuarios/**").permitAll()
 

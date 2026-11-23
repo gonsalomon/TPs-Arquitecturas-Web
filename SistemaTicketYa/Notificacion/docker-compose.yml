@@ -1,6 +1,6 @@
 version: "3"
 services:
-  mysql:
+  mysql-notificacion:
     image: mysql:8.0
     container_name: Notificacion-mysql
     restart: always

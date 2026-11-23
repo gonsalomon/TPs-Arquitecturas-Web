@@ -1,6 +1,6 @@
 version: "3"
 services:
-  mysql:
+  mysql-reserva:
     image: mysql:8.0
     container_name: Reserva-mysql
     restart: always

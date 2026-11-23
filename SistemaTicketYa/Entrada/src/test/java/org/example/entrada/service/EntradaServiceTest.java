@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.example.entrada.client.utils.Rol.ADMINISTRADOR;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -372,8 +373,8 @@ class EntradaServiceTest {
 
     // ---------------------------------------------------------------- revisión de devoluciones (admin)
 
-    private void usuarioConRol(Long id, Rol rol) {
-        when(usuarioClient.getById(id)).thenReturn(ResponseEntity.ok(new UsuarioResponseDTO(id, "N", "A", "x@mail.com", rol)));
+    private void usuarioConRol(Long id, Rol rol, List<String> authorities) {
+        when(usuarioClient.getById(id)).thenReturn(ResponseEntity.ok(new UsuarioResponseDTO(id, "N", "A", "x@mail.com", rol, authorities)));
     }
 
     private Entrada entradaValida(LocalDateTime fechaEvento) {
@@ -383,8 +384,8 @@ class EntradaServiceTest {
     }
 
     @Test
-    void aprobarLaDevolucionAnulaLaEntradaLiberaElAsientoYReembolsa() {
-        usuarioConRol(1L, Rol.ADMINISTRADOR);
+    void aprobarLaDevolucionAnulaLaEntradaLiberaElAsientoYReembolsa(List<String> authorities) {
+        usuarioConRol(1L, ADMINISTRADOR, authorities);
         Entrada e = entradaValida(LocalDateTime.now().plusDays(5));
         when(repo.findById(50L)).thenReturn(Optional.of(e));
 
@@ -399,8 +400,8 @@ class EntradaServiceTest {
     }
 
     @Test
-    void aprobarFueraDePlazoNoReembolsaNiLiberaNada() {
-        usuarioConRol(1L, Rol.ADMINISTRADOR);
+    void aprobarFueraDePlazoNoReembolsaNiLiberaNada(List<String> authorities) {
+        usuarioConRol(1L, ADMINISTRADOR, authorities);
         Entrada e = entradaValida(LocalDateTime.now().plusHours(71));
         when(repo.findById(50L)).thenReturn(Optional.of(e));
 
@@ -413,8 +414,8 @@ class EntradaServiceTest {
     }
 
     @Test
-    void aprobarSinIndicarLaEntradaEsInvalido() {
-        usuarioConRol(1L, Rol.ADMINISTRADOR);
+    void aprobarSinIndicarLaEntradaEsInvalido(List<String> authorities) {
+        usuarioConRol(1L, ADMINISTRADOR, authorities);
 
         assertThrows(IllegalArgumentException.class,
                 () -> service.revisarSolicitud(new RevisionEntradaRequestDTO(EstadoEvento.APROBADO, 12L, null), 1L));
@@ -422,8 +423,8 @@ class EntradaServiceTest {
     }
 
     @Test
-    void siSeRechazaLaDevolucionNoSeTocaNada() {
-        usuarioConRol(1L, Rol.ADMINISTRADOR);
+    void siSeRechazaLaDevolucionNoSeTocaNada(List<String> authorities) {
+        usuarioConRol(1L, ADMINISTRADOR, authorities);
 
         service.revisarSolicitud(new RevisionEntradaRequestDTO(EstadoEvento.RECHAZADO, 12L, 50L), 1L);
 
@@ -432,8 +433,8 @@ class EntradaServiceTest {
     }
 
     @Test
-    void soloUnAdministradorPuedeRevisarDevoluciones() {
-        usuarioConRol(7L, Rol.CLIENTE);
+    void soloUnAdministradorPuedeRevisarDevoluciones(List<String> authorities) {
+        usuarioConRol(7L, Rol.CLIENTE, authorities);
 
         ResponseStatusException ex = assertThrows(ResponseStatusException.class,
                 () -> service.revisarSolicitud(new RevisionEntradaRequestDTO(EstadoEvento.APROBADO, 12L, 50L), 7L));

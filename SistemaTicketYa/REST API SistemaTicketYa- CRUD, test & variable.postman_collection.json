@@ -1,179 +1,60 @@
 {
   "info": {
-    "_postman_id": "ca4e99c3-f3a6-473d-b676-eebab47238fa",
-    "name": "REST API SistemaTicketYa- CRUD, test & variable",
-    "description": "# 🚀 Get started here\n\nThis template guides you through CRUD operations (GET, POST, PUT, DELETE), variables, and tests.\n\n## 🔖 **How to use this template**\n\n#### **Step 1: Send requests**\n\nRESTful APIs allow you to perform CRUD operations using the POST, GET, PUT, and DELETE HTTP methods.\n\nThis collection contains each of these [request](https://learning.postman.com/docs/sending-requests/requests/) types. Open each request and click \"Send\" to see what happens.\n\n#### **Step 2: View responses**\n\nObserve the response tab for status code (200 OK), response time, and size.\n\n#### **Step 3: Send new Body data**\n\nUpdate or add new data in \"Body\" in the POST request. Typically, Body data is also used in PUT request.\n\n```\n{\n    \"name\": \"Add your name in the body\"\n}\n\n ```\n\n#### **Step 4: Update the variable**\n\nVariables enable you to store and reuse values in Postman. We have created a [variable](https://learning.postman.com/docs/sending-requests/variables/) called `base_url` with the sample request [https://postman-api-learner.glitch.me](https://postman-api-learner.glitch.me). Replace it with your API endpoint to customize this collection.\n\n#### **Step 5: Add tests in the \"Scripts\" tab**\n\nAdding tests to your requests can help you confirm that your API is working as expected. You can write test scripts in JavaScript and view the output in the \"Test Results\" tab.\n\n<img src=\"https://content.pstmn.io/fa30ea0a-373d-4545-a668-e7b283cca343/aW1hZ2UucG5n\" alt=\"\" height=\"1530\" width=\"2162\">\n\n## 💪 Pro tips\n\n- Use folders to group related requests and organize the collection.\n    \n- Add more [scripts](https://learning.postman.com/docs/writing-scripts/intro-to-scripts/) to verify if the API works as expected and execute workflows.\n    \n\n## 💡Related templates\n\n[API testing basics](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=e9a37a28-055b-49cd-8c7e-97494a21eb54&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)  \n[API documentation](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=e9c28f47-1253-44af-a2f3-20dce4da1f18&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)  \n[Authorization methods](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=31a9a6ed-4cdf-4ced-984c-d12c9aec1c27&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)",
+    "_postman_id": "38e310b7-d076-4607-884d-18113bf3ee30",
+    "name": "REST API SistemaTicketYa- CRUD, test & variable (E2E Completo)",
+    "description": "Colección actualizada de SistemaTicketYa con generación automática de datos únicos por ejecución, captura de variables y JWT, eventos de baja y alta demanda, fila virtual, entradas numeradas y no numeradas, recomendaciones y GET de verificación tras cada POST.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "49340244",
-    "_collection_link": "https://go.postman.co/collection/49340244-ca4e99c3-f3a6-473d-b676-eebab47238fa?source=collection_link"
+    "_exporter_id": "55889808",
+    "_collection_link": "https://go.postman.co/collection/55889808-38e310b7-d076-4607-884d-18113bf3ee30?source=collection_link"
   },
   "item": [
     {
-      "name": "Usuario",
+      "name": "01 - Usuario y JWT",
       "item": [
         {
-          "name": "Creacion usuario organizador",
+          "name": "1.1 POST Crear usuario ADMINISTRADOR",
           "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const now = Date.now().toString().slice(-6);",
+                  "const rand = Math.floor(100 + Math.random() * 900);",
+                  "const runId = `${now}_${rand}`;",
+                  "pm.collectionVariables.set(\"runId\", runId);",
+                  "pm.collectionVariables.set(\"adminEmail\", `admin_${runId}@example.com`);",
+                  "pm.collectionVariables.set(\"organizadorEmail\", `organizador_${runId}@example.com`);",
+                  "pm.collectionVariables.set(\"personalAccesoEmail\", `acceso_${runId}@example.com`);",
+                  "pm.collectionVariables.set(\"cliente1Email\", `cliente1_${runId}@example.com`);",
+                  "pm.collectionVariables.set(\"cliente2Email\", `cliente2_${runId}@example.com`);",
+                  "pm.collectionVariables.set(\"usuarioTemporalEmail\", `temp_${runId}@example.com`);",
+                  "pm.collectionVariables.set(\"usuarioTemporalEmailEditado\", `temp_edit_${runId}@example.com`);",
+                  "pm.collectionVariables.set(\"lugarNombre\", `Estadio Nacional ${runId}`);",
+                  "pm.collectionVariables.set(\"lugarNoNumeradoNombre\", `Sala Cultural ${runId}`);",
+                  "pm.collectionVariables.set(\"asientoFila\", String(Math.floor(1 + Math.random() * 15)));",
+                  "pm.collectionVariables.set(\"asientoNum1\", String(Math.floor(1 + Math.random() * 10)));",
+                  "pm.collectionVariables.set(\"asientoNum2\", String(Math.floor(11 + Math.random() * 10)));",
+                  "pm.collectionVariables.set(\"asientoReserva\", String(Math.floor(21 + Math.random() * 9)));"
+                ]
+              }
+            },
             {
               "listen": "test",
               "script": {
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
-                ],
                 "type": "text/javascript",
-                "packages": {},
-                "requests": {}
+                "exec": [
+                  "pm.test(\"Usuario Administrador creado correctamente\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "    const json = pm.response.json();",
+                  "    const id = json.id ?? json.idUsuario ?? json.usuarioId;",
+                  "    pm.expect(id, \"Debe devolver el ID del usuario\").to.not.be.undefined;",
+                  "    pm.collectionVariables.set(\"adminId\", String(id));",
+                  "});"
+                ]
               }
             }
           ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n  \"nombre\": \"Santiago\",\r\n  \"apellido\": \"Sosa\",\r\n  \"email\": \"sosasantiago@example.com\",\r\n  \"ciudad\" : \"Tandil\",\r\n  \"password\": 1234,\r\n  \"authorities\": [\"ORGANIZADOR\"],\r\n  \"artistasFavoritos\" : []\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:8080/api/usuarios",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8080",
-              "path": [
-                "api",
-                "usuarios"
-              ]
-            },
-            "description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
-          },
-          "response": []
-        },
-        {
-          "name": "Creacion usuario administrador",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n  \"nombre\": \"Maria\",\r\n  \"apellido\": \"Cabrera\",\r\n  \"email\": \"maria@example.com\",\r\n  \"ciudad\" : \"Tandil\",\r\n  \"password\": \"1234\",\r\n  \"authorities\": [\"ADMINISTRADOR\"],\r\n  \"artistasFavoritos\" : []\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:8080/api/usuarios",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8080",
-              "path": [
-                "api",
-                "usuarios"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Creacion personal acceso",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n  \"nombre\": \"Gustavo\",\r\n  \"apellido\": \"Puebla\",\r\n  \"email\": \"guspuebla@example.com\",\r\n  \"ciudad\" : \"Tandil\",\r\n  \"password\": \"1234\",\r\n  \"authorities\": [\"PERSONAL_DE_ACCESO\"]\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:8080/api/usuarios",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8080",
-              "path": [
-                "api",
-                "usuarios"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Creacion cliente normal 1",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n  \"nombre\": \"Santiago\",\r\n  \"apellido\": \"Gomez\",\r\n  \"email\": \"gomezsantiago@example.com\",\r\n  \"ciudad\" : \"Tandil\",\r\n  \"password\": 1234,\r\n  \"authorities\": [\"CLIENTE\"],\r\n  \"artistasFavoritos\" : [\r\n    \"Shakira\",\r\n    \"Maluma\"\r\n  ]\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:8080/api/usuarios",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8080",
-              "path": [
-                "api",
-                "usuarios"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Creacion cliente normal 2",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n  \"nombre\": \"Valeria\",\r\n  \"apellido\": \"Gomez\",\r\n  \"email\": \"gomezvaleria@example.com\",\r\n  \"ciudad\" : \"Tandil\",\r\n  \"password\": 1234,\r\n  \"authorities\": [\"CLIENTE\"],\r\n  \"artistasFavoritos\" : [\r\n    \"Shakira\",\r\n    \"Maluma\"\r\n  ]\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:8080/api/usuarios",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8080",
-              "path": [
-                "api",
-                "usuarios"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Login",
           "request": {
             "method": "POST",
             "header": [
@@ -184,7 +65,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"username\": \"maria@example.com\",\n  \"password\": \"1234\"\n}",
+              "raw": "{\n  \"nombre\": \"Maria\",\n  \"apellido\": \"Cabrera\",\n  \"email\": \"{{adminEmail}}\",\n  \"ciudad\": \"Tandil\",\n  \"password\": \"{{password}}\",\n  \"authorities\": [\n    \"ADMINISTRADOR\"\n  ],\n  \"artistasFavoritos\": []\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -192,12 +73,68 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8080/api/authenticate",
-              "protocol": "http",
+              "raw": "{{base_url}}/api/usuarios",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "8080",
+              "path": [
+                "api",
+                "usuarios"
+              ]
+            },
+            "description": "Genera un runId único para toda la corrida y crea el usuario Administrador."
+          },
+          "response": []
+        },
+        {
+          "name": "1.2 POST Login ADMINISTRADOR (JWT)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Login Administrador exitoso y JWT guardado\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "    let token = \"\";",
+                  "    try {",
+                  "        const json = pm.response.json();",
+                  "        token = json.id_token || json.token || json.jwt || json.accessToken || \"\";",
+                  "    } catch (e) {",
+                  "        token = pm.response.text().trim();",
+                  "    }",
+                  "    if (!token && pm.response.headers.has(\"Authorization\")) {",
+                  "        token = pm.response.headers.get(\"Authorization\").replace(/^Bearer\\s+/i, \"\");",
+                  "    }",
+                  "    pm.expect(token, \"No se encontró token JWT en la respuesta\").to.be.a(\"string\").and.not.empty;",
+                  "    pm.collectionVariables.set(\"tokenAdministrador\", token);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{adminEmail}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/authenticate",
+              "host": [
+                "{{base_url}}"
+              ],
               "path": [
                 "api",
                 "authenticate"
@@ -207,94 +144,176 @@
           "response": []
         },
         {
-          "name": "Obtener usuarios",
+          "name": "1.3 GET Verificar usuario ADMINISTRADOR creado",
           "event": [
             {
               "listen": "test",
               "script": {
-                "exec": [
-                  "pm.test(\"Successful POST request\", function () {",
-                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
-                  "});",
-                  ""
-                ],
                 "type": "text/javascript",
-                "packages": {},
-                "requests": {}
+                "exec": [
+                  "pm.test(\"GET Usuario Administrador devuelve 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
               }
             }
           ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdministrador}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:8080/api/usuarios",
-              "protocol": "http",
+              "raw": "{{base_url}}/api/usuarios/{{adminId}}",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "8080",
+              "path": [
+                "api",
+                "usuarios",
+                "{{adminId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.4 POST Crear usuario ORGANIZADOR",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Usuario Organizador creado correctamente\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "    const json = pm.response.json();",
+                  "    const id = json.id ?? json.idUsuario ?? json.usuarioId;",
+                  "    pm.expect(id, \"Debe devolver el ID del usuario\").to.not.be.undefined;",
+                  "    pm.collectionVariables.set(\"organizadorId\", String(id));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Santiago\",\n  \"apellido\": \"Sosa\",\n  \"email\": \"{{organizadorEmail}}\",\n  \"ciudad\": \"Tandil\",\n  \"password\": \"{{password}}\",\n  \"authorities\": [\n    \"ORGANIZADOR\"\n  ],\n  \"artistasFavoritos\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/usuarios",
+              "host": [
+                "{{base_url}}"
+              ],
               "path": [
                 "api",
                 "usuarios"
               ]
-            },
-            "description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+            }
           },
           "response": []
         },
         {
-          "name": "Obtener Usuario",
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          },
+          "name": "1.5 GET Verificar usuario ORGANIZADOR creado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET Usuario Organizador devuelve 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdministrador}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n  \"nombre\": \"Maria\",\r\n  \"apellido\": \"Cabrera\",\r\n  \"email\": \"emailejemplo@example.com\",\r\n  \"rol\": \"CLIENTE\"\r\n}"
-            },
             "url": {
-              "raw": "http://localhost:8080/api/usuarios/1",
-              "protocol": "http",
+              "raw": "{{base_url}}/api/usuarios/{{organizadorId}}",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "8080",
               "path": [
                 "api",
                 "usuarios",
-                "1"
+                "{{organizadorId}}"
               ]
             }
           },
           "response": []
         },
         {
-          "name": "Modificar usuario",
+          "name": "1.6 POST Login ORGANIZADOR (JWT)",
           "event": [
             {
               "listen": "test",
               "script": {
-                "exec": [
-                  "pm.test(\"Successful PUT request\", function () {",
-                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
-                  "});",
-                  ""
-                ],
                 "type": "text/javascript",
-                "packages": {},
-                "requests": {}
+                "exec": [
+                  "pm.test(\"Login Organizador exitoso y JWT guardado\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "    let token = \"\";",
+                  "    try {",
+                  "        const json = pm.response.json();",
+                  "        token = json.id_token || json.token || json.jwt || json.accessToken || \"\";",
+                  "    } catch (e) {",
+                  "        token = pm.response.text().trim();",
+                  "    }",
+                  "    if (!token && pm.response.headers.has(\"Authorization\")) {",
+                  "        token = pm.response.headers.get(\"Authorization\").replace(/^Bearer\\s+/i, \"\");",
+                  "    }",
+                  "    pm.expect(token, \"No se encontró token JWT en la respuesta\").to.be.a(\"string\").and.not.empty;",
+                  "    pm.collectionVariables.set(\"tokenOrganizador\", token);",
+                  "});"
+                ]
               }
             }
           ],
           "request": {
-            "method": "PUT",
-            "header": [],
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n        \"id\": 2,\n        \"nombre\": \"Maria\",\n        \"apellido\": \"Cabrera\",\n        \"email\": \"dasdwee@example.com\",\n        \"rol\": \"ADMINISTRADOR\"\n    }",
+              "raw": "{\n  \"username\": \"{{organizadorEmail}}\",\n  \"password\": \"{{password}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -302,76 +321,730 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8080/api/usuarios/2",
-              "protocol": "http",
+              "raw": "{{base_url}}/api/authenticate",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "8080",
               "path": [
                 "api",
-                "usuarios",
-                "2"
+                "authenticate"
               ]
-            },
-            "description": "This is a PUT request and it is used to overwrite an existing piece of data. For instance, after you create an entity with a POST request, you may want to modify that later. You can do that using a PUT request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful PUT request typically returns a `200 OK`, `201 Created`, or `204 No Content` response code."
+            }
           },
           "response": []
         },
         {
-          "name": "Eliminar usuario",
+          "name": "1.7 POST Crear usuario PERSONAL_DE_ACCESO",
           "event": [
             {
               "listen": "test",
               "script": {
-                "exec": [
-                  "pm.test(\"Successful DELETE request\", function () {",
-                  "    pm.expect(pm.response.code).to.be.oneOf([200, 202, 204]);",
-                  "});",
-                  ""
-                ],
                 "type": "text/javascript",
-                "packages": {},
-                "requests": {}
+                "exec": [
+                  "pm.test(\"Personal de Acceso creado correctamente\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "    const json = pm.response.json();",
+                  "    const id = json.id ?? json.idUsuario ?? json.usuarioId;",
+                  "    pm.expect(id, \"Debe devolver el ID del usuario\").to.not.be.undefined;",
+                  "    pm.collectionVariables.set(\"personalAccesoId\", String(id));",
+                  "});"
+                ]
               }
             }
           ],
           "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Gustavo\",\n  \"apellido\": \"Puebla\",\n  \"email\": \"{{personalAccesoEmail}}\",\n  \"ciudad\": \"Tandil\",\n  \"password\": \"{{password}}\",\n  \"authorities\": [\n    \"PERSONAL_DE_ACCESO\"\n  ],\n  \"artistasFavoritos\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/usuarios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "usuarios"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.8 GET Verificar PERSONAL_DE_ACCESO creado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET Personal de Acceso devuelve 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdministrador}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/usuarios/{{personalAccesoId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "usuarios",
+                "{{personalAccesoId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.9 POST Login PERSONAL_DE_ACCESO (JWT)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Login Personal de Acceso exitoso y JWT guardado\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "    let token = \"\";",
+                  "    try {",
+                  "        const json = pm.response.json();",
+                  "        token = json.id_token || json.token || json.jwt || json.accessToken || \"\";",
+                  "    } catch (e) {",
+                  "        token = pm.response.text().trim();",
+                  "    }",
+                  "    if (!token && pm.response.headers.has(\"Authorization\")) {",
+                  "        token = pm.response.headers.get(\"Authorization\").replace(/^Bearer\\s+/i, \"\");",
+                  "    }",
+                  "    pm.expect(token, \"No se encontró token JWT en la respuesta\").to.be.a(\"string\").and.not.empty;",
+                  "    pm.collectionVariables.set(\"tokenPersonalAcceso\", token);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{personalAccesoEmail}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/authenticate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "authenticate"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.10 POST Crear CLIENTE 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Cliente 1 creado correctamente\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "    const json = pm.response.json();",
+                  "    const id = json.id ?? json.idUsuario ?? json.usuarioId;",
+                  "    pm.expect(id, \"Debe devolver el ID del usuario\").to.not.be.undefined;",
+                  "    pm.collectionVariables.set(\"cliente1Id\", String(id));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Santiago\",\n  \"apellido\": \"Gomez\",\n  \"email\": \"{{cliente1Email}}\",\n  \"ciudad\": \"Tandil\",\n  \"password\": \"{{password}}\",\n  \"authorities\": [\n    \"CLIENTE\"\n  ],\n  \"artistasFavoritos\": [\n    \"Shakira\",\n    \"Maluma\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/usuarios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "usuarios"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.11 GET Verificar CLIENTE 1 creado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET Cliente 1 devuelve 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdministrador}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/usuarios/{{cliente1Id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "usuarios",
+                "{{cliente1Id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.12 POST Login CLIENTE 1 (JWT)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Login Cliente 1 exitoso y JWT guardado\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "    let token = \"\";",
+                  "    try {",
+                  "        const json = pm.response.json();",
+                  "        token = json.id_token || json.token || json.jwt || json.accessToken || \"\";",
+                  "    } catch (e) {",
+                  "        token = pm.response.text().trim();",
+                  "    }",
+                  "    if (!token && pm.response.headers.has(\"Authorization\")) {",
+                  "        token = pm.response.headers.get(\"Authorization\").replace(/^Bearer\\s+/i, \"\");",
+                  "    }",
+                  "    pm.expect(token, \"No se encontró token JWT en la respuesta\").to.be.a(\"string\").and.not.empty;",
+                  "    pm.collectionVariables.set(\"tokenCliente1\", token);",
+                  "});",
+                  "pm.collectionVariables.set(\"tokenCliente\", pm.collectionVariables.get(\"tokenCliente1\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{cliente1Email}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/authenticate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "authenticate"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.13 POST Crear CLIENTE 2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Cliente 2 creado correctamente\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "    const json = pm.response.json();",
+                  "    const id = json.id ?? json.idUsuario ?? json.usuarioId;",
+                  "    pm.expect(id, \"Debe devolver el ID del usuario\").to.not.be.undefined;",
+                  "    pm.collectionVariables.set(\"cliente2Id\", String(id));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Valeria\",\n  \"apellido\": \"Gomez\",\n  \"email\": \"{{cliente2Email}}\",\n  \"ciudad\": \"Tandil\",\n  \"password\": \"{{password}}\",\n  \"authorities\": [\n    \"CLIENTE\"\n  ],\n  \"artistasFavoritos\": [\n    \"Shakira\",\n    \"Maluma\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/usuarios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "usuarios"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.14 GET Verificar CLIENTE 2 creado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET Cliente 2 devuelve 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdministrador}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/usuarios/{{cliente2Id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "usuarios",
+                "{{cliente2Id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.15 POST Login CLIENTE 2 (JWT)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Login Cliente 2 exitoso y JWT guardado\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "    let token = \"\";",
+                  "    try {",
+                  "        const json = pm.response.json();",
+                  "        token = json.id_token || json.token || json.jwt || json.accessToken || \"\";",
+                  "    } catch (e) {",
+                  "        token = pm.response.text().trim();",
+                  "    }",
+                  "    if (!token && pm.response.headers.has(\"Authorization\")) {",
+                  "        token = pm.response.headers.get(\"Authorization\").replace(/^Bearer\\s+/i, \"\");",
+                  "    }",
+                  "    pm.expect(token, \"No se encontró token JWT en la respuesta\").to.be.a(\"string\").and.not.empty;",
+                  "    pm.collectionVariables.set(\"tokenCliente2\", token);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{cliente2Email}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/authenticate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "authenticate"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.16 POST Crear usuario temporal (para pruebas PUT/DELETE)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Usuario Temporal creado correctamente\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "    const json = pm.response.json();",
+                  "    const id = json.id ?? json.idUsuario ?? json.usuarioId;",
+                  "    pm.expect(id, \"Debe devolver el ID del usuario\").to.not.be.undefined;",
+                  "    pm.collectionVariables.set(\"usuarioTemporalId\", String(id));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Temporal\",\n  \"apellido\": \"Prueba\",\n  \"email\": \"{{usuarioTemporalEmail}}\",\n  \"ciudad\": \"Tandil\",\n  \"password\": \"{{password}}\",\n  \"authorities\": [\n    \"CLIENTE\"\n  ],\n  \"artistasFavoritos\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/usuarios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "usuarios"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.17 GET Obtener todos los usuarios",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET usuarios devuelve lista con los usuarios creados\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const lista = pm.response.json();",
+                  "    pm.expect(lista).to.be.an(\"array\").that.is.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdministrador}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/usuarios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "usuarios"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.18 PUT Modificar usuario temporal",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Usuario temporal modificado correctamente\", function () {\n    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdministrador}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": {{usuarioTemporalId}},\n  \"nombre\": \"Temporal Editado\",\n  \"apellido\": \"Prueba\",\n  \"email\": \"{{usuarioTemporalEmailEditado}}\",\n  \"password\": \"{{password}}\",\n  \"ciudad\": \"Tandil\",\n  \"authorities\": [\"CLIENTE\"]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/usuarios/{{usuarioTemporalId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "usuarios",
+                "{{usuarioTemporalId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.19 GET Verificar usuario temporal modificado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET Usuario Temporal Modificado devuelve 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdministrador}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/usuarios/{{usuarioTemporalId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "usuarios",
+                "{{usuarioTemporalId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.20 DELETE Eliminar usuario temporal",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Usuario temporal eliminado\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 202, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdministrador}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "DELETE",
             "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
             "url": {
-              "raw": "http://localhost:8080/api/usuarios/1",
-              "protocol": "http",
+              "raw": "{{base_url}}/api/usuarios/{{usuarioTemporalId}}",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "8080",
               "path": [
                 "api",
                 "usuarios",
-                "1"
+                "{{usuarioTemporalId}}"
               ]
-            },
-            "description": "This is a DELETE request, and it is used to delete data that was previously created via a POST request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful DELETE request typically returns a `200 OK`, `202 Accepted`, or `204 No Content` response code."
+            }
           },
           "response": []
         }
-      ]
+      ],
+      "description": "Crea usuarios con emails únicos por ejecución, obtiene sus tokens JWT y valida cada recurso con GET inmediatamente después de cada POST."
     },
     {
-      "name": "Evento",
+      "name": "02 - Evento y Lugares (Baja y Alta Demanda)",
       "item": [
         {
-          "name": "Creacion lugar",
+          "name": "2.1 POST Crear Lugar Principal (Numerado + No Numerado)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Lugar principal creado y sectores guardados\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "    const json = pm.response.json();",
+                  "    const id = json.id ?? json.idLugar ?? json.lugarId;",
+                  "    pm.expect(id, \"Debe devolver el ID del lugar\").to.not.be.undefined;",
+                  "    pm.collectionVariables.set(\"lugarId\", String(id));",
+                  "    if (Array.isArray(json.sectores)) {",
+                  "        const platea = json.sectores.find(s => (s.nombre || \"\").toLowerCase() === \"platea\");",
+                  "        const campo = json.sectores.find(s => (s.nombre || \"\").toLowerCase() === \"campo\");",
+                  "        const vip = json.sectores.find(s => (s.nombre || \"\").toLowerCase() === \"vip\");",
+                  "        pm.collectionVariables.set(\"sectorPlateaId\", String((platea && (platea.id || platea._id || platea.sectorId)) || id));",
+                  "        pm.collectionVariables.set(\"sectorCampoId\", String((campo && (campo.id || campo._id || campo.sectorId)) || id));",
+                  "        pm.collectionVariables.set(\"sectorVipId\", String((vip && (vip.id || vip._id || vip.sectorId)) || id));",
+                  "    } else {",
+                  "        pm.collectionVariables.set(\"sectorPlateaId\", String(id));",
+                  "        pm.collectionVariables.set(\"sectorCampoId\", String(id));",
+                  "        pm.collectionVariables.set(\"sectorVipId\", String(id));",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
             "auth": {
               "type": "bearer",
@@ -384,10 +1057,15 @@
               ]
             },
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"nombre\": \"Estadio Nacional\",\r\n  \"direccion\": \"Av. Principal 123\",\r\n  \"ciudad\": \"Tandil\",\r\n  \"latitud\": -37.3217,\r\n  \"longitud\": -59.1332,\r\n  \"sectores\": [\r\n    {\r\n      \"nombre\": \"Platea\",\r\n      \"tipo\": \"NUMERADO\",\r\n      \"filas\": 20,\r\n      \"asientosPorFila\": 30,\r\n       \"capacidad\": 600\r\n    },\r\n    {\r\n      \"nombre\": \"Campo\",\r\n      \"tipo\": \"NO_NUMERADO\",\r\n      \"capacidad\": 500\r\n    },\r\n    {\r\n      \"nombre\": \"VIP\",\r\n      \"tipo\": \"NUMERADO\",\r\n      \"filas\": 5,\r\n      \"asientosPorFila\": 10,\r\n       \"capacidad\": 50\r\n    }\r\n  ]\r\n}",
+              "raw": "{\n  \"nombre\": \"{{lugarNombre}}\",\n  \"direccion\": \"Av. Principal {{runId}}\",\n  \"ciudad\": \"Tandil\",\n  \"latitud\": -37.3217,\n  \"longitud\": -59.1332,\n  \"sectores\": [\n    {\n      \"nombre\": \"Platea\",\n      \"tipo\": \"NUMERADO\",\n      \"filas\": 20,\n      \"asientosPorFila\": 30,\n      \"capacidad\": 600\n    },\n    {\n      \"nombre\": \"Campo\",\n      \"tipo\": \"NO_NUMERADO\",\n      \"capacidad\": 500\n    },\n    {\n      \"nombre\": \"VIP\",\n      \"tipo\": \"NUMERADO\",\n      \"filas\": 5,\n      \"asientosPorFila\": 10,\n      \"capacidad\": 50\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -395,12 +1073,10 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8080/api/eventos/lugares",
-              "protocol": "http",
+              "raw": "{{base_url}}/api/eventos/lugares",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "8080",
               "path": [
                 "api",
                 "eventos",
@@ -411,17 +1087,28 @@
           "response": []
         },
         {
-          "name": "Obtener lugar",
+          "name": "2.2 GET Obtener Lugares (verificar Lugar Principal)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET Lugares tras crear Lugar Principal devuelve 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:8080/api/eventos/lugares",
-              "protocol": "http",
+              "raw": "{{base_url}}/api/eventos/lugares",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "8080",
               "path": [
                 "api",
                 "eventos",
@@ -432,7 +1119,30 @@
           "response": []
         },
         {
-          "name": "Creacion evento NUMERADO",
+          "name": "2.3 POST Crear Lugar Secundario (Solo NO_NUMERADO)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Lugar no numerado creado\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "    const json = pm.response.json();",
+                  "    const id = json.id ?? json.idLugar ?? json.lugarId;",
+                  "    pm.expect(id).to.not.be.undefined;",
+                  "    pm.collectionVariables.set(\"lugarNoNumeradoId\", String(id));",
+                  "    if (Array.isArray(json.sectores) && json.sectores.length > 0) {",
+                  "        const sala = json.sectores[0];",
+                  "        pm.collectionVariables.set(\"sectorSalaId\", String(sala.id || sala._id || sala.sectorId || id));",
+                  "    } else {",
+                  "        pm.collectionVariables.set(\"sectorSalaId\", String(id));",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
             "auth": {
               "type": "bearer",
@@ -445,10 +1155,15 @@
               ]
             },
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"nombre\": \"Concierto de Rock\",\r\n  \"descripcion\": \"Una noche de música en vivo\",\r\n  \"tipo\": \"RECITAL\",\r\n  \"fechaHora\": \"2027-05-20T21:00:00\",\r\n  \"idLugar\": \"6b0366aa04d66d0ce8d52d11\",\r\n  \"participantes\": [\r\n    \"Shakira\",\r\n    \"Artista Invitado\"\r\n  ],\r\n  \"precios\": [\r\n    {\r\n      \"sector\": \"Platea\",\r\n      \"precio\": 25000\r\n    },\r\n    {\r\n      \"sector\": \"Campo\",\r\n      \"precio\": 15000\r\n    },\r\n    {\r\n      \"sector\": \"VIP\",\r\n      \"precio\": 40000\r\n    }\r\n  ]\r\n}",
+              "raw": "{\n  \"nombre\": \"{{lugarNoNumeradoNombre}}\",\n  \"direccion\": \"Calle Teatro {{runId}}\",\n  \"ciudad\": \"Tandil\",\n  \"latitud\": -37.328,\n  \"longitud\": -59.136,\n  \"sectores\": [\n    {\n      \"nombre\": \"Sala\",\n      \"tipo\": \"NO_NUMERADO\",\n      \"capacidad\": 300\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -456,90 +1171,139 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8080/api/eventos?usuarioId=1",
-              "protocol": "http",
+              "raw": "{{base_url}}/api/eventos/lugares",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "8080",
               "path": [
                 "api",
-                "eventos"
-              ],
-              "query": [
-                {
-                  "key": "usuarioId",
-                  "value": "1"
-                }
+                "eventos",
+                "lugares"
               ]
             }
           },
           "response": []
         },
         {
-          "name": "Creacion evento NO_NUMERADO",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenOrganizador}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n  \"nombre\": \"Show de magia\",\r\n  \"descripcion\": \"Una noche a magia.\",\r\n  \"tipo\": \"OTRO\",\r\n  \"participantes\": [\"Mago A\"],\r\n  \"fechaHora\": \"2026-12-30T21:00:00\",\r\n  \"idLugar\": \"6afe2f18568a69642caedc8a\",\r\n  \"precios\": [\r\n    {\r\n      \"sector\": \"sala\",\r\n      \"precio\": 5000.00\r\n    }\r\n  ]\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
+          "name": "2.4 GET Obtener Lugares (verificar Lugar Secundario)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET Lugares tras crear Lugar Secundario devuelve 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
               }
-            },
-            "url": {
-              "raw": "http://localhost:8080/api/eventos?usuarioId=1",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8080",
-              "path": [
-                "api",
-                "eventos"
-              ],
-              "query": [
-                {
-                  "key": "usuarioId",
-                  "value": "1"
-                }
-              ]
             }
-          },
-          "response": []
-        },
-        {
-          "name": "Obtener eventos",
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          },
+          ],
           "request": {
             "method": "GET",
             "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/eventos/lugares",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "eventos",
+                "lugares"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.5 POST Crear Evento BAJA DEMANDA (Sectores Numerado y No Numerado)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Evento Baja Demanda creado correctamente\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "    const json = pm.response.json();",
+                  "    const id = json.id ?? json.idEvento ?? json.eventoId;",
+                  "    pm.expect(id, \"Debe devolver ID del evento\").to.not.be.undefined;",
+                  "    pm.collectionVariables.set(\"eventoBajaDemandaId\", String(id));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOrganizador}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"nombre\": \"Maria\",\r\n  \"apellido\": \"Cabrera\",\r\n  \"email\": \"dasdwee@example.com\",\r\n  \"rol\": \"Cliente\"\r\n}"
+              "raw": "{\n  \"nombre\": \"Concierto Rock Baja Demanda {{runId}}\",\n  \"descripcion\": \"Show en vivo sin fila virtual con sectores Platea (numerado) y Campo (no numerado)\",\n  \"tipo\": \"RECITAL\",\n  \"fechaHora\": \"2027-05-20T21:00:00\",\n  \"idLugar\": \"{{lugarId}}\",\n  \"altaDemanda\": false,\n  \"participantes\": [\n    \"Shakira\",\n    \"Artista Invitado\"\n  ],\n  \"precios\": [\n    {\n      \"sector\": \"Platea\",\n      \"precio\": 25000\n    },\n    {\n      \"sector\": \"Campo\",\n      \"precio\": 15000\n    },\n    {\n      \"sector\": \"VIP\",\n      \"precio\": 40000\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
             "url": {
-              "raw": "http://localhost:8080/api/eventos",
-              "protocol": "http",
+              "raw": "{{base_url}}/api/eventos?usuarioId={{organizadorId}}",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "8080",
+              "path": [
+                "api",
+                "eventos"
+              ],
+              "query": [
+                {
+                  "key": "usuarioId",
+                  "value": "{{organizadorId}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.6 GET Obtener Eventos (verificar Evento Baja Demanda)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET Eventos tras crear Baja Demanda devuelve 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/eventos",
+              "host": [
+                "{{base_url}}"
+              ],
               "path": [
                 "api",
                 "eventos"
@@ -549,7 +1313,20 @@
           "response": []
         },
         {
-          "name": "Modificar evento por organizador",
+          "name": "2.7 PATCH Publicar Evento BAJA DEMANDA (Organizador)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Evento Baja Demanda publicado\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
             "auth": {
               "type": "bearer",
@@ -562,10 +1339,15 @@
               ]
             },
             "method": "PATCH",
-            "header": [],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"nombre\": \"Concierto de Rock\",\r\n    \"descripcion\": \"Una noche de música en vivo\",\r\n    \"tipo\": \"RECITAL\",\r\n    \"idOrganizador\": 1,\r\n    \"participantes\": [\r\n        \"Shakira\",\r\n        \"Artista Invitado\"\r\n    ],\r\n    \"fechaHora\": \"2027-05-20T21:00:00\",\r\n    \"idLugar\": \"6b0361d43cbe5448e65e34e0\",\r\n    \"nombreLugar\": \"Estadio Municipal\",\r\n    \"precios\": [\r\n        {\r\n            \"sector\": \"Platea\",\r\n            \"precio\": 25000.0\r\n        },\r\n        {\r\n            \"sector\": \"Campo\",\r\n            \"precio\": 15000.0\r\n        },\r\n        {\r\n            \"sector\": \"VIP\",\r\n            \"precio\": 40000.0\r\n        }\r\n    ],\r\n    \"estado\": \"PUBLICADO\"\r\n}",
+              "raw": "{\n  \"nombre\": \"Concierto Rock Baja Demanda {{runId}}\",\n  \"descripcion\": \"Show en vivo sin fila virtual con sectores Platea (numerado) y Campo (no numerado)\",\n  \"tipo\": \"RECITAL\",\n  \"idOrganizador\": {{organizadorId}},\n  \"participantes\": [\"Shakira\", \"Artista Invitado\"],\n  \"fechaHora\": \"2027-05-20T21:00:00\",\n  \"idLugar\": \"{{lugarId}}\",\n  \"nombreLugar\": \"{{lugarNombre}}\",\n  \"altaDemanda\": false,\n  \"precios\": [\n    { \"sector\": \"Platea\", \"precio\": 25000.0 },\n    { \"sector\": \"Campo\", \"precio\": 15000.0 },\n    { \"sector\": \"VIP\", \"precio\": 40000.0 }\n  ],\n  \"estado\": \"PUBLICADO\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -573,22 +1355,20 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8080/api/eventos/6b0366f004d66d0ce8d52d12/estado?usuarioId=1",
-              "protocol": "http",
+              "raw": "{{base_url}}/api/eventos/{{eventoBajaDemandaId}}/estado?usuarioId={{organizadorId}}",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "8080",
               "path": [
                 "api",
                 "eventos",
-                "6b0366f004d66d0ce8d52d12",
+                "{{eventoBajaDemandaId}}",
                 "estado"
               ],
               "query": [
                 {
                   "key": "usuarioId",
-                  "value": "1"
+                  "value": "{{organizadorId}}"
                 }
               ]
             }
@@ -596,7 +1376,421 @@
           "response": []
         },
         {
-          "name": "Modificar fecha por organizador",
+          "name": "2.8 POST Crear Evento ALTA DEMANDA (con Fila Virtual)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Evento Alta Demanda creado correctamente\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "    const json = pm.response.json();",
+                  "    const id = json.id ?? json.idEvento ?? json.eventoId;",
+                  "    pm.expect(id, \"Debe devolver ID del evento\").to.not.be.undefined;",
+                  "    pm.collectionVariables.set(\"eventoAltaDemandaId\", String(id));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOrganizador}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Festival Internacional Alta Demanda {{runId}}\",\n  \"descripcion\": \"Evento masivo que activa la Fila Virtual y sirve para probar co-compras\",\n  \"tipo\": \"RECITAL\",\n  \"fechaHora\": \"2027-06-15T21:00:00\",\n  \"idLugar\": \"{{lugarId}}\",\n  \"altaDemanda\": true,\n  \"participantes\": [\n    \"Shakira\",\n    \"Maluma\"\n  ],\n  \"precios\": [\n    {\n      \"sector\": \"Platea\",\n      \"precio\": 50000\n    },\n    {\n      \"sector\": \"Campo\",\n      \"precio\": 30000\n    },\n    {\n      \"sector\": \"VIP\",\n      \"precio\": 80000\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/eventos?usuarioId={{organizadorId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "eventos"
+              ],
+              "query": [
+                {
+                  "key": "usuarioId",
+                  "value": "{{organizadorId}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.9 GET Obtener Eventos (verificar Evento Alta Demanda)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET Eventos tras crear Alta Demanda devuelve 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/eventos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "eventos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.10 PATCH Publicar Evento ALTA DEMANDA (Organizador)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Evento Alta Demanda publicado\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOrganizador}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Festival Internacional Alta Demanda {{runId}}\",\n  \"descripcion\": \"Evento masivo que activa la Fila Virtual y sirve para probar co-compras\",\n  \"tipo\": \"RECITAL\",\n  \"idOrganizador\": {{organizadorId}},\n  \"participantes\": [\"Shakira\", \"Maluma\"],\n  \"fechaHora\": \"2027-06-15T21:00:00\",\n  \"idLugar\": \"{{lugarId}}\",\n  \"nombreLugar\": \"{{lugarNombre}}\",\n  \"altaDemanda\": true,\n  \"precios\": [\n    { \"sector\": \"Platea\", \"precio\": 50000.0 },\n    { \"sector\": \"Campo\", \"precio\": 30000.0 },\n    { \"sector\": \"VIP\", \"precio\": 80000.0 }\n  ],\n  \"estado\": \"PUBLICADO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/eventos/{{eventoAltaDemandaId}}/estado?usuarioId={{organizadorId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "eventos",
+                "{{eventoAltaDemandaId}}",
+                "estado"
+              ],
+              "query": [
+                {
+                  "key": "usuarioId",
+                  "value": "{{organizadorId}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.11 POST Crear Evento NO_NUMERADO (Baja Demanda - Teatro)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Evento No Numerado creado correctamente\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "    const json = pm.response.json();",
+                  "    const id = json.id ?? json.idEvento ?? json.eventoId;",
+                  "    pm.expect(id, \"Debe devolver ID del evento\").to.not.be.undefined;",
+                  "    pm.collectionVariables.set(\"eventoNoNumeradoId\", String(id));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOrganizador}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Obra de Teatro No Numerado {{runId}}\",\n  \"descripcion\": \"Evento solo con entradas no numeradas (también usado para recomendaciones por tipo TEATRO)\",\n  \"tipo\": \"TEATRO\",\n  \"fechaHora\": \"2027-07-10T20:00:00\",\n  \"idLugar\": \"{{lugarNoNumeradoId}}\",\n  \"altaDemanda\": false,\n  \"participantes\": [\n    \"Elenco Nacional\"\n  ],\n  \"precios\": [\n    {\n      \"sector\": \"Sala\",\n      \"precio\": 5000.0\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/eventos?usuarioId={{organizadorId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "eventos"
+              ],
+              "query": [
+                {
+                  "key": "usuarioId",
+                  "value": "{{organizadorId}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.12 GET Obtener Eventos (verificar Evento No Numerado)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET Eventos tras crear Evento No Numerado devuelve 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/eventos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "eventos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.13 PATCH Publicar Evento NO_NUMERADO (Organizador)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Evento No Numerado publicado\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOrganizador}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Obra de Teatro No Numerado {{runId}}\",\n  \"descripcion\": \"Evento solo con entradas no numeradas (también usado para recomendaciones por tipo TEATRO)\",\n  \"tipo\": \"TEATRO\",\n  \"idOrganizador\": {{organizadorId}},\n  \"participantes\": [\"Elenco Nacional\"],\n  \"fechaHora\": \"2027-07-10T20:00:00\",\n  \"idLugar\": \"{{lugarNoNumeradoId}}\",\n  \"nombreLugar\": \"{{lugarNoNumeradoNombre}}\",\n  \"altaDemanda\": false,\n  \"precios\": [\n    { \"sector\": \"Sala\", \"precio\": 5000.0 }\n  ],\n  \"estado\": \"PUBLICADO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/eventos/{{eventoNoNumeradoId}}/estado?usuarioId={{organizadorId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "eventos",
+                "{{eventoNoNumeradoId}}",
+                "estado"
+              ],
+              "query": [
+                {
+                  "key": "usuarioId",
+                  "value": "{{organizadorId}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.14 POST Crear Evento Extra (para probar cambio de fecha y cancelación)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Evento Cancelable creado correctamente\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "    const json = pm.response.json();",
+                  "    const id = json.id ?? json.idEvento ?? json.eventoId;",
+                  "    pm.expect(id, \"Debe devolver ID del evento\").to.not.be.undefined;",
+                  "    pm.collectionVariables.set(\"eventoCancelableId\", String(id));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOrganizador}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Show Cancelable {{runId}}\",\n  \"descripcion\": \"Evento dedicado para probar PATCH fecha y cancelación por administrador\",\n  \"tipo\": \"OTRO\",\n  \"fechaHora\": \"2027-08-05T21:00:00\",\n  \"idLugar\": \"{{lugarNoNumeradoId}}\",\n  \"altaDemanda\": false,\n  \"participantes\": [\n    \"Mago A\"\n  ],\n  \"precios\": [\n    {\n      \"sector\": \"Sala\",\n      \"precio\": 7000.0\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/eventos?usuarioId={{organizadorId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "eventos"
+              ],
+              "query": [
+                {
+                  "key": "usuarioId",
+                  "value": "{{organizadorId}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.15 GET Obtener Eventos (verificar todos los eventos creados)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET Listado completo de eventos devuelve 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/eventos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "eventos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.15.1 PATCH cambiar fecha a eventos publicados",
           "request": {
             "auth": {
               "type": "bearer",
@@ -612,7 +1806,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"fechaHora\": \"2026-12-26T21:00:00\"\r\n}",
+              "raw": "{\"estado\": \"PUBLICADO\"}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -620,22 +1814,20 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8080/api/eventos/6b0362293cbe5448e65e34e1/fecha?usuarioId=1",
-              "protocol": "http",
+              "raw": "{{base_url}}/api/eventos/{{eventoCancelableId}}/estado?usuarioId={{organizadorId}}",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "8080",
               "path": [
                 "api",
                 "eventos",
-                "6b0362293cbe5448e65e34e1",
-                "fecha"
+                "{{eventoCancelableId}}",
+                "estado"
               ],
               "query": [
                 {
                   "key": "usuarioId",
-                  "value": "1"
+                  "value": "{{organizadorId}}"
                 }
               ]
             }
@@ -643,7 +1835,83 @@
           "response": []
         },
         {
-          "name": "Modificar evento por administrador",
+          "name": "2.16 PATCH Modificar fecha de Evento Extra (Organizador)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Fecha modificada por organizador\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenOrganizador}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaHora\": \"2027-08-20T21:00:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/eventos/{{eventoCancelableId}}/fecha?usuarioId={{organizadorId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "eventos",
+                "{{eventoCancelableId}}",
+                "fecha"
+              ],
+              "query": [
+                {
+                  "key": "usuarioId",
+                  "value": "{{organizadorId}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.17 PATCH Cancelar Evento Extra (Administrador)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Evento cancelado por administrador\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
             "auth": {
               "type": "bearer",
@@ -656,10 +1924,15 @@
               ]
             },
             "method": "PATCH",
-            "header": [],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"nombre\": \"Concierto de Rock\",\r\n    \"descripcion\": \"Una noche de música en vivo\",\r\n    \"tipo\": \"RECITAL\",\r\n    \"idOrganizador\": 1,\r\n    \"participantes\": [\r\n        \"Shakira\",\r\n        \"Artista Invitado\"\r\n    ],\r\n    \"fechaHora\": \"2026-12-26T21:00:00\",\r\n    \"idLugar\": \"6b0361d43cbe5448e65e34e0\",\r\n    \"nombreLugar\": \"Estadio Municipal\",\r\n    \"precios\": [\r\n        {\r\n            \"sector\": \"Platea\",\r\n            \"precio\": 25000.0\r\n        },\r\n        {\r\n            \"sector\": \"Campo\",\r\n            \"precio\": 15000.0\r\n        },\r\n        {\r\n            \"sector\": \"VIP\",\r\n            \"precio\": 40000.0\r\n        }\r\n    ],\r\n    \"estado\": \"CANCELADO\"\r\n}",
+              "raw": "{\n  \"nombre\": \"Show Cancelable {{runId}}\",\n  \"descripcion\": \"Evento dedicado para probar PATCH fecha y cancelación por administrador\",\n  \"tipo\": \"OTRO\",\n  \"idOrganizador\": {{organizadorId}},\n  \"participantes\": [\"Mago A\"],\n  \"fechaHora\": \"2027-08-20T21:00:00\",\n  \"idLugar\": \"{{lugarNoNumeradoId}}\",\n  \"nombreLugar\": \"{{lugarNoNumeradoNombre}}\",\n  \"altaDemanda\": false,\n  \"precios\": [\n    { \"sector\": \"Sala\", \"precio\": 7000.0 }\n  ],\n  \"estado\": \"CANCELADO\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -667,22 +1940,20 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8080/api/eventos/6b0362293cbe5448e65e34e1/estado?usuarioId=2",
-              "protocol": "http",
+              "raw": "{{base_url}}/api/eventos/{{eventoCancelableId}}/estado?usuarioId={{adminId}}",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "8080",
               "path": [
                 "api",
                 "eventos",
-                "6b0362293cbe5448e65e34e1",
+                "{{eventoCancelableId}}",
                 "estado"
               ],
               "query": [
                 {
                   "key": "usuarioId",
-                  "value": "2"
+                  "value": "{{adminId}}"
                 }
               ]
             }
@@ -690,17 +1961,28 @@
           "response": []
         },
         {
-          "name": "Filtros",
+          "name": "2.18 GET Filtrar Eventos por ciudad (Tandil)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET Filtro por ciudad Tandil devuelve 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:8080/api/eventos/buscar?ciudad=tandil",
-              "protocol": "http",
+              "raw": "{{base_url}}/api/eventos/buscar?ciudad=tandil",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "8080",
               "path": [
                 "api",
                 "eventos",
@@ -716,66 +1998,50 @@
           },
           "response": []
         }
-      ]
+      ],
+      "description": "Crea lugares únicos (con sectores NUMERADO y NO_NUMERADO), eventos de baja demanda, alta demanda y no numerado, los publica y verifica cada alta con GET."
     },
     {
-      "name": "Notificacion",
+      "name": "03 - Fila Virtual (Encolamiento Alta Demanda)",
       "item": [
         {
-          "name": "Obtener notificaciones",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:8086/api/notificaciones",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8086",
-              "path": [
-                "api",
-                "notificaciones"
-              ]
+          "name": "3.1 POST Cliente 1 ingresa a la Fila Virtual (Evento Alta Demanda)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Cliente 1 encolado en Fila Virtual\", function () {\n    pm.expect(pm.response.code).to.be.oneOf([200, 201]);\n    const json = pm.response.json();\n    const turno = json.tokenAcceso || json.token || json.turnoFila || json.codigoTurno || json.id || json.turnoId || \"\";\n    pm.expect(turno, \"No se encontró token de fila en la respuesta\").to.not.be.empty;\n    pm.collectionVariables.set(\"turnoFilaC1\", String(turno));\n});"
+                ]
+              }
             }
-          },
-          "response": []
-        },
-        {
-          "name": "Obtener notificaciones de eventos canceladas",
+          ],
           "request": {
-            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCliente1}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
             "header": [
               {
                 "key": "X-Usuario-Id",
-                "value": "1",
-                "type": "text"
+                "value": "{{cliente1Id}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
-            "url": {
-              "raw": "http://localhost:8086/api/notificaciones/canceladas",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8086",
-              "path": [
-                "api",
-                "notificaciones",
-                "canceladas"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Crear notificacion",
-          "request": {
-            "method": "POST",
-            "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"tipo\": \"CONFIRMACION_COMPRA\",\r\n    \"canal\": \"EMAIL\",\r\n    \"email\": \"usuario@gmail.com\",\r\n    \"fechaAnterior\": null,\r\n    \"fechaNueva\": null\r\n}",
+              "raw": "{\n  \"eventoId\": \"{{eventoAltaDemandaId}}\",\n  \"usuarioId\": {{cliente1Id}}\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -783,44 +2049,290 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8086/api/notificaciones/notificar",
-              "protocol": "http",
+              "raw": "{{base_url}}/api/fila/ingresar",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "8086",
               "path": [
                 "api",
-                "notificaciones",
-                "notificar"
+                "fila",
+                "ingresar"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3.2 GET Consultar estado/posición en fila de Cliente 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET Estado en Fila Virtual Cliente 1 devuelve 200 OK\", function () {\n    pm.response.to.have.status(200);\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCliente1}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{cliente1Id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/fila/eventos/{{eventoAltaDemandaId}}/estado?X-Usuario-Id={{cliente1Id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "fila",
+                "eventos",
+                "{{eventoAltaDemandaId}}",
+                "estado"
+              ],
+              "query": [
+                {
+                  "key": "X-Usuario-Id",
+                  "value": "{{cliente1Id}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3.3 POST Cliente 2 ingresa a la Fila Virtual (queda encolado detrás de Cliente 1)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Cliente 2 encolado en Fila Virtual\", function () {\n    pm.expect(pm.response.code).to.be.oneOf([200, 201]);\n    const json = pm.response.json();\n    const turno = json.tokenAcceso || json.token || json.turnoFila || json.codigoTurno || json.id || json.turnoId || \"\";\n    pm.expect(turno, \"No se encontró token de fila en la respuesta\").to.not.be.empty;\n    pm.collectionVariables.set(\"turnoFilaC2\", String(turno));\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCliente2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{cliente2Id}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"eventoId\": \"{{eventoAltaDemandaId}}\",\n  \"usuarioId\": {{cliente2Id}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/fila/ingresar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "fila",
+                "ingresar"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3.4 GET Consultar estado/posición en fila de Cliente 2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET Estado en Fila Virtual Cliente 2 devuelve 200 OK\", function () {\n    pm.response.to.have.status(200);\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCliente2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{cliente2Id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/fila/eventos/{{eventoAltaDemandaId}}/estado?X-Usuario-Id={{cliente1Id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "fila",
+                "eventos",
+                "{{eventoAltaDemandaId}}",
+                "estado"
+              ],
+              "query": [
+                {
+                  "key": "X-Usuario-Id",
+                  "value": "{{cliente1Id}}"
+                }
               ]
             }
           },
           "response": []
         }
-      ]
+      ],
+      "description": "Prueba el encolamiento de múltiples clientes en el evento de Alta Demanda y consulta su posición/estado con GET tras cada ingreso. (Si tu Gateway todavía no rutea /api/fila-virtual, cambiá {{base_url}} por {{fila_url}} en esta carpeta)."
     },
     {
-      "name": "Orden",
+      "name": "04 - Orden (Numerado, No Numerado y Alta Demanda)",
       "item": [
         {
-          "name": "Obtener ordenes por cliente",
+          "name": "4.1 POST Crear Orden NUMERADO (Cliente 1 - Baja Demanda, Platea)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Orden Numerada (Cliente 1) creada correctamente\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "    const json = pm.response.json();",
+                  "    const id = json.id ?? json.idOrden ?? json.ordenId;",
+                  "    pm.expect(id, \"Debe devolver ID de la orden\").to.not.be.undefined;",
+                  "    pm.collectionVariables.set(\"ordenNumeradaId\", String(id));",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCliente1}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{cliente1Id}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"eventoId\": \"{{eventoBajaDemandaId}}\",\n  \"sector\": \"Platea\",\n  \"asientos\": [\n    {\n      \"fila\": {{asientoFila}},\n      \"asiento\": {{asientoNum1}}\n    },\n    {\n      \"fila\": {{asientoFila}},\n      \"asiento\": {{asientoNum2}}\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/ordenes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "ordenes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4.2 GET Obtener Órdenes de Cliente 1 (verificar Orden Numerada)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET Órdenes Cliente 1 tras crear Orden Numerada devuelve 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCliente1}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [
               {
                 "key": "X-Usuario-Id",
-                "value": "6",
-                "type": "text"
+                "value": "{{cliente1Id}}"
               }
             ],
             "url": {
-              "raw": "http://localhost:8080/api/ordenes",
-              "protocol": "http",
+              "raw": "{{base_url}}/api/ordenes",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "8080",
               "path": [
                 "api",
                 "ordenes"
@@ -830,59 +2342,27 @@
           "response": []
         },
         {
-          "name": "Creacion orden NUMERADO",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenCliente}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "X-Usuario-Id",
-                "value": "4",
-                "type": "text"
+          "name": "4.3 POST Pagar Orden NUMERADA (Cliente 1)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Pago de Orden Numerada procesado\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});"
+                ]
               }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n    \"eventoId\": \"6b0366f004d66d0ce8d52d12\",\r\n    \"sector\": \"Platea\",\r\n    \"asientos\": [\r\n        {\r\n            \"fila\": 1,\r\n            \"asiento\": 7\r\n        },\r\n        {\r\n            \"fila\": 1,\r\n            \"asiento\": 9\r\n        }\r\n    ]\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:8080/api/ordenes",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8080",
-              "path": [
-                "api",
-                "ordenes"
-              ]
             }
-          },
-          "response": []
-        },
-        {
-          "name": "Creacion orden NO_NUMERADO",
+          ],
           "request": {
             "auth": {
               "type": "bearer",
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{tokenCliente}}",
+                  "value": "{{tokenCliente1}}",
                   "type": "string"
                 }
               ]
@@ -891,58 +2371,16 @@
             "header": [
               {
                 "key": "X-Usuario-Id",
-                "value": "6",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n    \"eventoId\": \"6b0366f004d66d0ce8d52d12\",\r\n    \"sector\": \"Campo\",\r\n    \"cantidad\" : 3\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:8080/api/ordenes",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8080",
-              "path": [
-                "api",
-                "ordenes"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Pago orden por usuario",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenCliente}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [
+                "value": "{{cliente1Id}}"
+              },
               {
-                "key": "X-Usuario-Id",
-                "value": "6",
-                "type": "text"
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"medioPago\": \"TARJETA_CREDITO\"\r\n}",
+              "raw": "{\n  \"medioPago\": \"TARJETA_CREDITO\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -950,16 +2388,14 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8080/api/ordenes/4/pago",
-              "protocol": "http",
+              "raw": "{{base_url}}/api/ordenes/{{ordenNumeradaId}}/pago",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "8080",
               "path": [
                 "api",
                 "ordenes",
-                "4",
+                "{{ordenNumeradaId}}",
                 "pago"
               ]
             }
@@ -967,13 +2403,95 @@
           "response": []
         },
         {
-          "name": "Cancelacion",
+          "name": "4.4 GET Obtener Órdenes de Cliente 1 (verificar estado PAGADA)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET Órdenes Cliente 1 tras pago devuelve 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
-            "method": "PUT",
-            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCliente1}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{cliente1Id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/ordenes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "ordenes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4.5 POST Crear Orden NO_NUMERADO (Cliente 2 - Baja Demanda, Campo)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Orden No Numerada (Cliente 2) creada correctamente\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "    const json = pm.response.json();",
+                  "    const id = json.id ?? json.idOrden ?? json.ordenId;",
+                  "    pm.expect(id, \"Debe devolver ID de la orden\").to.not.be.undefined;",
+                  "    pm.collectionVariables.set(\"ordenNoNumeradaId\", String(id));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCliente2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{cliente2Id}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "",
+              "raw": "{\n  \"eventoId\": \"{{eventoBajaDemandaId}}\",\n  \"sector\": \"Campo\",\n  \"cantidad\": 3\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -981,30 +2499,396 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8080/api/ordenes/:idEvento/cancelacion",
-              "protocol": "http",
+              "raw": "{{base_url}}/api/ordenes",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "8080",
               "path": [
                 "api",
-                "ordenes",
-                ":idEvento",
-                "cancelacion"
-              ],
-              "variable": [
-                {
-                  "key": "idEvento",
-                  "value": "6afe2f24568a69642caedc8b"
-                }
+                "ordenes"
               ]
             }
           },
           "response": []
         },
         {
-          "name": "Reporte de Evento",
+          "name": "4.6 GET Obtener Órdenes de Cliente 2 (verificar Orden No Numerada)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET Órdenes Cliente 2 tras crear Orden No Numerada devuelve 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCliente2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{cliente2Id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/ordenes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "ordenes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4.7 POST Pagar Orden NO_NUMERADA (Cliente 2)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Pago de Orden No Numerada procesado\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCliente2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{cliente2Id}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medioPago\": \"TARJETA_CREDITO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/ordenes/{{ordenNoNumeradaId}}/pago",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "ordenes",
+                "{{ordenNoNumeradaId}}",
+                "pago"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4.8 GET Obtener Órdenes de Cliente 2 (verificar estado PAGADA)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET Órdenes Cliente 2 tras pago devuelve 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCliente2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{cliente2Id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/ordenes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "ordenes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4.9 POST Crear Orden Evento ALTA DEMANDA (Cliente 1 - VIP)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Orden Alta Demanda (Cliente 1) creada correctamente\", function () {\n    pm.expect(pm.response.code).to.be.oneOf([200, 201]);\n    const json = pm.response.json();\n    const id = json.id ?? json.idOrden ?? json.ordenId;\n    pm.expect(id, \"Debe devolver ID de la orden\").to.not.be.undefined;\n    pm.collectionVariables.set(\"ordenAltaDemandaId\", String(id));\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCliente1}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{cliente1Id}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"eventoId\": \"{{eventoAltaDemandaId}}\",\n  \"sector\": \"VIP\",\n  \"tokenFila\": \"{{turnoFilaC1}}\",\n  \"asientos\": [\n    {\n      \"fila\": 1,\n      \"asiento\": 1\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/ordenes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "ordenes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4.10 GET Obtener Órdenes de Cliente 1 (verificar Orden Alta Demanda)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET Órdenes Cliente 1 tras crear Alta Demanda devuelve 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCliente1}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{cliente1Id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/ordenes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "ordenes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4.11 POST Pagar Orden ALTA DEMANDA (Cliente 1 - genera co-compra)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Pago de Orden Alta Demanda procesado\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCliente1}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{cliente1Id}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medioPago\": \"TARJETA_CREDITO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/ordenes/{{ordenAltaDemandaId}}/pago",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "ordenes",
+                "{{ordenAltaDemandaId}}",
+                "pago"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4.12 GET Obtener Órdenes de Cliente 1 (verificar pago Alta Demanda)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET Órdenes Cliente 1 tras pago Alta Demanda devuelve 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCliente1}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{cliente1Id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/ordenes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "ordenes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4.13 GET Reporte de Evento Baja Demanda (Organizador)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET Reporte de Evento Baja Demanda devuelve 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
             "auth": {
               "type": "bearer",
@@ -1019,32 +2903,33 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:8080/api/ordenes/reportes/6b0366f004d66d0ce8d52d12",
-              "protocol": "http",
+              "raw": "{{base_url}}/api/ordenes/reportes/{{eventoBajaDemandaId}}",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "8080",
               "path": [
                 "api",
                 "ordenes",
                 "reportes",
-                "6b0366f004d66d0ce8d52d12"
+                "{{eventoBajaDemandaId}}"
               ]
             }
           },
           "response": []
-        }
-      ]
-    },
-    {
-      "name": "Reserva",
-      "item": [
+        },
         {
-          "name": "Obtener reservas",
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          },
+          "name": "4.14 PUT Cancelación de órdenes por evento cancelado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Cancelación de órdenes ejecutada\", function () {\n    pm.expect(pm.response.code).to.be.oneOf([200, 204]);\n});"
+                ]
+              }
+            }
+          ],
           "request": {
             "auth": {
               "type": "bearer",
@@ -1056,169 +2941,68 @@
                 }
               ]
             },
-            "method": "GET",
+            "method": "PUT",
             "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
             "url": {
-              "raw": "http://localhost:8080/api/reservas",
-              "protocol": "http",
+              "raw": "{{base_url}}/api/ordenes/{{eventoCancelableId}}/cancelacion",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "8080",
               "path": [
                 "api",
-                "reservas"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Creacion reserva",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n  \"idCliente\": 1,\r\n  \"idEvento\": \"6af11a5fc202f2022202a26d\",\r\n  \"sector\": \"platea\",\r\n  \"asientos\": [\r\n    1\r\n  ]\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:8080/api/reservas",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8080",
-              "path": [
-                "api",
-                "reservas"
+                "ordenes",
+                "{{eventoCancelableId}}",
+                "cancelacion"
               ]
             }
           },
           "response": []
         }
-      ]
+      ],
+      "description": "Crea y paga órdenes NUMERADO (Cliente 1 en Baja Demanda), NO_NUMERADO (Cliente 2 en Baja Demanda) y de Evento Alta Demanda (Cliente 1) para construir historial de co-compras. Incluye GET después de cada POST."
     },
     {
-      "name": "Entrada",
+      "name": "05 - Reserva",
       "item": [
         {
-          "name": "Obtener entrada",
+          "name": "5.1 POST Crear Reserva (Cliente 1)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Reserva creada correctamente\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "    const json = pm.response.json();",
+                  "    const id = json.id ?? json.idReserva ?? json.reservaId;",
+                  "    if (id !== undefined) pm.collectionVariables.set(\"reservaId\", String(id));",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
             "auth": {
               "type": "bearer",
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{tokenCliente}}",
+                  "value": "{{tokenCliente1}}",
                   "type": "string"
                 }
               ]
             },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:8080/api/entradas/1",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8080",
-              "path": [
-                "api",
-                "entradas",
-                "1"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Creacion entrada NUMERADA",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n    \"ordenId\" : 1,\r\n    \"eventoId\" : \"6aefe6392b81f513fccee8d8\",\r\n    \"clienteId\" : 1,\r\n    \"fechaEvento\" : \"2026-12-15T21:00:00\",\r\n    \"items\" : [\r\n        {\r\n            \"sectorId\" : \"6aefe5ad2b81f513fccee8d7\",\r\n            \"fila\": 1,\r\n            \"asiento\": 5,\r\n            \"precio\": 35000.0\r\n        }\r\n    ]\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:8080/api/entradas",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8080",
-              "path": [
-                "api",
-                "entradas"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Creacion entrada NO_NUMERADA",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n    \"ordenId\" : 1,\r\n    \"eventoId\" : \"6afe2f24568a69642caedc8b\",\r\n    \"clienteId\" : 1,\r\n    \"fechaEvento\" : \"2026-12-30T21:00:00\",\r\n    \"items\" : [\r\n        {\r\n            \"sectorId\" : \"6afe2f18568a69642caedc8a\",\r\n            \"cantidad\": 2,\r\n            \"precio\": 10000.0\r\n        }\r\n    ]\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:8080/api/entradas",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8080",
-              "path": [
-                "api",
-                "entradas"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Revision Administrador",
-          "request": {
             "method": "POST",
             "header": [
               {
-                "key": "idUsuario",
-                "value": "2",
-                "type": "text"
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"estado\" : \"APROBADO\",\r\n    \"idReserva\" : 3,\r\n    \"idEntrada\" : 3\r\n}",
+              "raw": "{\n  \"idCliente\": {{cliente1Id}},\n  \"idEvento\": \"{{eventoBajaDemandaId}}\",\n  \"sector\": \"Platea\",\n  \"asientos\": [\n    {{asientoReserva}}\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1226,12 +3010,324 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8080/api/entradas/revision",
-              "protocol": "http",
+              "raw": "{{base_url}}/api/reservas",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "8080",
+              "path": [
+                "api",
+                "reservas"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5.2 GET Obtener Reservas (verificar Reserva creada)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET Reservas tras POST devuelve 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCliente1}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/reservas",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "reservas"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "Crea una reserva sobre asientos libres únicos y la consulta inmediatamente con GET."
+    },
+    {
+      "name": "06 - Entrada (Numerada, No Numerada y QR)",
+      "item": [
+        {
+          "name": "6.1 POST Crear Entrada NUMERADA (Cliente 1 - Baja Demanda)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Entrada Numerada creada correctamente\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "    const raw = pm.response.json();",
+                  "    const item = Array.isArray(raw) ? raw[0] : raw;",
+                  "    if (item) {",
+                  "        const id = item.id ?? item.idEntrada ?? item.entradaId;",
+                  "        if (id !== undefined) pm.collectionVariables.set(\"entradaNumeradaId\", String(id));",
+                  "        const qr = item.codigoQr || item.qr || item.codigo;",
+                  "        if (qr) pm.collectionVariables.set(\"codigoQrEntradaNumerada\", String(qr));",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCliente1}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ordenId\": {{ordenNumeradaId}},\n  \"eventoId\": \"{{eventoBajaDemandaId}}\",\n  \"clienteId\": {{cliente1Id}},\n  \"fechaEvento\": \"2027-05-20T21:00:00\",\n  \"items\": [\n    {\n      \"sectorId\": \"{{sectorPlateaId}}\",\n      \"fila\": 2,\n      \"asiento\": {{asientoNum1}},\n      \"precio\": 25000.0\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/entradas",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "entradas"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "6.2 GET Obtener Entrada NUMERADA creada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET Entrada Numerada devuelve 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCliente1}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/entradas/{{entradaNumeradaId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "entradas",
+                "{{entradaNumeradaId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "6.3 POST Crear Entrada NO_NUMERADA (Cliente 2 - Evento No Numerado)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Entrada No Numerada creada correctamente\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "    const raw = pm.response.json();",
+                  "    const item = Array.isArray(raw) ? raw[0] : raw;",
+                  "    if (item) {",
+                  "        const id = item.id ?? item.idEntrada ?? item.entradaId;",
+                  "        if (id !== undefined) pm.collectionVariables.set(\"entradaNoNumeradaId\", String(id));",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCliente2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ordenId\": {{ordenNoNumeradaId}},\n  \"eventoId\": \"{{eventoNoNumeradoId}}\",\n  \"clienteId\": {{cliente2Id}},\n  \"fechaEvento\": \"2027-07-10T20:00:00\",\n  \"items\": [\n    {\n      \"sectorId\": \"{{sectorSalaId}}\",\n      \"cantidad\": 2,\n      \"precio\": 5000.0\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/entradas",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "entradas"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "6.4 GET Obtener Entrada NO_NUMERADA creada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET Entrada No Numerada devuelve 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCliente2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/entradas/{{entradaNoNumeradaId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "entradas",
+                "{{entradaNoNumeradaId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "6.5 POST Revisión Administrador sobre Entrada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Revisión de administrador procesada\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdministrador}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "idUsuario",
+                "value": "{{adminId}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"APROBADO\",\n  \"idReserva\": {{reservaId}},\n  \"idEntrada\": {{entradaNoNumeradaId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/entradas/revision",
+              "host": [
+                "{{base_url}}"
+              ],
               "path": [
                 "api",
                 "entradas",
@@ -1242,7 +3338,62 @@
           "response": []
         },
         {
-          "name": "Validacion de QR",
+          "name": "6.6 GET Verificar Entrada tras Revisión Administrador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET Entrada tras Revisión Administrador devuelve 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCliente2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/entradas/{{entradaNoNumeradaId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "entradas",
+                "{{entradaNoNumeradaId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "6.7 PATCH Validación de QR (Personal de Acceso)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código QR validado correctamente\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
             "auth": {
               "type": "bearer",
@@ -1255,10 +3406,15 @@
               ]
             },
             "method": "PATCH",
-            "header": [],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"codigoQr\" : \"8f791f41-92de-42a5-bab4-17e5b8f8a659\",\r\n    \"eventoId\" : \"6b0366f004d66d0ce8d52d12\"\r\n}",
+              "raw": "{\n  \"codigoQr\": \"{{codigoQrEntradaNumerada}}\",\n  \"eventoId\": \"{{eventoBajaDemandaId}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1266,12 +3422,10 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8080/api/entradas/validar",
-              "protocol": "http",
+              "raw": "{{base_url}}/api/entradas/validar",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "8080",
               "path": [
                 "api",
                 "entradas",
@@ -1280,14 +3434,109 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "6.8 GET Verificar Entrada tras Validación de QR",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET Entrada Numerada tras Validación QR devuelve 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCliente1}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/entradas/{{entradaNumeradaId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "entradas",
+                "{{entradaNumeradaId}}"
+              ]
+            }
+          },
+          "response": []
         }
-      ]
+      ],
+      "description": "Prueba creación directa de entradas NUMERADA y NO_NUMERADA, verifica cada una con GET, prueba revisión de administrador y validación de QR."
     },
     {
-      "name": "Pago",
+      "name": "07 - Pago",
       "item": [
         {
-          "name": "Obtener pagos",
+          "name": "7.1 GET Obtener Pagos registrados",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET Listado de Pagos devuelve 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCliente1}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/pagos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pagos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "7.2 POST Crear Reembolso para Reserva",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Reembolso procesado\", function () {\n    pm.expect(pm.response.code).to.be.oneOf([200, 201]);\n});"
+                ]
+              }
+            }
+          ],
           "request": {
             "auth": {
               "type": "bearer",
@@ -1299,15 +3548,57 @@
                 }
               ]
             },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/pagos/reserva/{{reservaId}}/reembolso",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pagos",
+                "reserva",
+                "{{reservaId}}",
+                "reembolso"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "7.3 GET Obtener Pagos (verificar Reembolso)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET Listado de Pagos tras Reembolso devuelve 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCliente1}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:8080/api/pagos",
-              "protocol": "http",
+              "raw": "{{base_url}}/api/pagos",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "8080",
               "path": [
                 "api",
                 "pagos"
@@ -1315,15 +3606,44 @@
             }
           },
           "response": []
-        },
+        }
+      ],
+      "description": "Consulta pagos generados, solicita un reembolso y vuelve a listar con GET para verificar el cambio."
+    },
+    {
+      "name": "08 - Notificacion",
+      "item": [
         {
-          "name": "Creacion reembolso",
+          "name": "8.1 POST Crear Notificación (Confirmación de Compra)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Notificación creada\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "    try {",
+                  "        const json = pm.response.json();",
+                  "        const id = json.id ?? json.idNotificacion;",
+                  "        if (id !== undefined) pm.collectionVariables.set(\"notificacionId\", String(id));",
+                  "    } catch (e) {}",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "",
+              "raw": "{\n  \"tipo\": \"CONFIRMACION_COMPRA\",\n  \"canal\": \"EMAIL\",\n  \"email\": \"{{cliente1Email}}\",\n  \"fechaAnterior\": null,\n  \"fechaNueva\": null\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1331,24 +3651,412 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8080/api/pagos/reserva/2/reembolso",
-              "protocol": "http",
+              "raw": "{{notificacion_url}}/api/notificaciones/notificar",
               "host": [
-                "localhost"
+                "{{notificacion_url}}"
               ],
-              "port": "8080",
               "path": [
                 "api",
-                "pagos",
-                "reserva",
-                "2",
-                "reembolso"
+                "notificaciones",
+                "notificar"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "8.2 GET Obtener todas las Notificaciones (verificar POST)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET Notificaciones tras POST devuelve 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{notificacion_url}}/api/notificaciones",
+              "host": [
+                "{{notificacion_url}}"
+              ],
+              "path": [
+                "api",
+                "notificaciones"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "8.3 GET Obtener Notificaciones de eventos cancelados",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET Notificaciones canceladas devuelve 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{cliente1Id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{notificacion_url}}/api/notificaciones/canceladas",
+              "host": [
+                "{{notificacion_url}}"
+              ],
+              "path": [
+                "api",
+                "notificaciones",
+                "canceladas"
               ]
             }
           },
           "response": []
         }
-      ]
+      ],
+      "description": "Crea una notificación con el email único del Cliente 1 y luego verifica con GET."
+    },
+    {
+      "name": "09 - Preferencias y Recomendaciones",
+      "item": [
+        {
+          "name": "9.1 PUT Registrar Preferencias de Cliente 2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Preferencias de Cliente 2 guardadas\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.ciudad).to.eql(\"Tandil\");",
+                  "    pm.expect(json.tiposEvento).to.include(\"TEATRO\");",
+                  "    pm.expect(json.artistasFavoritos).to.include(\"Shakira\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCliente2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ciudad\": \"Tandil\",\n  \"tiposEvento\": [\n    \"TEATRO\",\n    \"RECITAL\"\n  ],\n  \"artistasFavoritos\": [\n    \"Shakira\",\n    \"Maluma\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/usuarios/{{cliente2Id}}/preferencias",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "usuarios",
+                "{{cliente2Id}}",
+                "preferencias"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "9.2 GET Verificar Preferencias de Cliente 2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Preferencias recuperadas correctamente\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.ciudad).to.eql(\"Tandil\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCliente2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/usuarios/{{cliente2Id}}/preferencias",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "usuarios",
+                "{{cliente2Id}}",
+                "preferencias"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "9.3 GET Historial de Eventos comprados por Cliente 1 (Entrada)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Historial de compras de Cliente 1 obtenido\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const eventos = pm.response.json();",
+                  "    pm.expect(eventos).to.be.an(\"array\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCliente1}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/entradas/cliente/{{cliente1Id}}/eventos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "entradas",
+                "cliente",
+                "{{cliente1Id}}",
+                "eventos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "9.4 GET Co-compras crudas para Evento Baja Demanda (Entrada)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Co-compras desde Entrada obtenidas\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const ids = pm.response.json();",
+                  "    pm.expect(ids).to.be.an(\"array\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCliente2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/entradas/co-compras/evento/{{eventoBajaDemandaId}}?limit=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "entradas",
+                "co-compras",
+                "evento",
+                "{{eventoBajaDemandaId}}"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "9.5 GET Eventos Similares ('Quienes compraron Baja Demanda también compraron...')",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Similares devuelve Evento Alta Demanda por co-compra\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const lista = pm.response.json();",
+                  "    pm.expect(lista).to.be.an(\"array\").that.is.not.empty;",
+                  "    const ids = lista.map(e => e.eventoId);",
+                  "    pm.expect(ids).to.include(pm.collectionVariables.get(\"eventoAltaDemandaId\"));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCliente2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/eventos/{{eventoBajaDemandaId}}/similares?limit=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "eventos",
+                "{{eventoBajaDemandaId}}",
+                "similares"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "9.6 GET Recomendaciones Personalizadas para Cliente 2 (Historial + Preferencias)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Recomendaciones personalizadas devuelven Alta Demanda y excluyen ya comprados\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const lista = pm.response.json();",
+                  "    pm.expect(lista).to.be.an(\"array\").that.is.not.empty;",
+                  "    const ids = lista.map(e => e.eventoId);",
+                  "    const bajaId = pm.collectionVariables.get(\"eventoBajaDemandaId\");",
+                  "    const altaId = pm.collectionVariables.get(\"eventoAltaDemandaId\");",
+                  "    pm.expect(ids, \"No debe recomendar un evento que Cliente 2 ya compró\").to.not.include(bajaId);",
+                  "    pm.expect(ids, \"Debe recomendar Evento Alta Demanda por co-compra + artistas + ciudad\").to.include(altaId);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCliente2}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{cliente2Id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/eventos/recomendaciones?limit=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "eventos",
+                "recomendaciones"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "Registra preferencias de Cliente 2 (ciudad, tipos de evento, artistas), verifica con GET y prueba tanto 'quienes compraron entradas para este evento también compraron para...' como las recomendaciones personalizadas."
     }
   ],
   "event": [
@@ -1356,9 +4064,11 @@
       "listen": "prerequest",
       "script": {
         "type": "text/javascript",
-        "requests": {},
         "exec": [
-          ""
+          "if (!pm.collectionVariables.get(\"runId\")) {",
+          "    const fallbackId = `${Date.now().toString().slice(-6)}_${Math.floor(100 + Math.random() * 900)}`;",
+          "    pm.collectionVariables.set(\"runId\", fallbackId);",
+          "}"
         ]
       }
     },
@@ -1366,7 +4076,6 @@
       "listen": "test",
       "script": {
         "type": "text/javascript",
-        "requests": {},
         "exec": [
           ""
         ]
@@ -1375,19 +4084,91 @@
   ],
   "variable": [
     {
-      "key": "id",
-      "value": "1"
-    },
-    {
       "key": "base_url",
-      "value": "https://template.postman-echo.com"
+      "value": "http://localhost:8080"
     },
     {
-      "key": "tokenCliente",
+      "key": "usuario_url",
+      "value": "http://localhost:8081"
+    },
+    {
+      "key": "evento_url",
+      "value": "http://localhost:8083"
+    },
+    {
+      "key": "entrada_url",
+      "value": "http://localhost:8085"
+    },
+    {
+      "key": "notificacion_url",
+      "value": "http://localhost:8086"
+    },
+    {
+      "key": "orden_url",
+      "value": "http://localhost:8087"
+    },
+    {
+      "key": "fila_url",
+      "value": "http://localhost:8088"
+    },
+    {
+      "key": "runId",
       "value": ""
     },
     {
-      "key": "tokenOrganizador",
+      "key": "password",
+      "value": "1234"
+    },
+    {
+      "key": "adminEmail",
+      "value": ""
+    },
+    {
+      "key": "organizadorEmail",
+      "value": ""
+    },
+    {
+      "key": "personalAccesoEmail",
+      "value": ""
+    },
+    {
+      "key": "cliente1Email",
+      "value": ""
+    },
+    {
+      "key": "cliente2Email",
+      "value": ""
+    },
+    {
+      "key": "usuarioTemporalEmail",
+      "value": ""
+    },
+    {
+      "key": "usuarioTemporalEmailEditado",
+      "value": ""
+    },
+    {
+      "key": "adminId",
+      "value": ""
+    },
+    {
+      "key": "organizadorId",
+      "value": ""
+    },
+    {
+      "key": "personalAccesoId",
+      "value": ""
+    },
+    {
+      "key": "cliente1Id",
+      "value": ""
+    },
+    {
+      "key": "cliente2Id",
+      "value": ""
+    },
+    {
+      "key": "usuarioTemporalId",
       "value": ""
     },
     {
@@ -1395,7 +4176,127 @@
       "value": ""
     },
     {
+      "key": "tokenOrganizador",
+      "value": ""
+    },
+    {
       "key": "tokenPersonalAcceso",
+      "value": ""
+    },
+    {
+      "key": "tokenCliente",
+      "value": ""
+    },
+    {
+      "key": "tokenCliente1",
+      "value": ""
+    },
+    {
+      "key": "tokenCliente2",
+      "value": ""
+    },
+    {
+      "key": "lugarId",
+      "value": ""
+    },
+    {
+      "key": "lugarNombre",
+      "value": ""
+    },
+    {
+      "key": "lugarNoNumeradoId",
+      "value": ""
+    },
+    {
+      "key": "lugarNoNumeradoNombre",
+      "value": ""
+    },
+    {
+      "key": "sectorPlateaId",
+      "value": ""
+    },
+    {
+      "key": "sectorCampoId",
+      "value": ""
+    },
+    {
+      "key": "sectorVipId",
+      "value": ""
+    },
+    {
+      "key": "sectorSalaId",
+      "value": ""
+    },
+    {
+      "key": "eventoBajaDemandaId",
+      "value": ""
+    },
+    {
+      "key": "eventoAltaDemandaId",
+      "value": ""
+    },
+    {
+      "key": "eventoNoNumeradoId",
+      "value": ""
+    },
+    {
+      "key": "eventoCancelableId",
+      "value": ""
+    },
+    {
+      "key": "turnoFilaC1",
+      "value": ""
+    },
+    {
+      "key": "turnoFilaC2",
+      "value": ""
+    },
+    {
+      "key": "asientoFila",
+      "value": "1"
+    },
+    {
+      "key": "asientoNum1",
+      "value": "7"
+    },
+    {
+      "key": "asientoNum2",
+      "value": "9"
+    },
+    {
+      "key": "asientoReserva",
+      "value": "25"
+    },
+    {
+      "key": "ordenNumeradaId",
+      "value": ""
+    },
+    {
+      "key": "ordenNoNumeradaId",
+      "value": ""
+    },
+    {
+      "key": "ordenAltaDemandaId",
+      "value": ""
+    },
+    {
+      "key": "reservaId",
+      "value": ""
+    },
+    {
+      "key": "entradaNumeradaId",
+      "value": ""
+    },
+    {
+      "key": "entradaNoNumeradaId",
+      "value": ""
+    },
+    {
+      "key": "codigoQrEntradaNumerada",
+      "value": ""
+    },
+    {
+      "key": "notificacionId",
       "value": ""
     }
   ]

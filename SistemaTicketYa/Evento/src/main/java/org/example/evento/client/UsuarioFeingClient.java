@@ -2,6 +2,7 @@ package org.example.evento.client;
 
 import org.example.evento.client.usuario.dto.response.NotificacionArtistaDTO;
 import org.example.evento.client.usuario.dto.response.UsuarioResponseDTO;
+import org.example.evento.dto.request.PreferenciasExternasDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,4 +23,7 @@ public interface UsuarioFeingClient {
             @RequestParam Set<String> artistas,
             @RequestParam String ciudad
     );
+
+    @GetMapping("/api/usuarios/{usuarioId}/preferencias")
+    PreferenciasExternasDTO obtenerPreferencias(@PathVariable("usuarioId") Long usuarioId);
 }

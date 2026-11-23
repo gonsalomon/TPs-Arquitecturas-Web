@@ -1,0 +1,12 @@
+name: sistema-ticketya
+
+include:
+  - Usuario/docker-compose.yml
+  - Evento/docker-compose.yml
+  - Entrada/docker-compose.yml
+  - Orden/docker-compose.yml
+  - Fila_Virtual/docker-compose.yml
+  - Gateway/docker-compose.yml
+  - Pago/docker-compose.yml
+  - Reserva/docker-compose.yml
+  - Notificacion/docker-compose.yml

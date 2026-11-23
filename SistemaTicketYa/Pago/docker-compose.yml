@@ -1,6 +1,6 @@
 version: "3"
 services:
-  mysql:
+  mysql-pago:
     image: mysql:8.0
     container_name: Pago-mysql
     restart: always

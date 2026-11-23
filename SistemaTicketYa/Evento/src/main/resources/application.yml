@@ -9,3 +9,9 @@ spring:
 
 server:
   port: 8083
+
+servicios:
+  entradas:
+    url: http://localhost:8085/api/entradas
+  usuarios:
+    url: http://localhost:8081/api/usuarios

@@ -11,7 +11,7 @@ public interface FilaVirtualClient {
     ValidacionFilaDTO validarAcceso(
             @RequestParam("clienteId") Long clienteId,
             @RequestParam("eventoId") String eventoId,
-            @RequestParam(value = "tokenAcceso", required = false) String tokenAcceso);
+            @RequestParam(value = "tokenAcceso", required = false) String tokenFila);
 
     @PostMapping("/api/fila/eventos/{eventoId}/completar")
     void completarTurno(

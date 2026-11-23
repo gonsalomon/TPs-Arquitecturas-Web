@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.example.entrada.client.utils.Rol;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -14,4 +16,5 @@ public class UsuarioResponseDTO {
     private String apellido;
     private String email;
     private Rol rol;
+    private List<String> authorities;
 }
