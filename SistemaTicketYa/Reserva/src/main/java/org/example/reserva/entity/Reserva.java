@@ -51,7 +51,10 @@ public class Reserva {
     @Column
     private Integer cantidad;
 
-    public Reserva(Long idCliente, String idEvento, String sector){
+    @Column(name = "idempotency_key", unique = true, length = 128)
+    private String idempotencyKey;
+
+    public Reserva(Long idCliente, String idEvento, String sector) {
         this.idCliente = idCliente;
         this.idEvento = idEvento;
         this.sector = sector;
@@ -59,5 +62,4 @@ public class Reserva {
         this.fecha_inicio = LocalDateTime.now();
         this.fechaVencimiento = fecha_inicio.plusMinutes(10);
     }
-
 }

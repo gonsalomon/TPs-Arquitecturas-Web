@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
@@ -24,15 +25,20 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
     @Query("SELECT COUNT(r) FROM Reserva r JOIN r.asientos a " +
             "WHERE r.idEvento = :idEvento " +
+            "AND LOWER(r.sector) = LOWER(:sector) " +
             "AND r.estado IN :estados " +
             "AND a IN :asientosSolicitados")
     long contarAsientosOcupados(
             @Param("idEvento") String idEvento,
+            @Param("sector") String sector,
             @Param("estados") List<EstadoReserva> estados,
             @Param("asientosSolicitados") List<Long> asientosSolicitados
     );
 
-    @Query("SELECT COALESCE(SUM(r.cantidad), 0) FROM Reserva r WHERE r.idEvento = :idEvento AND r.sector = :sector AND r.estado IN :estados")
+    @Query("SELECT COALESCE(SUM(r.cantidad), 0) FROM Reserva r " +
+            "WHERE r.idEvento = :idEvento " +
+            "AND LOWER(r.sector) = LOWER(:sector) " +
+            "AND r.estado IN :estados")
     long contarEntradasVendidasPorSector(
             @Param("idEvento") String idEvento,
             @Param("sector") String sector,
@@ -40,4 +46,6 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     );
 
     List<Reserva> findByEstadoAndFechaVencimientoBefore(EstadoReserva estado, LocalDateTime fechaActual);
+
+    Optional<Reserva> findByIdempotencyKey(String idempotencyKey);
 }

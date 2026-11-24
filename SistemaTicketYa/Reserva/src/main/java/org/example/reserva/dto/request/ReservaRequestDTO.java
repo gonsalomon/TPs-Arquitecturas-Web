@@ -1,7 +1,10 @@
 package org.example.reserva.dto.request;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -10,8 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReservaRequestDTO {
-
-
 
     @NotNull(message = "Se necesita un cliente valido")
     private Long idCliente;

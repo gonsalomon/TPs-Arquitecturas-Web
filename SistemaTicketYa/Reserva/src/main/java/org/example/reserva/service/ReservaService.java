@@ -1,47 +1,78 @@
 package org.example.reserva.service;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+import feign.FeignException;
 import lombok.AllArgsConstructor;
-
 import org.example.reserva.dto.request.*;
 import org.example.reserva.dto.response.ReservaResponseDTO;
+import org.example.reserva.entity.AsientoBloqueado;
 import org.example.reserva.entity.Reserva;
 import org.example.reserva.feignClients.EventosClient;
 import org.example.reserva.feignClients.OrdenClient;
 import org.example.reserva.feignClients.UsuarioClient;
 import org.example.reserva.mapper.ReservaMapper;
+import org.example.reserva.repository.AsientoBloqueadoRepository;
+import org.example.reserva.repository.BloqueoSectorRepository;
 import org.example.reserva.repository.ReservaRepository;
 import org.example.reserva.utils.EstadoReserva;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-import feign.FeignException;
-import org.example.reserva.feignClients.OrdenClient;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
-import java.util.Objects;
 
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.client.j2se.MatrixToImageWriter;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.QRCodeWriter;
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class ReservaService {
+
     private final ReservaMapper mapper;
     private final ReservaRepository repository;
     private final EventosClient eventosClient;
     private final OrdenClient ordenClient;
     private final UsuarioClient usuarioClient;
+    private final AsientoBloqueadoRepository asientoBloqueadoRepository;
+    private final BloqueoSectorRepository bloqueoSectorRepository;
+    private final BloqueoSectorHelper bloqueoSectorHelper;
 
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public ReservaResponseDTO crearReserva(ReservaRequestDTO request) {
+        return crearReserva(request, null, null);
+    }
+
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public ReservaResponseDTO crearReserva(ReservaRequestDTO request, Long usuarioIdHeader) {
+        return crearReserva(request, usuarioIdHeader, null);
+    }
+
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public ReservaResponseDTO crearReserva(ReservaRequestDTO request, Long usuarioIdHeader, String idempotencyKey) {
+        // A. IDEMPOTENCIA (si la clave ya fue procesada, devuelve la reserva original)
+        String claveIdempotencia = (idempotencyKey != null && !idempotencyKey.isBlank())
+                ? idempotencyKey.trim()
+                : null;
+
+        if (claveIdempotencia != null) {
+            Optional<Reserva> existente = repository.findByIdempotencyKey(claveIdempotencia);
+            if (existente.isPresent()) {
+                return mapper.convertToDTO(existente.get());
+            }
+        }
+
         // 0. VALIDACIÓN DE CLIENTE CONTRA USUARIO AUTENTICADO Y ORDEN
         if (request.getIdCliente() == null || request.getIdCliente() <= 0) {
             throw new IllegalArgumentException("El idCliente es inválido.");
@@ -99,47 +130,63 @@ public class ReservaService {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("El sector solicitado no existe."));
 
+        String sectorNorm = sectorSolicitado.getNombre().trim().toUpperCase(Locale.ROOT);
+
         // 3. PREPARACIÓN DE VARIABLES SEGURAS
         List<EstadoReserva> estadosActivos = List.of(EstadoReserva.PENDIENTE, EstadoReserva.CONFIRMADA);
         List<Long> asientosPedidos = request.getAsientos() != null ? request.getAsientos() : new ArrayList<>();
 
-        // Obtenemos la cantidad de forma segura contra nulos
         int cantidadPedida = request.getCantidad() != null ? request.getCantidad() : 0;
-
-        // Definimos la cantidad final
         int cantidadEntradas = asientosPedidos.isEmpty() ? cantidadPedida : asientosPedidos.size();
 
         if (cantidadEntradas <= 0) {
             throw new IllegalArgumentException("Debe solicitar al menos una entrada (cantidad mayor a 0 o enviar asientos).");
         }
 
-        // 4. VALIDACIÓN DIVIDIDA POR TIPO DE SECTOR
-        if ("NUMERADO".equalsIgnoreCase(sectorSolicitado.getTipo())) {
+        boolean esNumerado = "NUMERADO".equalsIgnoreCase(sectorSolicitado.getTipo());
 
-            // A. Validar límites físicos del asiento (asumiendo que filas * asientosPorFila da el maximo, o usando capacidad)
+        // 4. VALIDACIÓN DIVIDIDA POR TIPO DE SECTOR
+        if (esNumerado) {
+            if (asientosPedidos.isEmpty()) {
+                throw new IllegalArgumentException("Debe seleccionar al menos un asiento para un sector numerado.");
+            }
+            if (new HashSet<>(asientosPedidos).size() != asientosPedidos.size()) {
+                throw new IllegalArgumentException("La solicitud contiene asientos duplicados.");
+            }
+
             long maxAsientoFisico = (sectorSolicitado.getFilas() != null && sectorSolicitado.getAsientosPorFila() != null)
                     ? sectorSolicitado.getFilas() * sectorSolicitado.getAsientosPorFila()
                     : sectorSolicitado.getCapacidad();
 
             boolean asientosValidos = asientosPedidos.stream()
-                    .allMatch(asiento -> asiento > 0 && asiento <= maxAsientoFisico);
+                    .allMatch(asiento -> asiento != null && asiento > 0 && asiento <= maxAsientoFisico);
 
             if (!asientosValidos) {
                 throw new IllegalArgumentException("Uno o más asientos seleccionados no existen en este sector.");
             }
 
-            // B. Validar disponibilidad
-            long asientosOcupados = repository.contarAsientosOcupados(request.getIdEvento(), estadosActivos, asientosPedidos);
+            // Validación rápida previa (la garantía real contra concurrencia la da el UNIQUE en asiento_bloqueado)
+            long asientosOcupados = repository.contarAsientosOcupados(
+                    request.getIdEvento(),
+                    sectorSolicitado.getNombre(),
+                    estadosActivos,
+                    asientosPedidos
+            );
             if (asientosOcupados > 0) {
                 throw new IllegalStateException("Los asientos solicitados ya están ocupados.");
             }
 
         } else {
-            // Lógica para CAMPO / SIN ASIENTOS (NO_NUMERADO)
-            // Validar que la nueva compra no exceda la capacidad máxima del sector
+            // LOCK PESIMISTA EN BD (SELECT ... FOR UPDATE) PARA EVITAR SOBREVENTA MULTI-INSTANCIA
+            if (bloqueoSectorRepository.findWithLock(request.getIdEvento(), sectorNorm).isEmpty()) {
+                bloqueoSectorHelper.asegurarFilaExiste(request.getIdEvento(), sectorNorm);
+                bloqueoSectorRepository.findWithLock(request.getIdEvento(), sectorNorm)
+                        .orElseThrow(() -> new IllegalStateException("No se pudo adquirir bloqueo de sector."));
+            }
+
             long entradasYaVendidas = repository.contarEntradasVendidasPorSector(
                     request.getIdEvento(),
-                    request.getSector(),
+                    sectorSolicitado.getNombre(),
                     estadosActivos
             );
 
@@ -149,26 +196,48 @@ public class ReservaService {
             }
         }
 
-        // 5. CÁLCULO DE PRECIO (Usando la variable 'cantidadEntradas')
+        // 5. CÁLCULO DE PRECIO
         Float precioTotal = evento.getPrecio() * cantidadEntradas;
 
         // 6. PERSISTENCIA
         Reserva nuevaReserva = mapper.convertToEntity(request);
 
-        // Forzamos el guardado de los campos clave por si el mapper los ignora
+        nuevaReserva.setSector(sectorSolicitado.getNombre());
         nuevaReserva.setAsientos(asientosPedidos);
         nuevaReserva.setCantidad(cantidadEntradas);
         nuevaReserva.setMonto(precioTotal);
         nuevaReserva.setEstado(EstadoReserva.PENDIENTE);
         nuevaReserva.setFecha_inicio(LocalDateTime.now());
         nuevaReserva.setFechaVencimiento(LocalDateTime.now().plusMinutes(10));
+        nuevaReserva.setIdempotencyKey(claveIdempotencia);
 
-        Reserva reservaGuardada = repository.save(nuevaReserva);
+        Reserva reservaGuardada = repository.saveAndFlush(nuevaReserva);
+
+        // BLOQUEO ATÓMICO EN BD PARA ASIENTOS NUMERADOS (ordenados para prevenir deadlocks)
+        if (esNumerado) {
+            List<AsientoBloqueado> bloqueos = asientosPedidos.stream()
+                    .sorted()
+                    .map(asiento -> new AsientoBloqueado(
+                            null,
+                            request.getIdEvento(),
+                            sectorNorm,
+                            asiento,
+                            reservaGuardada.getIdReserva()
+                    ))
+                    .toList();
+            asientoBloqueadoRepository.saveAllAndFlush(bloqueos);
+        }
 
         return mapper.convertToDTO(reservaGuardada);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
+    public Optional<ReservaResponseDTO> buscarPorIdempotencyKey(String idempotencyKey) {
+        return repository.findByIdempotencyKey(idempotencyKey.trim())
+                .map(mapper::convertToDTO);
+    }
+
+    @Transactional(readOnly = true)
     public List<ReservaResponseDTO> obtenerTodasLasReservas() {
         return repository.findAll().stream()
                 .map(mapper::convertToDTO)
@@ -183,8 +252,7 @@ public class ReservaService {
     }
 
     public List<ReservaResponseDTO> obtenerReservasConfirmadas(Long idCliente, String idEvento) {
-        // Usamos el estado CONFIRMADA convertido a String, tal como ajustaste antes
-        List<String> estadosConfirmados = List.of("CONFIRMADA"); // O EstadoReserva.CONFIRMADA.name()
+        List<String> estadosConfirmados = List.of(EstadoReserva.CONFIRMADA.name());
 
         List<Reserva> reservas = repository.buscarReservasPorCliente(
                 idCliente,
@@ -202,33 +270,38 @@ public class ReservaService {
         Reserva reserva = repository.findById(idReserva)
                 .orElseThrow(() -> new IllegalArgumentException("Reserva no encontrada con ID: " + idReserva));
 
-        reserva.setEstado(EstadoReserva.valueOf(nuevoEstado.toUpperCase()));
-
+        EstadoReserva estadoNuevo = EstadoReserva.valueOf(nuevoEstado.toUpperCase(Locale.ROOT));
+        reserva.setEstado(estadoNuevo);
         repository.save(reserva);
+
+        // Liberar los asientos bloqueados si la reserva deja de estar activa (ej. VENCIDA, CANCELADA, REEMBOLSADA)
+        if (estadoNuevo != EstadoReserva.PENDIENTE && estadoNuevo != EstadoReserva.CONFIRMADA) {
+            asientoBloqueadoRepository.deleteByIdReserva(idReserva);
+        }
     }
 
-    @Scheduled(fixedRate = 60000) //Verifica cada 1 minuto
+    @Scheduled(fixedRate = 60000)
     @Transactional
     public void liberarReservasVencidas() {
         LocalDateTime ahora = LocalDateTime.now();
 
-        // Buscamos todas las reservas PENDIENTES que ya pasaron sus 10 minutos
         List<Reserva> reservasExpiradas = repository.findByEstadoAndFechaVencimientoBefore(
                 EstadoReserva.PENDIENTE, ahora
         );
 
         if (!reservasExpiradas.isEmpty()) {
+            List<Long> idsExpiradas = new ArrayList<>();
             for (Reserva reserva : reservasExpiradas) {
-                reserva.setEstado(EstadoReserva.VENCIDA); // Cambiamos el estado
+                reserva.setEstado(EstadoReserva.VENCIDA);
+                idsExpiradas.add(reserva.getIdReserva());
             }
-            // Guardamos los cambios masivamente
             repository.saveAll(reservasExpiradas);
+            asientoBloqueadoRepository.deleteByIdReservaIn(idsExpiradas);
             System.out.println("Se liberaron " + reservasExpiradas.size() + " reservas vencidas.");
         }
     }
 
     public byte[] generarQRReserva(Long idReserva) {
-        // 1. Validar que la reserva exista y esté pagada
         Reserva reserva = repository.findById(idReserva)
                 .orElseThrow(() -> new IllegalArgumentException("Reserva no encontrada"));
 
@@ -236,11 +309,9 @@ public class ReservaService {
             throw new IllegalStateException("Solo se pueden generar QRs para reservas confirmadas y pagadas.");
         }
 
-        // 2. Armar el contenido del QR (ejemplo: JSON o cadena de validación)
-        String contenidoQr = String.format("TicketYa | Reserva: %d | Cliente: %s | Evento: %d | Asientos: %s",
+        String contenidoQr = String.format("TicketYa | Reserva: %d | Cliente: %s | Evento: %s | Asientos: %s",
                 reserva.getIdReserva(), reserva.getIdCliente(), reserva.getIdEvento(), reserva.getAsientos());
 
-        // 3. Generar la imagen usando ZXing
         try {
             QRCodeWriter qrCodeWriter = new QRCodeWriter();
             BitMatrix bitMatrix = qrCodeWriter.encode(contenidoQr, BarcodeFormat.QR_CODE, 300, 300);

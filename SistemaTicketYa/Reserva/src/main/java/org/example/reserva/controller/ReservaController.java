@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.example.reserva.dto.request.ReservaRequestDTO;
 import org.example.reserva.dto.response.ReservaResponseDTO;
 import org.example.reserva.service.ReservaService;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +31,6 @@ public class ReservaController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ReservaResponseDTO> obtenerReservaPorId(@PathVariable Long id) {
-        // Si tu ID es String, cambia Long por String en los parámetros
         ReservaResponseDTO reserva = reservaService.obtenerReservaPorId(id);
         return ResponseEntity.ok(reserva);
     }
@@ -38,10 +38,21 @@ public class ReservaController {
     @PostMapping
     public ResponseEntity<?> crearReserva(
             @Valid @RequestBody ReservaRequestDTO request,
-            @RequestHeader(value = "X-Usuario-Id", required = false) Long usuarioIdHeader) {
+            @RequestHeader(value = "X-Usuario-Id", required = false) Long usuarioIdHeader,
+            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey) {
         try {
-            ReservaResponseDTO response = reservaService.crearReserva(request, usuarioIdHeader);
+            ReservaResponseDTO response = reservaService.crearReserva(request, usuarioIdHeader, idempotencyKey);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (DataIntegrityViolationException e) {
+            // Si dos requests concurrentes llegaron con la misma Idempotency-Key, devolvemos la reserva ya creada
+            if (idempotencyKey != null && !idempotencyKey.isBlank()) {
+                return reservaService.buscarPorIdempotencyKey(idempotencyKey)
+                        .<ResponseEntity<?>>map(ResponseEntity::ok)
+                        .orElseGet(() -> ResponseEntity.status(HttpStatus.CONFLICT)
+                                .body("Los asientos solicitados ya están ocupados o fueron reservados por otro usuario."));
+            }
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("Los asientos solicitados ya están ocupados o fueron reservados por otro usuario.");
         } catch (ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         } catch (IllegalArgumentException e) {
