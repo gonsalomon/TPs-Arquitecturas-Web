@@ -1,8 +1,8 @@
 package org.example.gateway.config;
 
 import org.example.gateway.security.AuthorityConstant;
-import org.example.gateway.security.jwt.TokenProvider;
 import org.example.gateway.security.jwt.JwtFilter;
+import org.example.gateway.security.jwt.TokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -16,32 +16,53 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+
     private final TokenProvider tokenProvider;
 
-    public SecurityConfig( TokenProvider tokenProvider ) {
+    public SecurityConfig(TokenProvider tokenProvider) {
         this.tokenProvider = tokenProvider;
     }
 
-    @Bean // Indica que es un componente de spring
+    @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public SecurityFilterChain filterChain( final HttpSecurity http ) throws Exception {
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOriginPatterns(List.of("*"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setExposedHeaders(List.of("Authorization"));
+        config.setAllowCredentials(false);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
         http
-                .csrf( AbstractHttpConfigurer::disable );
-        http
-                .sessionManagement( s -> s.sessionCreationPolicy( SessionCreationPolicy.STATELESS ) );
-        http
-                .securityMatcher("/api/**" )
-                .authorizeHttpRequests( authz -> authz
-                        //mas especificos
+                .cors(Customizer.withDefaults())
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .securityMatcher("/api/**")
+                .authorizeHttpRequests(authz -> authz
+                        // Preflight CORS del navegador
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        // Más específicos
                         .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/authenticate").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/eventos").hasAuthority(AuthorityConstant.ORGANIZADOR)
@@ -56,22 +77,18 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/eventos/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/eventos/lugares/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/ordenes/**").permitAll()
-                        //menos especificos
+                        // Menos específicos
                         .requestMatchers("/api/ordenes/**").hasAuthority(AuthorityConstant.CLIENTE)
                         .requestMatchers("/api/pagos/**").hasAuthority(AuthorityConstant.CLIENTE)
                         .requestMatchers("/api/reservas/**").hasAuthority(AuthorityConstant.CLIENTE)
                         .requestMatchers("/api/fila/**").hasAuthority(AuthorityConstant.CLIENTE)
                         .requestMatchers("/api/notificaciones/**").permitAll()
-                        .requestMatchers("api/usuarios/**").permitAll()
-
-
-
+                        .requestMatchers("/api/usuarios/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .httpBasic( Customizer.withDefaults() )
-                .addFilterBefore( new JwtFilter( this.tokenProvider ), UsernamePasswordAuthenticationFilter.class );
+                .httpBasic(Customizer.withDefaults())
+                .addFilterBefore(new JwtFilter(this.tokenProvider), UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
-
-
 }

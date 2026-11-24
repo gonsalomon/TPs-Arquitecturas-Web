@@ -51,16 +51,10 @@ spring:
             uri: http://localhost:8088
             predicates:
               - Path=/api/fila/**
-      globalcors:
-        corsConfigurations:
-          '[/**]':
-            allowedOrigins: "*"
-            allowedMethods: "*"
-            allowedHeaders: "*"
 
 logging:
   level:
     org.springframework.security: DEBUG
     org.springframework.web: DEBUG
     org.springframework.cloud.gateway: DEBUG
-    org.springframework.web.servlet.mvc:.method.annotation.equestMappingHandlerMapping: TRACE
+    org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: TRACE

@@ -1,0 +1,2081 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TicketYa — Portal de Entradas</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+  <style>
+    :root {
+      --bg: #f4f6fb;
+      --surface: #ffffff;
+      --surface-alt: #f8fafc;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --muted: #64748b;
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --primary-soft: #eef2ff;
+      --success: #16a34a;
+      --success-soft: #dcfce7;
+      --warning: #d97706;
+      --warning-soft: #fef3c7;
+      --danger: #dc2626;
+      --danger-soft: #fee2e2;
+      --radius: 12px;
+      --shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HEADER */
+    header {
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 60%, #4f46e5 100%);
+      color: #fff;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.15);
+    }
+
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.3rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      cursor: pointer;
+    }
+
+    .brand-badge {
+      background: rgba(255,255,255,0.18);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      color: rgba(255,255,255,0.85);
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.92rem;
+      font-weight: 600;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .nav-btn:hover, .nav-btn.active {
+      background: rgba(255,255,255,0.16);
+      color: #fff;
+    }
+
+    .user-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.14);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+    }
+
+    /* MAIN */
+    main {
+      max-width: 1200px;
+      width: 100%;
+      margin: 28px auto;
+      padding: 0 20px 60px;
+      flex: 1;
+    }
+
+    .view { display: none; }
+    .view.active { display: block; animation: fadeIn 0.2s ease; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* CARDS & COMMON */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .section-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .muted { color: var(--muted); font-size: 0.9rem; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 9px 16px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover:not(:disabled) { background: var(--primary-hover); }
+    .btn-success { background: var(--success); color: #fff; }
+    .btn-success:hover:not(:disabled) { background: #15803d; }
+    .btn-outline { background: #fff; color: var(--text); border-color: var(--border); }
+    .btn-outline:hover:not(:disabled) { background: var(--surface-alt); border-color: #cbd5e1; }
+    .btn-danger-outline { background: #fff; color: var(--danger); border-color: #fecaca; }
+    .btn-danger-outline:hover:not(:disabled) { background: var(--danger-soft); }
+    .btn-sm { padding: 6px 12px; font-size: 0.82rem; }
+    .btn-white { background: #fff; color: var(--primary); }
+    .btn-white:hover { background: #f1f5f9; }
+
+    input, select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.92rem;
+      font-family: inherit;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,0.12); }
+
+    label {
+      display: block;
+      font-size: 0.83rem;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 5px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .badge-primary { background: var(--primary-soft); color: var(--primary); }
+    .badge-success { background: var(--success-soft); color: var(--success); }
+    .badge-warning { background: var(--warning-soft); color: var(--warning); }
+    .badge-danger { background: var(--danger-soft); color: var(--danger); }
+    .badge-gray { background: #e2e8f0; color: #475569; }
+
+    /* SEARCH BAR */
+    .search-panel {
+      display: grid;
+      grid-template-columns: 2fr 1.2fr 1fr auto auto;
+      gap: 12px;
+      align-items: end;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 820px) {
+      .search-panel { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 520px) {
+      .search-panel { grid-template-columns: 1fr; }
+    }
+
+    /* EVENTS GRID */
+    .events-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 18px;
+    }
+
+    .event-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .event-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 26px rgba(15, 23, 42, 0.1);
+    }
+
+    .event-banner {
+      padding: 16px 18px;
+      background: linear-gradient(135deg, #312e81, #4f46e5);
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .event-banner.alta { background: linear-gradient(135deg, #9a3412, #ea580c); }
+    .event-banner.teatro { background: linear-gradient(135deg, #581c87, #9333ea); }
+    .event-banner.cancelado { background: linear-gradient(135deg, #475569, #64748b); }
+
+    .event-body {
+      padding: 16px 18px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .event-title { font-size: 1.08rem; font-weight: 700; }
+
+    .event-meta {
+      font-size: 0.86rem;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .event-footer {
+      padding: 12px 18px;
+      border-top: 1px solid var(--border);
+      background: var(--surface-alt);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .price-from { font-weight: 700; font-size: 1rem; color: var(--primary); }
+
+    /* RECOMMENDATIONS STRIP */
+    .reco-section {
+      margin-bottom: 26px;
+      padding: 18px;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%);
+      border: 1px solid #c7d2fe;
+    }
+
+    .reco-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .reco-item {
+      background: #fff;
+      border: 1px solid #e0e7ff;
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    /* EVENT DETAIL & CHECKOUT */
+    .detail-layout {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr;
+      gap: 22px;
+      align-items: start;
+    }
+
+    @media (max-width: 900px) {
+      .detail-layout { grid-template-columns: 1fr; }
+    }
+
+    .sector-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 10px;
+      margin: 12px 0 18px;
+    }
+
+    .sector-card {
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+      background: #fff;
+    }
+
+    .sector-card:hover { border-color: #a5b4fc; }
+    .sector-card.selected { border-color: var(--primary); background: var(--primary-soft); }
+
+    /* SEAT MAP */
+    .stage-bar {
+      background: #1e293b;
+      color: #e2e8f0;
+      text-align: center;
+      padding: 8px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      margin-bottom: 14px;
+    }
+
+    .seat-map-wrapper {
+      overflow-x: auto;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface-alt);
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .seat-row {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 5px;
+      width: max-content;
+    }
+
+    .row-label {
+      width: 34px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-align: right;
+      padding-right: 6px;
+      flex-shrink: 0;
+    }
+
+    .seat {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #334155;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.12s;
+    }
+
+    .seat:hover:not(.occupied) { border-color: var(--primary); background: var(--primary-soft); color: var(--primary); }
+    .seat.selected { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .seat.occupied { background: #cbd5e1; border-color: #94a3b8; color: #64748b; cursor: not-allowed; }
+
+    .seat-legend {
+      display: flex;
+      gap: 16px;
+      margin-top: 10px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      flex-wrap: wrap;
+    }
+
+    .legend-dot {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+      vertical-align: middle;
+      margin-right: 5px;
+      border: 1px solid #cbd5e1;
+    }
+
+    .qty-box {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface-alt);
+    }
+
+    .qty-val { font-size: 1.4rem; font-weight: 800; min-width: 36px; text-align: center; }
+
+    .queue-box {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 18px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px dashed var(--border);
+      font-size: 0.92rem;
+    }
+
+    .summary-total {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      font-size: 1.15rem;
+      font-weight: 800;
+    }
+
+    .chip-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+    .chip {
+      background: var(--primary-soft);
+      color: var(--primary);
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+
+    /* TICKETS & ORDERS */
+    .tickets-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 18px;
+    }
+
+    .ticket-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      display: flex;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .ticket-left {
+      padding: 16px;
+      flex: 1;
+      border-right: 2px dashed var(--border);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .ticket-right {
+      padding: 14px;
+      width: 148px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface-alt);
+      gap: 6px;
+    }
+
+    .qr-box {
+      width: 116px;
+      height: 116px;
+      background: #fff;
+      padding: 6px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .qr-code-text {
+      font-family: monospace;
+      font-size: 0.68rem;
+      color: var(--muted);
+      word-break: break-all;
+      text-align: center;
+    }
+
+    .order-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 18px;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 10px 16px;
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+    }
+
+    .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+    /* AUTH */
+    .auth-grid {
+      max-width: 880px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
+    }
+
+    @media (max-width: 760px) {
+      .auth-grid { grid-template-columns: 1fr; }
+    }
+
+    .form-group { margin-bottom: 12px; }
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    /* TOASTS */
+    #toastContainer {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-width: 380px;
+    }
+
+    .toast {
+      padding: 12px 16px;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 0.88rem;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      animation: fadeIn 0.2s ease;
+    }
+
+    .toast.info { background: #1e293b; }
+    .toast.success { background: var(--success); }
+    .toast.error { background: var(--danger); }
+    .toast.warning { background: var(--warning); }
+
+    /* API LOG CONSOLE */
+    .api-bar {
+      background: #0f172a;
+      color: #cbd5e1;
+      font-size: 0.8rem;
+      padding: 8px 20px;
+      border-top: 1px solid #1e293b;
+    }
+
+    .api-bar-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .api-console {
+      max-width: 1200px;
+      margin: 8px auto 0;
+      max-height: 180px;
+      overflow-y: auto;
+      font-family: Consolas, monospace;
+      font-size: 0.76rem;
+      background: #020617;
+      padding: 10px;
+      border-radius: 8px;
+      display: none;
+    }
+
+    .api-console.open { display: block; }
+    .log-ok { color: #4ade80; }
+    .log-err { color: #f87171; }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--muted);
+    }
+
+    .alert-box {
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      margin-bottom: 14px;
+    }
+    .alert-warning { background: var(--warning-soft); color: #92400e; border: 1px solid #fde68a; }
+    .alert-info { background: var(--primary-soft); color: #3730a3; border: 1px solid #c7d2fe; }
+    .alert-success { background: var(--success-soft); color: #166534; border: 1px solid #bbf7d0; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="nav-inner">
+    <div class="brand" onclick="showView('eventos')">
+      <span>TicketYa</span>
+      <span class="brand-badge">Gateway :8080</span>
+    </div>
+
+    <div class="nav-links">
+      <button class="nav-btn active" id="nav-eventos" onclick="showView('eventos')">Eventos</button>
+      <button class="nav-btn" id="nav-entradas" onclick="showView('entradas')">Mis Entradas y Órdenes</button>
+      <button class="nav-btn" id="nav-preferencias" onclick="showView('preferencias')">Preferencias</button>
+    </div>
+
+    <div class="user-area" id="headerUserArea"></div>
+  </div>
+</header>
+
+<main>
+  <!-- ===================== VISTA 1: EVENTOS ===================== -->
+  <section id="view-eventos" class="view active">
+    <div id="recoContainer" style="display:none;" class="reco-section">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div>
+          <strong>Recomendados para vos</strong>
+          <span class="muted"> — basados en tus preferencias e historial</span>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="cargarRecomendaciones()">Actualizar</button>
+      </div>
+      <div class="reco-list" id="recoList"></div>
+    </div>
+
+    <div class="card search-panel">
+      <div>
+        <label for="filtroTexto">Buscar por nombre o artista</label>
+        <input id="filtroTexto" type="text" placeholder="Ej: Rock, Shakira, Teatro..." oninput="renderEventos()" />
+      </div>
+      <div>
+        <label for="filtroCiudad">Ciudad (consulta al Gateway)</label>
+        <input id="filtroCiudad" type="text" placeholder="Ej: Tandil" onkeydown="if(event.key==='Enter') buscarEventos()" />
+      </div>
+      <div>
+        <label for="filtroTipo">Tipo de evento</label>
+        <select id="filtroTipo" onchange="renderEventos()">
+          <option value="">Todos</option>
+          <option value="RECITAL">Recital</option>
+          <option value="TEATRO">Teatro</option>
+          <option value="DEPORTE">Deporte</option>
+          <option value="OTRO">Otro</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="buscarEventos()">Buscar</button>
+      <button class="btn btn-outline" onclick="limpiarFiltros()">Todos</button>
+    </div>
+
+    <div class="section-title">
+      <span>Cartelera de Eventos</span>
+      <span class="muted" id="eventosCount">Cargando...</span>
+    </div>
+
+    <div id="eventosGrid" class="events-grid"></div>
+  </section>
+
+  <!-- ===================== VISTA 2: DETALLE Y COMPRA ===================== -->
+  <section id="view-detalle" class="view">
+    <div style="margin-bottom: 14px;">
+      <button class="btn btn-outline btn-sm" onclick="showView('eventos')">← Volver a Eventos</button>
+    </div>
+
+    <div class="detail-layout">
+      <!-- Columna izquierda: info + fila virtual + sectores + asientos -->
+      <div style="display:flex; flex-direction:column; gap:18px;">
+        <div class="card" id="detalleHeaderCard"></div>
+
+        <!-- Fila Virtual (solo si altaDemanda === true) -->
+        <div class="queue-box" id="filaVirtualBox" style="display:none;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div>
+              <strong>Evento de Alta Demanda — Fila Virtual</strong>
+              <p class="muted" style="margin-top:2px;">Para comprar en este evento necesitás un turno activo en la fila virtual.</p>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button class="btn btn-primary btn-sm" onclick="ingresarFilaVirtual()">Ingresar a la Fila</button>
+              <button class="btn btn-outline btn-sm" onclick="consultarEstadoFila()">Consultar Estado</button>
+            </div>
+          </div>
+          <div id="filaEstadoOutput" style="margin-top:10px; font-size:0.88rem;"></div>
+        </div>
+
+        <!-- Sectores y Asientos -->
+        <div class="card">
+          <h3 style="margin-bottom:6px;">1. Elegí tu sector</h3>
+          <p class="muted">Seleccioná un sector para ver precios y elegir asientos o cantidad.</p>
+          <div class="sector-list" id="sectorList"></div>
+
+          <div id="selectorAsientosContainer" style="display:none;">
+            <h3 style="margin-bottom:8px;" id="selectorTitulo">2. Elegí tus ubicaciones</h3>
+            <div id="selectorBody"></div>
+          </div>
+        </div>
+
+        <!-- Similares -->
+        <div class="card" id="similaresCard" style="display:none;">
+          <h3 style="margin-bottom:10px;">Quienes compraron este evento también compraron</h3>
+          <div class="reco-list" id="similaresList"></div>
+        </div>
+      </div>
+
+      <!-- Columna derecha: resumen y checkout -->
+      <div class="card" style="position: sticky; top: 84px;">
+        <h3 style="margin-bottom:12px;">Resumen de Compra</h3>
+        <div id="checkoutAuthWarning" class="alert-box alert-warning" style="display:none;">
+          Iniciá sesión como cliente para crear tu orden y comprar entradas.
+          <div style="margin-top:8px;">
+            <button class="btn btn-primary btn-sm" onclick="showView('auth')">Ir a Iniciar Sesión / Registro</button>
+          </div>
+        </div>
+
+        <div id="resumenSeleccion">
+          <p class="muted">Seleccioná un sector y tus entradas para comenzar.</p>
+        </div>
+
+        <div id="pasoOrdenBtns" style="margin-top:16px; display:none;">
+          <button class="btn btn-primary" style="width:100%;" id="btnCrearOrden" onclick="crearOrden()">
+            Crear Orden y Reservar
+          </button>
+        </div>
+
+        <!-- Paso 2: Pagar Orden creada -->
+        <div id="pasoPagoBox" style="margin-top:18px; padding-top:16px; border-top:2px solid var(--border); display:none;">
+          <div class="alert-box alert-info" id="ordenCreadaInfo"></div>
+          <div class="form-group">
+            <label for="medioPagoSelect">Medio de pago</label>
+            <select id="medioPagoSelect">
+              <option value="TARJETA_CREDITO">Tarjeta de Crédito</option>
+              <option value="TARJETA_DEBITO">Tarjeta de Débito</option>
+              <option value="MERCADO_PAGO">Mercado Pago</option>
+              <option value="TRANSFERENCIA">Transferencia</option>
+            </select>
+          </div>
+          <button class="btn btn-success" style="width:100%;" id="btnPagarOrden" onclick="pagarOrdenActual()">
+            Confirmar y Pagar
+          </button>
+        </div>
+
+        <!-- Confirmación -->
+        <div id="pagoExitosoBox" style="margin-top:16px; display:none;">
+          <div class="alert-box alert-success">
+            <strong>¡Compra confirmada!</strong> Tus entradas ya están listas.
+          </div>
+          <button class="btn btn-primary" style="width:100%;" onclick="showView('entradas')">
+            Ver Mis Entradas y QR
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== VISTA 3: MIS ENTRADAS Y ÓRDENES ===================== -->
+  <section id="view-entradas" class="view">
+    <div class="section-title">
+      <span>Mis Entradas y Órdenes</span>
+      <button class="btn btn-outline btn-sm" onclick="cargarMisOrdenesYEntradas()">Actualizar</button>
+    </div>
+
+    <div id="entradasAuthAlert" class="card empty-state" style="display:none;">
+      <p style="margin-bottom:12px;">Necesitás iniciar sesión para ver tus órdenes y entradas.</p>
+      <button class="btn btn-primary" onclick="showView('auth')">Iniciar Sesión / Registrarse</button>
+    </div>
+
+    <div id="entradasContent">
+      <div class="tabs">
+        <button class="tab-btn active" id="tab-mis-entradas" onclick="switchEntradasTab('tickets')">Mis Entradas (QR)</button>
+        <button class="tab-btn" id="tab-mis-ordenes" onclick="switchEntradasTab('ordenes')">Historial de Órdenes</button>
+      </div>
+
+      <!-- TAB TICKETS -->
+      <div id="panel-tickets">
+        <div class="card" style="margin-bottom:18px; display:flex; gap:10px; align-items:end; flex-wrap:wrap;">
+          <div style="flex:1; min-width:220px;">
+            <label for="buscarEntradaId">Consultar entrada por ID (<code>GET /api/entradas/{id}</code>)</label>
+            <input id="buscarEntradaId" type="number" placeholder="Ej: 1" />
+          </div>
+          <button class="btn btn-primary" onclick="buscarEntradaPorId()">Buscar y agregar</button>
+        </div>
+
+        <div id="ticketsGrid" class="tickets-grid"></div>
+      </div>
+
+      <!-- TAB ORDENES -->
+      <div id="panel-ordenes" style="display:none;">
+        <div id="ordenesList"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== VISTA 4: PREFERENCIAS ===================== -->
+  <section id="view-preferencias" class="view">
+    <div class="card" style="max-width:600px; margin:0 auto;">
+      <h2 style="margin-bottom:6px;">Mis Preferencias</h2>
+      <p class="muted" style="margin-bottom:18px;">Se usan para calcular tus recomendaciones personalizadas en la pantalla principal.</p>
+
+      <div id="prefAuthAlert" class="alert-box alert-warning" style="display:none;">
+        Iniciá sesión para configurar tus preferencias.
+      </div>
+
+      <form id="prefForm" onsubmit="guardarPreferencias(event)">
+        <div class="form-group">
+          <label for="prefCiudad">Ciudad preferida</label>
+          <input id="prefCiudad" type="text" placeholder="Ej: Tandil" required />
+        </div>
+        <div class="form-group">
+          <label>Tipos de evento que te interesan</label>
+          <div style="display:flex; gap:14px; flex-wrap:wrap; margin-top:6px;">
+            <label style="display:inline-flex; align-items:center; gap:6px; font-weight:500;">
+              <input type="checkbox" name="prefTipo" value="RECITAL" style="width:auto;" /> Recital
+            </label>
+            <label style="display:inline-flex; align-items:center; gap:6px; font-weight:500;">
+              <input type="checkbox" name="prefTipo" value="TEATRO" style="width:auto;" /> Teatro
+            </label>
+            <label style="display:inline-flex; align-items:center; gap:6px; font-weight:500;">
+              <input type="checkbox" name="prefTipo" value="DEPORTE" style="width:auto;" /> Deporte
+            </label>
+            <label style="display:inline-flex; align-items:center; gap:6px; font-weight:500;">
+              <input type="checkbox" name="prefTipo" value="OTRO" style="width:auto;" /> Otro
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="prefArtistas">Artistas favoritos (separados por coma)</label>
+          <input id="prefArtistas" type="text" placeholder="Ej: Shakira, Maluma" />
+        </div>
+        <button class="btn btn-primary" type="submit">Guardar Preferencias</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ===================== VISTA 5: LOGIN / REGISTRO ===================== -->
+  <section id="view-auth" class="view">
+    <div class="auth-grid">
+      <!-- LOGIN -->
+      <div class="card">
+        <h2 style="margin-bottom:6px;">Iniciar Sesión</h2>
+        <p class="muted" style="margin-bottom:16px;">Ingresá con tu email y contraseña (<code>POST /api/authenticate</code>).</p>
+        <form onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label for="loginEmail">Email</label>
+            <input id="loginEmail" type="email" required placeholder="cliente@example.com" />
+          </div>
+          <div class="form-group">
+            <label for="loginPassword">Contraseña</label>
+            <input id="loginPassword" type="password" required placeholder="1234" />
+          </div>
+          <div class="form-group">
+            <label for="loginUserIdManual">ID de Cliente (opcional, solo si tu JWT no incluye el ID)</label>
+            <input id="loginUserIdManual" type="number" placeholder="Dejar vacío para detectar automáticamente" />
+          </div>
+          <button class="btn btn-primary" style="width:100%;" type="submit">Entrar</button>
+        </form>
+      </div>
+
+      <!-- REGISTRO -->
+      <div class="card">
+        <h2 style="margin-bottom:6px;">Crear Cuenta de Cliente</h2>
+        <p class="muted" style="margin-bottom:16px;">Se registra con rol <code>CLIENTE</code> e inicia sesión automáticamente.</p>
+        <form onsubmit="handleRegister(event)">
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="regNombre">Nombre</label>
+              <input id="regNombre" type="text" required placeholder="Santiago" />
+            </div>
+            <div class="form-group">
+              <label for="regApellido">Apellido</label>
+              <input id="regApellido" type="text" required placeholder="Gomez" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="regEmail">Email</label>
+            <input id="regEmail" type="email" required placeholder="nuevo@example.com" />
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="regCiudad">Ciudad</label>
+              <input id="regCiudad" type="text" required value="Tandil" />
+            </div>
+            <div class="form-group">
+              <label for="regPassword">Contraseña</label>
+              <input id="regPassword" type="password" required placeholder="1234" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="regArtistas">Artistas favoritos (separados por coma)</label>
+            <input id="regArtistas" type="text" placeholder="Shakira, Maluma" />
+          </div>
+          <button class="btn btn-success" style="width:100%;" type="submit">Registrarse y Entrar</button>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- BARRA INFERIOR: CONFIG GATEWAY + CONSOLA API -->
+<div class="api-bar">
+  <div class="api-bar-inner">
+    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+      <span>Gateway:</span>
+      <input id="gatewayUrlInput" type="text" value="http://localhost:8080"
+             style="width:210px; padding:4px 8px; font-size:0.78rem; background:#1e293b; color:#fff; border-color:#334155;"
+             onchange="guardarGatewayUrl(this.value)" />
+    </div>
+    <button class="btn btn-outline btn-sm" style="background:#1e293b; color:#e2e8f0; border-color:#334155;" onclick="toggleApiConsole()">
+      Ver / Ocultar Log API (<span id="logCount">0</span>)
+    </button>
+  </div>
+  <div id="apiConsole" class="api-console"></div>
+</div>
+
+<div id="toastContainer"></div>
+
+<script>
+  // ===================== ESTADO GLOBAL =====================
+  const state = {
+    baseUrl: localStorage.getItem('ticketya_base_url') || 'http://localhost:8080',
+    session: JSON.parse(localStorage.getItem('ticketya_session') || 'null'), // { token, userId, email, nombre }
+    eventos: [],
+    todosEventos: [],
+    lugares: [],
+    sectoresActuales: [],
+    eventoActual: null,
+    lugarActual: null,
+    sectorSeleccionado: null, // { nombre, tipo, precio, filas, asientosPorFila, capacidad }
+    asientosSeleccionados: [], // [{ fila, asiento }]
+    cantidadSeleccionada: 1,
+    tokenFilaActual: null,
+    ordenActual: null,
+    apiLogs: []
+  };
+
+  // ===================== INICIALIZACIÓN =====================
+  window.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('gatewayUrlInput').value = state.baseUrl;
+    renderHeaderUser();
+    cargarCatalogoInicial();
+  });
+
+  function guardarGatewayUrl(url) {
+    state.baseUrl = (url || 'http://localhost:8080').trim().replace(/\/+$/, '');
+    localStorage.setItem('ticketya_base_url', state.baseUrl);
+    toast(`Gateway actualizado a ${state.baseUrl}`, 'info');
+    cargarCatalogoInicial();
+  }
+
+  // ===================== HTTP CLIENT =====================
+  async function apiFetch(path, options = {}) {
+    const url = `${state.baseUrl}${path}`;
+    const headers = { ...(options.headers || {}) };
+
+    if (options.body && !headers['Content-Type']) {
+      headers['Content-Type'] = 'application/json';
+    }
+    if (options.auth !== false && state.session?.token) {
+      headers['Authorization'] = `Bearer ${state.session.token}`;
+    }
+    if (options.includeUserId && state.session?.userId) {
+      headers['X-Usuario-Id'] = String(state.session.userId);
+    }
+
+    const method = options.method || 'GET';
+    let res, text, data;
+
+    try {
+      res = await fetch(url, {
+        method,
+        headers,
+        body: options.body ? JSON.stringify(options.body) : undefined
+      });
+      text = await res.text();
+      try { data = text ? JSON.parse(text) : null; } catch { data = text; }
+
+      logApi(method, path, res.status, res.ok ? 'OK' : (data?.message || data?.error || text));
+
+      if (!res.ok) {
+        const msg = (typeof data === 'object' && data !== null)
+          ? (data.message || data.error || data.detail || JSON.stringify(data))
+          : (text || `Error HTTP ${res.status}`);
+        throw new Error(msg);
+      }
+      return { data, headers: res.headers, status: res.status };
+    } catch (err) {
+      if (!res) {
+        logApi(method, path, 'ERR', 'No se pudo conectar (¿Gateway encendido y CORS habilitado?)');
+        throw new Error('Error de red/CORS al conectar con el Gateway (' + state.baseUrl + ').');
+      }
+      throw err;
+    }
+  }
+
+  function logApi(method, path, status, info) {
+    const time = new Date().toLocaleTimeString();
+    state.apiLogs.unshift({ time, method, path, status, info });
+    if (state.apiLogs.length > 40) state.apiLogs.pop();
+    document.getElementById('logCount').textContent = state.apiLogs.length;
+    const el = document.getElementById('apiConsole');
+    el.innerHTML = state.apiLogs.map(l => {
+      const ok = typeof l.status === 'number' && l.status >= 200 && l.status < 300;
+      return `<div class="${ok ? 'log-ok' : 'log-err'}">[${l.time}] ${l.method} ${l.path} → ${l.status} ${escapeHtml(String(l.info || '').slice(0, 140))}</div>`;
+    }).join('');
+  }
+
+  function toggleApiConsole() {
+    document.getElementById('apiConsole').classList.toggle('open');
+  }
+
+  // ===================== NAVEGACIÓN =====================
+  function showView(viewName) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+
+    const target = document.getElementById(`view-${viewName}`);
+    if (target) target.classList.add('active');
+    const navBtn = document.getElementById(`nav-${viewName}`);
+    if (navBtn) navBtn.classList.add('active');
+
+    if (viewName === 'entradas') cargarMisOrdenesYEntradas();
+    if (viewName === 'preferencias') cargarPreferencias();
+    if (viewName === 'eventos' && state.session?.token) cargarRecomendaciones();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ===================== AUTH & SESIÓN =====================
+  function renderHeaderUser() {
+    const area = document.getElementById('headerUserArea');
+    if (state.session?.token) {
+      const label = state.session.nombre || state.session.email || 'Cliente';
+      const idText = state.session.userId ? `ID #${state.session.userId}` : 'Sin ID';
+      area.innerHTML = `
+        <div class="user-pill">
+          <span>${escapeHtml(label)}</span>
+          <span class="badge badge-primary" style="background:rgba(255,255,255,0.22); color:#fff; cursor:pointer;"
+                title="Click para editar ID de Usuario" onclick="editarUserIdManual()">${idText}</span>
+        </div>
+        <button class="btn btn-sm btn-white" onclick="logout()">Salir</button>
+      `;
+    } else {
+      area.innerHTML = `
+        <button class="btn btn-sm btn-white" onclick="showView('auth')">Iniciar Sesión / Registro</button>
+      `;
+    }
+  }
+
+  function saveSession(session) {
+    state.session = session;
+    localStorage.setItem('ticketya_session', JSON.stringify(session));
+    renderHeaderUser();
+  }
+
+  function logout() {
+    state.session = null;
+    localStorage.removeItem('ticketya_session');
+    document.getElementById('recoContainer').style.display = 'none';
+    renderHeaderUser();
+    toast('Sesión cerrada', 'info');
+    showView('eventos');
+  }
+
+  function decodeJwtPayload(token) {
+    try {
+      const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+      return JSON.parse(decodeURIComponent(escape(atob(base64))));
+    } catch {
+      return null;
+    }
+  }
+
+  function extractToken(data, headers) {
+    let token = '';
+    if (typeof data === 'object' && data !== null) {
+      token = data.id_token || data.token || data.jwt || data.accessToken || '';
+    } else if (typeof data === 'string') {
+      token = data.trim();
+    }
+    if (!token && headers?.get('Authorization')) {
+      token = headers.get('Authorization').replace(/^Bearer\s+/i, '');
+    }
+    return token;
+  }
+
+  async function handleLogin(e) {
+    e.preventDefault();
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const manualId = document.getElementById('loginUserIdManual').value.trim();
+
+    try {
+      const { data, headers } = await apiFetch('/api/authenticate', {
+        method: 'POST',
+        auth: false,
+        body: { username: email, password }
+      });
+
+      const token = extractToken(data, headers);
+      if (!token) throw new Error('La respuesta no incluyó un token JWT.');
+
+      const payload = decodeJwtPayload(token) || {};
+      let userId = manualId
+        || data?.id || data?.usuarioId || data?.idUsuario || data?.userId
+        || payload.id || payload.usuarioId || payload.idUsuario || payload.userId
+        || null;
+
+      // Buscar si ya guardamos este email localmente antes
+      if (!userId) {
+        const known = JSON.parse(localStorage.getItem('ticketya_known_users') || '{}');
+        if (known[email]) userId = known[email];
+      }
+
+      saveSession({ token, userId: userId ? Number(userId) : null, email, nombre: data?.nombre || email.split('@')[0] });
+      toast('¡Bienvenido de nuevo!', 'success');
+
+      if (!state.session.userId) {
+        toast('Tu JWT no incluye el ID numérico del usuario. Tocá "Sin ID" arriba para ingresarlo si el Gateway requiere X-Usuario-Id.', 'warning');
+      }
+
+      showView('eventos');
+    } catch (err) {
+      toast(`Error al iniciar sesión: ${err.message}`, 'error');
+    }
+  }
+
+  async function handleRegister(e) {
+    e.preventDefault();
+    const nombre = document.getElementById('regNombre').value.trim();
+    const apellido = document.getElementById('regApellido').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const ciudad = document.getElementById('regCiudad').value.trim();
+    const password = document.getElementById('regPassword').value;
+    const artistasRaw = document.getElementById('regArtistas').value.trim();
+    const artistasFavoritos = artistasRaw ? artistasRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+    try {
+      const { data: userCreated } = await apiFetch('/api/usuarios', {
+        method: 'POST',
+        auth: false,
+        body: {
+          nombre, apellido, email, ciudad, password,
+          authorities: ['CLIENTE'],
+          artistasFavoritos
+        }
+      });
+
+      const userId = userCreated?.id ?? userCreated?.idUsuario ?? userCreated?.usuarioId ?? null;
+      if (userId) {
+        const known = JSON.parse(localStorage.getItem('ticketya_known_users') || '{}');
+        known[email] = userId;
+        localStorage.setItem('ticketya_known_users', JSON.stringify(known));
+      }
+
+      // Login automático
+      const { data: authData, headers } = await apiFetch('/api/authenticate', {
+        method: 'POST',
+        auth: false,
+        body: { username: email, password }
+      });
+
+      const token = extractToken(authData, headers);
+      saveSession({ token, userId: userId ? Number(userId) : null, email, nombre });
+      toast(`Cuenta creada (ID #${userId}) e inicio de sesión exitoso`, 'success');
+      showView('eventos');
+    } catch (err) {
+      toast(`Error al registrarse: ${err.message}`, 'error');
+    }
+  }
+
+  function editarUserIdManual() {
+    const actual = state.session?.userId || '';
+    const nuevo = prompt('Ingresá tu ID numérico de Cliente (usado en el header X-Usuario-Id):', actual);
+    if (nuevo !== null && nuevo.trim() !== '') {
+      state.session.userId = Number(nuevo.trim());
+      saveSession(state.session);
+      toast(`ID de usuario actualizado a #${state.session.userId}`, 'success');
+    }
+  }
+
+  // ===================== EVENTOS Y LUGARES =====================
+  async function cargarCatalogoInicial() {
+    try {
+      const [evRes, lugRes] = await Promise.all([
+        apiFetch('/api/eventos', { auth: false }),
+        apiFetch('/api/eventos/lugares', { auth: false })
+      ]);
+      state.eventos = Array.isArray(evRes.data) ? evRes.data : [];
+      state.todosEventos = [...state.eventos];
+      state.lugares = Array.isArray(lugRes.data) ? lugRes.data : [];
+      renderEventos();
+
+      if (state.session?.token) cargarRecomendaciones();
+    } catch (err) {
+      document.getElementById('eventosGrid').innerHTML = `
+        <div class="card empty-state" style="grid-column:1/-1;">
+          <strong>No se pudieron cargar los eventos</strong>
+          <p style="margin-top:6px;">${escapeHtml(err.message)}</p>
+          <p style="margin-top:8px; font-size:0.84rem;">Verificá que el Gateway esté corriendo en <code>${escapeHtml(state.baseUrl)}</code> y tenga CORS habilitado.</p>
+          <button class="btn btn-primary btn-sm" style="margin-top:12px;" onclick="cargarCatalogoInicial()">Reintentar</button>
+        </div>`;
+    }
+  }
+
+  async function buscarEventos() {
+    const ciudad = document.getElementById('filtroCiudad').value.trim();
+    try {
+      const path = ciudad
+        ? `/api/eventos/buscar?ciudad=${encodeURIComponent(ciudad)}`
+        : '/api/eventos';
+      const { data } = await apiFetch(path, { auth: false });
+      state.eventos = Array.isArray(data) ? data : [];
+      renderEventos();
+      toast(ciudad ? `Eventos filtrados por ciudad: ${ciudad}` : 'Mostrando todos los eventos', 'info');
+    } catch (err) {
+      toast(`Error al buscar eventos: ${err.message}`, 'error');
+    }
+  }
+
+  function limpiarFiltros() {
+    document.getElementById('filtroTexto').value = '';
+    document.getElementById('filtroCiudad').value = '';
+    document.getElementById('filtroTipo').value = '';
+    cargarCatalogoInicial();
+  }
+
+  function getEventId(ev) {
+    return ev?.id ?? ev?.idEvento ?? ev?.eventoId;
+  }
+
+  function getLugarById(idLugar) {
+    return state.lugares.find(l => String(l.id ?? l.idLugar ?? l.lugarId) === String(idLugar)) || null;
+  }
+
+  function getPrecioMinimo(ev) {
+    if (!Array.isArray(ev.precios) || ev.precios.length === 0) return null;
+    return Math.min(...ev.precios.map(p => Number(p.precio || 0)));
+  }
+
+  function renderEventos() {
+    const texto = document.getElementById('filtroTexto').value.trim().toLowerCase();
+    const tipo = document.getElementById('filtroTipo').value;
+
+    const filtrados = state.eventos.filter(ev => {
+      if (tipo && (ev.tipo || '').toUpperCase() !== tipo) return false;
+      if (texto) {
+        const hay = [
+          ev.nombre,
+          ev.descripcion,
+          ev.nombreLugar,
+          ...(ev.participantes || [])
+        ].join(' ').toLowerCase();
+        if (!hay.includes(texto)) return false;
+      }
+      return true;
+    });
+
+    document.getElementById('eventosCount').textContent = `${filtrados.length} evento(s)`;
+    const grid = document.getElementById('eventosGrid');
+
+    if (filtrados.length === 0) {
+      grid.innerHTML = `<div class="card empty-state" style="grid-column:1/-1;">No se encontraron eventos con esos filtros.</div>`;
+      return;
+    }
+
+    grid.innerHTML = filtrados.map(ev => {
+      const id = getEventId(ev);
+      const lugar = getLugarById(ev.idLugar);
+      const minPrice = getPrecioMinimo(ev);
+      const estado = (ev.estado || 'PUBLICADO').toUpperCase();
+      const cancelado = estado === 'CANCELADO';
+      const bannerClass = cancelado ? 'cancelado' : (ev.altaDemanda ? 'alta' : ((ev.tipo || '').toUpperCase() === 'TEATRO' ? 'teatro' : ''));
+
+      return `
+        <div class="event-card">
+          <div class="event-banner ${bannerClass}">
+            <div>
+              <span class="badge" style="background:rgba(255,255,255,0.2); color:#fff;">${escapeHtml(ev.tipo || 'EVENTO')}</span>
+              ${ev.altaDemanda ? `<span class="badge" style="background:#fef3c7; color:#92400e; margin-left:4px;">Alta Demanda</span>` : ''}
+            </div>
+            <span class="badge ${cancelado ? 'badge-danger' : 'badge-success'}">${escapeHtml(estado)}</span>
+          </div>
+          <div class="event-body">
+            <div class="event-title">${escapeHtml(ev.nombre || 'Evento sin nombre')}</div>
+            <p class="muted" style="font-size:0.85rem;">${escapeHtml(ev.descripcion || '')}</p>
+            <div class="event-meta">
+              <span>📅 ${formatDate(ev.fechaHora)}</span>
+              <span>📍 ${escapeHtml(ev.nombreLugar || lugar?.nombre || 'Lugar a confirmar')}${lugar?.ciudad ? ` · ${escapeHtml(lugar.ciudad)}` : ''}</span>
+              ${ev.participantes?.length ? `<span>🎤 ${escapeHtml(ev.participantes.join(', '))}</span>` : ''}
+            </div>
+          </div>
+          <div class="event-footer">
+            <div class="price-from">${minPrice !== null ? `Desde $${minPrice.toLocaleString('es-AR')}` : 'Consultar precio'}</div>
+            <button class="btn btn-primary btn-sm" ${cancelado ? 'disabled' : ''} onclick="abrirEvento('${escapeAttr(id)}')">
+              ${cancelado ? 'Cancelado' : 'Elegir Entradas'}
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  async function cargarRecomendaciones() {
+    if (!state.session?.token || !state.session?.userId) return;
+    try {
+      const { data } = await apiFetch('/api/eventos/recomendaciones?limit=6', { includeUserId: true });
+      if (!Array.isArray(data) || data.length === 0) {
+        document.getElementById('recoContainer').style.display = 'none';
+        return;
+      }
+      document.getElementById('recoContainer').style.display = 'block';
+      document.getElementById('recoList').innerHTML = data.map(r => {
+        const id = getEventId(r);
+        const full = state.todosEventos.find(e => String(getEventId(e)) === String(id)) || state.eventos.find(e => String(getEventId(e)) === String(id)) || r;
+        return `
+          <div class="reco-item">
+            <div>
+              <div style="font-weight:700; font-size:0.95rem;">${escapeHtml(full.nombre || r.nombre || `Evento ${id}`)}</div>
+              <div class="muted" style="font-size:0.8rem;">${escapeHtml(full.tipo || r.tipo || '')} · ${formatDate(full.fechaHora || r.fechaHora)}</div>
+              ${r.motivo ? `<div style="font-size:0.78rem; color:var(--primary); margin-top:4px;">${escapeHtml(r.motivo)}</div>` : ''}
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="abrirEvento('${escapeAttr(id)}')">Ver evento</button>
+          </div>
+        `;
+      }).join('');
+    } catch {
+      document.getElementById('recoContainer').style.display = 'none';
+    }
+  }
+
+  // ===================== DETALLE DEL EVENTO Y ASIENTOS =====================
+  async function abrirEvento(eventoId) {
+    let ev = state.todosEventos.find(e => String(getEventId(e)) === String(eventoId)) || state.eventos.find(e => String(getEventId(e)) === String(eventoId));
+    if (!ev) {
+      toast('No se encontró el detalle del evento en el catálogo.', 'error');
+      return;
+    }
+
+    state.eventoActual = ev;
+    state.lugarActual = getLugarById(ev.idLugar);
+    state.sectorSeleccionado = null;
+    state.asientosSeleccionados = [];
+    state.cantidadSeleccionada = 1;
+    state.tokenFilaActual = null;
+    state.ordenActual = null;
+
+    // Reset paneles de compra
+    document.getElementById('pasoPagoBox').style.display = 'none';
+    document.getElementById('pagoExitosoBox').style.display = 'none';
+    document.getElementById('selectorAsientosContainer').style.display = 'none';
+    document.getElementById('checkoutAuthWarning').style.display = state.session?.token ? 'none' : 'block';
+
+    // Header del evento
+    document.getElementById('detalleHeaderCard').innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap;">
+        <div>
+          <div style="display:flex; gap:6px; margin-bottom:8px;">
+            <span class="badge badge-primary">${escapeHtml(ev.tipo || 'EVENTO')}</span>
+            ${ev.altaDemanda ? `<span class="badge badge-warning">Alta Demanda</span>` : `<span class="badge badge-success">Compra Directa</span>`}
+          </div>
+          <h1 style="font-size:1.5rem; margin-bottom:6px;">${escapeHtml(ev.nombre)}</h1>
+          <p class="muted">${escapeHtml(ev.descripcion || '')}</p>
+        </div>
+      </div>
+      <div style="display:flex; gap:18px; flex-wrap:wrap; margin-top:14px; font-size:0.9rem; color:#334155;">
+        <span>📅 <strong>${formatDate(ev.fechaHora)}</strong></span>
+        <span>📍 <strong>${escapeHtml(ev.nombreLugar || state.lugarActual?.nombre || '')}</strong>${state.lugarActual?.direccion ? ` (${escapeHtml(state.lugarActual.direccion)}, ${escapeHtml(state.lugarActual.ciudad || '')})` : ''}</span>
+        ${ev.participantes?.length ? `<span>🎤 ${escapeHtml(ev.participantes.join(', '))}</span>` : ''}
+      </div>
+    `;
+
+    // Fila Virtual
+    const filaBox = document.getElementById('filaVirtualBox');
+    document.getElementById('filaEstadoOutput').innerHTML = '';
+    filaBox.style.display = ev.altaDemanda ? 'block' : 'none';
+
+    // Sectores (cruzando precios del evento con sectores del lugar)
+    const sectoresLugar = state.lugarActual?.sectores || [];
+    const preciosEvento = ev.precios || [];
+    const sectoresCombinados = preciosEvento.map(p => {
+      const infoLugar = sectoresLugar.find(s => (s.nombre || '').toLowerCase() === (p.sector || '').toLowerCase()) || {};
+      return {
+        nombre: p.sector,
+        precio: Number(p.precio || 0),
+        tipo: infoLugar.tipo || (infoLugar.filas ? 'NUMERADO' : 'NO_NUMERADO'),
+        filas: Number(infoLugar.filas || 10),
+        asientosPorFila: Number(infoLugar.asientosPorFila || 10),
+        capacidad: Number(infoLugar.capacidad || 100)
+      };
+    });
+
+    state.sectoresActuales = sectoresCombinados;
+    const sectorListEl = document.getElementById('sectorList');
+    if (sectoresCombinados.length === 0) {
+      sectorListEl.innerHTML = `<p class="muted">Este evento no tiene sectores cargados.</p>`;
+    } else {
+      sectorListEl.innerHTML = sectoresCombinados.map((s, idx) => `
+        <div class="sector-card" id="sector-card-${idx}" onclick="seleccionarSector(${idx})">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:4px;">
+            <strong>${escapeHtml(s.nombre)}</strong>
+            <span class="badge ${s.tipo === 'NUMERADO' ? 'badge-primary' : 'badge-gray'}">${s.tipo === 'NUMERADO' ? 'Numerado' : 'General'}</span>
+          </div>
+          <div style="font-size:1.1rem; font-weight:800; color:var(--primary); margin-top:6px;">$${s.precio.toLocaleString('es-AR')}</div>
+          <div class="muted" style="font-size:0.78rem; margin-top:2px;">
+            ${s.tipo === 'NUMERADO' ? `${s.filas} filas × ${s.asientosPorFila} asientos` : `Capacidad: ${s.capacidad}`}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    renderResumenCompra();
+    showView('detalle');
+    cargarSimilares(eventoId);
+  }
+
+  async function cargarSimilares(eventoId) {
+    const card = document.getElementById('similaresCard');
+    if (!state.session?.token) { card.style.display = 'none'; return; }
+    try {
+      const { data } = await apiFetch(`/api/eventos/${eventoId}/similares?limit=4`);
+      if (!Array.isArray(data) || data.length === 0) { card.style.display = 'none'; return; }
+      card.style.display = 'block';
+      document.getElementById('similaresList').innerHTML = data.map(item => {
+        const id = getEventId(item);
+        const full = state.todosEventos.find(e => String(getEventId(e)) === String(id)) || state.eventos.find(e => String(getEventId(e)) === String(id)) || item;
+        return `
+          <div class="reco-item">
+            <div>
+              <div style="font-weight:700; font-size:0.9rem;">${escapeHtml(full.nombre || item.nombre || `Evento ${id}`)}</div>
+              <div class="muted" style="font-size:0.78rem;">${formatDate(full.fechaHora || item.fechaHora)}</div>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="abrirEvento('${escapeAttr(id)}')">Ver</button>
+          </div>
+        `;
+      }).join('');
+    } catch {
+      card.style.display = 'none';
+    }
+  }
+
+  function seleccionarSector(idx) {
+    const sector = state.sectoresActuales[idx];
+    if (!sector) return;
+    document.querySelectorAll('.sector-card').forEach(c => c.classList.remove('selected'));
+    document.getElementById(`sector-card-${idx}`)?.classList.add('selected');
+
+    state.sectorSeleccionado = sector;
+    state.asientosSeleccionados = [];
+    state.cantidadSeleccionada = 1;
+    state.ordenActual = null;
+    document.getElementById('pasoPagoBox').style.display = 'none';
+    document.getElementById('pagoExitosoBox').style.display = 'none';
+
+    const container = document.getElementById('selectorAsientosContainer');
+    const body = document.getElementById('selectorBody');
+    container.style.display = 'block';
+
+    if (sector.tipo === 'NUMERADO') {
+      document.getElementById('selectorTitulo').textContent = `2. Elegí tus asientos en ${sector.nombre}`;
+      const ocupadosLocales = obtenerAsientosCompradosLocales(getEventId(state.eventoActual), sector.nombre);
+      const maxFilas = Math.min(sector.filas, 25);
+      const maxAsientos = Math.min(sector.asientosPorFila, 30);
+
+      let rowsHtml = '';
+      for (let f = 1; f <= maxFilas; f++) {
+        let seatsHtml = '';
+        for (let a = 1; a <= maxAsientos; a++) {
+          const isOcc = ocupadosLocales.has(`${f}-${a}`);
+          seatsHtml += `<button type="button" class="seat ${isOcc ? 'occupied' : ''}" id="seat-${f}-${a}"
+            ${isOcc ? 'disabled title="Ya comprado"' : `onclick="toggleAsiento(${f}, ${a})"`}>${a}</button>`;
+        }
+        rowsHtml += `<div class="seat-row"><span class="row-label">F${f}</span>${seatsHtml}</div>`;
+      }
+
+      body.innerHTML = `
+        <div class="stage-bar">ESCENARIO</div>
+        <div class="seat-map-wrapper">${rowsHtml}</div>
+        <div class="seat-legend">
+          <span><span class="legend-dot" style="background:#fff;"></span>Disponible</span>
+          <span><span class="legend-dot" style="background:var(--primary); border-color:var(--primary);"></span>Seleccionado</span>
+          <span><span class="legend-dot" style="background:#cbd5e1;"></span>Ya comprado por vos</span>
+        </div>
+      `;
+    } else {
+      document.getElementById('selectorTitulo').textContent = `2. Elegí la cantidad de entradas (${sector.nombre})`;
+      body.innerHTML = `
+        <div class="qty-box">
+          <button type="button" class="btn btn-outline" onclick="cambiarCantidad(-1)">−</button>
+          <span class="qty-val" id="qtyDisplay">1</span>
+          <button type="button" class="btn btn-outline" onclick="cambiarCantidad(1)">+</button>
+          <span class="muted">Máximo 10 entradas por orden · $${sector.precio.toLocaleString('es-AR')} c/u</span>
+        </div>
+      `;
+    }
+
+    renderResumenCompra();
+  }
+
+  function toggleAsiento(fila, asiento) {
+    const idx = state.asientosSeleccionados.findIndex(s => s.fila === fila && s.asiento === asiento);
+    const btn = document.getElementById(`seat-${fila}-${asiento}`);
+    if (idx >= 0) {
+      state.asientosSeleccionados.splice(idx, 1);
+      btn?.classList.remove('selected');
+    } else {
+      if (state.asientosSeleccionados.length >= 6) {
+        toast('Podés seleccionar hasta 6 asientos por orden.', 'warning');
+        return;
+      }
+      state.asientosSeleccionados.push({ fila, asiento });
+      btn?.classList.add('selected');
+    }
+    renderResumenCompra();
+  }
+
+  function cambiarCantidad(delta) {
+    const max = Math.min(10, state.sectorSeleccionado?.capacidad || 10);
+    state.cantidadSeleccionada = Math.max(1, Math.min(max, state.cantidadSeleccionada + delta));
+    const el = document.getElementById('qtyDisplay');
+    if (el) el.textContent = state.cantidadSeleccionada;
+    renderResumenCompra();
+  }
+
+  function renderResumenCompra() {
+    const box = document.getElementById('resumenSeleccion');
+    const btns = document.getElementById('pasoOrdenBtns');
+    const sector = state.sectorSeleccionado;
+
+    if (!sector) {
+      box.innerHTML = `<p class="muted">Seleccioná un sector y tus ubicaciones para calcular el total.</p>`;
+      btns.style.display = 'none';
+      return;
+    }
+
+    const cant = sector.tipo === 'NUMERADO' ? state.asientosSeleccionados.length : state.cantidadSeleccionada;
+    const total = cant * sector.precio;
+
+    let detalleUbicacion = '';
+    if (sector.tipo === 'NUMERADO') {
+      detalleUbicacion = state.asientosSeleccionados.length
+        ? `<div class="chip-list">${state.asientosSeleccionados.map(s => `<span class="chip">Fila ${s.fila} · Asiento ${s.asiento}</span>`).join('')}</div>`
+        : `<p class="muted" style="margin-top:6px;">Hacé clic en el mapa para elegir al menos 1 asiento.</p>`;
+    } else {
+      detalleUbicacion = `<div class="muted" style="margin-top:4px;">Entrada general sin numeración (×${cant})</div>`;
+    }
+
+    box.innerHTML = `
+      <div class="summary-row"><span>Evento</span><strong>${escapeHtml(state.eventoActual.nombre)}</strong></div>
+      <div class="summary-row"><span>Sector</span><strong>${escapeHtml(sector.nombre)}</strong></div>
+      <div class="summary-row"><span>Precio unitario</span><span>$${sector.precio.toLocaleString('es-AR')}</span></div>
+      <div class="summary-row"><span>Cantidad</span><strong>${cant}</strong></div>
+      ${state.tokenFilaActual ? `<div class="summary-row"><span>Token Fila</span><code style="font-size:0.78rem;">${escapeHtml(state.tokenFilaActual)}</code></div>` : ''}
+      <div style="padding:8px 0; border-bottom:1px dashed var(--border);">${detalleUbicacion}</div>
+      <div class="summary-total"><span>Total</span><span style="color:var(--primary);">$${total.toLocaleString('es-AR')}</span></div>
+    `;
+
+    const puedeCrear = state.session?.token && cant > 0 && !state.ordenActual;
+    btns.style.display = puedeCrear ? 'block' : 'none';
+  }
+
+  // ===================== FILA VIRTUAL =====================
+  async function ingresarFilaVirtual() {
+    if (!requireAuth()) return;
+    const eventoId = getEventId(state.eventoActual);
+    try {
+      const { data } = await apiFetch('/api/fila/ingresar', {
+        method: 'POST',
+        includeUserId: true,
+        body: { eventoId, usuarioId: state.session.userId }
+      });
+
+      const token = data?.tokenAcceso || data?.token || data?.turnoFila || data?.codigoTurno || data?.id || data?.turnoId || '';
+      state.tokenFilaActual = token ? String(token) : null;
+
+      document.getElementById('filaEstadoOutput').innerHTML = `
+        <div class="alert-box alert-success" style="margin:0;">
+          <strong>¡Ingresaste a la fila!</strong>
+          ${data?.estado ? `Estado: <strong>${escapeHtml(data.estado)}</strong> · ` : ''}
+          ${data?.posicion !== undefined ? `Posición: <strong>#${data.posicion}</strong> · ` : ''}
+          Token: <code>${escapeHtml(state.tokenFilaActual || 'N/A')}</code>
+        </div>`;
+      renderResumenCompra();
+      toast('Turno de fila virtual obtenido', 'success');
+    } catch (err) {
+      toast(`Error en Fila Virtual: ${err.message}`, 'error');
+    }
+  }
+
+  async function consultarEstadoFila() {
+    if (!requireAuth()) return;
+    const eventoId = getEventId(state.eventoActual);
+    try {
+      const { data } = await apiFetch(`/api/fila/eventos/${eventoId}/estado?X-Usuario-Id=${state.session.userId}`, {
+        includeUserId: true
+      });
+      const token = data?.tokenAcceso || data?.token || data?.turnoFila || data?.codigoTurno || state.tokenFilaActual;
+      if (token) state.tokenFilaActual = String(token);
+
+      document.getElementById('filaEstadoOutput').innerHTML = `
+        <div class="alert-box alert-info" style="margin:0;">
+          <strong>Estado en fila:</strong> ${escapeHtml(data?.estado || JSON.stringify(data))}
+          ${data?.posicion !== undefined ? ` · Posición: <strong>#${data.posicion}</strong>` : ''}
+          ${state.tokenFilaActual ? ` · Token: <code>${escapeHtml(state.tokenFilaActual)}</code>` : ''}
+        </div>`;
+      renderResumenCompra();
+    } catch (err) {
+      toast(`No se pudo consultar la fila: ${err.message}`, 'error');
+    }
+  }
+
+  // ===================== CREAR Y PAGAR ORDEN =====================
+  async function crearOrden() {
+    if (!requireAuth()) return;
+    const ev = state.eventoActual;
+    const sector = state.sectorSeleccionado;
+
+    if (ev.altaDemanda && !state.tokenFilaActual) {
+      toast('Este evento es de alta demanda: ingresá primero a la Fila Virtual.', 'warning');
+      return;
+    }
+
+    const body = {
+      eventoId: getEventId(ev),
+      sector: sector.nombre
+    };
+
+    if (sector.tipo === 'NUMERADO') {
+      body.asientos = state.asientosSeleccionados;
+    } else {
+      body.cantidad = state.cantidadSeleccionada;
+    }
+
+    if (state.tokenFilaActual) {
+      body.tokenFila = state.tokenFilaActual;
+    }
+
+    const btn = document.getElementById('btnCrearOrden');
+    btn.disabled = true;
+    btn.textContent = 'Reservando...';
+
+    try {
+      const { data } = await apiFetch('/api/ordenes', {
+        method: 'POST',
+        includeUserId: true,
+        body
+      });
+
+      const ordenId = data?.id ?? data?.idOrden ?? data?.ordenId;
+      state.ordenActual = { ...data, id: ordenId };
+
+      document.getElementById('pasoOrdenBtns').style.display = 'none';
+      document.getElementById('pasoPagoBox').style.display = 'block';
+      document.getElementById('ordenCreadaInfo').innerHTML = `
+        <strong>Orden #${ordenId} reservada</strong><br/>
+        Total a pagar: <strong>$${Number(data?.total ?? 0).toLocaleString('es-AR')}</strong><br/>
+        ${data?.fechaVencimiento ? `<span style="font-size:0.8rem;">Vence: ${formatDate(data.fechaVencimiento)}</span>` : ''}
+      `;
+      toast(`Orden #${ordenId} creada. ¡Completá el pago!`, 'success');
+    } catch (err) {
+      toast(`No se pudo crear la orden: ${err.message}`, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Crear Orden y Reservar';
+    }
+  }
+
+  async function pagarOrdenActual() {
+    if (!state.ordenActual?.id) return;
+    const medioPago = document.getElementById('medioPagoSelect').value;
+    const btn = document.getElementById('btnPagarOrden');
+    btn.disabled = true;
+    btn.textContent = 'Procesando pago...';
+
+    try {
+      const { data } = await apiFetch(`/api/ordenes/${state.ordenActual.id}/pago`, {
+        method: 'POST',
+        includeUserId: true,
+        body: { medioPago }
+      });
+
+      guardarEntradasDesdeRespuesta(data, state.eventoActual, state.ordenActual);
+      document.getElementById('pasoPagoBox').style.display = 'none';
+      document.getElementById('pagoExitosoBox').style.display = 'block';
+      toast('¡Pago confirmado y entradas emitidas!', 'success');
+    } catch (err) {
+      toast(`Error al procesar el pago: ${err.message}`, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Confirmar y Pagar';
+    }
+  }
+
+  async function pagarOrdenPendiente(ordenId) {
+    const medioPago = document.getElementById(`medio-orden-${ordenId}`)?.value || 'TARJETA_CREDITO';
+    try {
+      const { data } = await apiFetch(`/api/ordenes/${ordenId}/pago`, {
+        method: 'POST',
+        includeUserId: true,
+        body: { medioPago }
+      });
+      guardarEntradasDesdeRespuesta(data, null, { id: ordenId, eventoId: data?.eventoId });
+      toast(`Orden #${ordenId} pagada con éxito`, 'success');
+      cargarMisOrdenesYEntradas();
+    } catch (err) {
+      toast(`Error al pagar orden #${ordenId}: ${err.message}`, 'error');
+    }
+  }
+
+  // ===================== ALMACÉN LOCAL DE ENTRADAS EMITIDAS =====================
+  function getTicketsStorageKey() {
+    return `ticketya_tickets_user_${state.session?.userId || 'anon'}`;
+  }
+
+  function getStoredTickets() {
+    return JSON.parse(localStorage.getItem(getTicketsStorageKey()) || '[]');
+  }
+
+  function saveStoredTickets(tickets) {
+    localStorage.setItem(getTicketsStorageKey(), JSON.stringify(tickets));
+  }
+
+  function guardarEntradasDesdeRespuesta(pagoData, eventoRef, ordenRef) {
+    const entradas = Array.isArray(pagoData?.entradas)
+      ? pagoData.entradas
+      : (Array.isArray(pagoData) ? pagoData : []);
+
+    if (entradas.length === 0) return;
+
+    const existentes = getStoredTickets();
+    const eventoId = pagoData?.eventoId || ordenRef?.eventoId || getEventId(eventoRef);
+    const ev = eventoRef || state.todosEventos.find(e => String(getEventId(e)) === String(eventoId)) || state.eventos.find(e => String(getEventId(e)) === String(eventoId));
+
+    entradas.forEach(ent => {
+      const id = ent.id ?? ent.idEntrada ?? ent.entradaId;
+      const qr = ent.codigoQr || ent.qr || ent.codigo || `TICKET-${id || Date.now()}`;
+      const yaExiste = existentes.some(t => (id && t.id === id) || t.codigoQr === qr);
+      if (!yaExiste) {
+        existentes.unshift({
+          id,
+          codigoQr: qr,
+          sector: ent.sector || pagoData?.sector || '',
+          fila: ent.fila ?? null,
+          asiento: ent.asiento ?? null,
+          idReserva: ent.idReserva ?? null,
+          estado: ent.estado || 'VALIDA',
+          ordenId: pagoData?.id || ordenRef?.id || null,
+          eventoId,
+          eventoNombre: ev?.nombre || `Evento ${eventoId || ''}`,
+          fechaEvento: ent.fechaEvento || ev?.fechaHora || null
+        });
+      }
+    });
+
+    saveStoredTickets(existentes);
+  }
+
+  function obtenerAsientosCompradosLocales(eventoId, sectorNombre) {
+    const set = new Set();
+    getStoredTickets().forEach(t => {
+      if (String(t.eventoId) === String(eventoId)
+          && (t.sector || '').toLowerCase() === (sectorNombre || '').toLowerCase()
+          && t.fila && t.asiento) {
+        set.add(`${t.fila}-${t.asiento}`);
+      }
+    });
+    return set;
+  }
+
+  // ===================== MIS ENTRADAS Y ÓRDENES =====================
+  function switchEntradasTab(tab) {
+    document.getElementById('tab-mis-entradas').classList.toggle('active', tab === 'tickets');
+    document.getElementById('tab-mis-ordenes').classList.toggle('active', tab === 'ordenes');
+    document.getElementById('panel-tickets').style.display = tab === 'tickets' ? 'block' : 'none';
+    document.getElementById('panel-ordenes').style.display = tab === 'ordenes' ? 'block' : 'none';
+  }
+
+  async function cargarMisOrdenesYEntradas() {
+    const isAuth = Boolean(state.session?.token);
+    document.getElementById('entradasAuthAlert').style.display = isAuth ? 'none' : 'block';
+    document.getElementById('entradasContent').style.display = isAuth ? 'block' : 'none';
+    if (!isAuth) return;
+
+    // 1. Traer órdenes del cliente desde el Gateway
+    let ordenes = [];
+    try {
+      const { data } = await apiFetch('/api/ordenes', { includeUserId: true });
+      ordenes = Array.isArray(data) ? data : [];
+      // Si alguna orden ya trae entradas desde el backend, sincronizarlas
+      ordenes.forEach(o => {
+        if (Array.isArray(o.entradas) && o.entradas.length > 0) {
+          guardarEntradasDesdeRespuesta(o, null, o);
+        }
+      });
+    } catch (err) {
+      toast(`Error al cargar órdenes: ${err.message}`, 'error');
+    }
+
+    renderTickets();
+    renderOrdenes(ordenes);
+  }
+
+  function renderTickets() {
+    const tickets = getStoredTickets();
+    const grid = document.getElementById('ticketsGrid');
+
+    if (tickets.length === 0) {
+      grid.innerHTML = `
+        <div class="card empty-state" style="grid-column:1/-1;">
+          <strong>Todavía no tenés entradas guardadas en este navegador</strong>
+          <p style="margin-top:6px;">Cuando pagues una orden aparecerán aquí con su QR, o podés buscar una entrada por ID arriba.</p>
+        </div>`;
+      return;
+    }
+
+    grid.innerHTML = tickets.map((t, i) => `
+      <div class="ticket-card">
+        <div class="ticket-left">
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:6px; margin-bottom:6px;">
+              <span class="badge badge-success">${escapeHtml(t.estado || 'EMITIDA')}</span>
+              ${t.id ? `<span class="muted" style="font-size:0.78rem;">Entrada #${t.id}</span>` : ''}
+            </div>
+            <div style="font-weight:800; font-size:1rem; margin-bottom:4px;">${escapeHtml(t.eventoNombre || 'Evento TicketYa')}</div>
+            ${t.fechaEvento ? `<div class="muted" style="font-size:0.82rem;">📅 ${formatDate(t.fechaEvento)}</div>` : ''}
+          </div>
+          <div style="margin-top:8px; font-size:0.86rem;">
+            <div><strong>Sector:</strong> ${escapeHtml(t.sector || 'General')}</div>
+            <div><strong>Ubicación:</strong> ${t.fila && t.asiento ? `Fila ${t.fila} · Asiento ${t.asiento}` : 'Acceso General (No numerado)'}</div>
+            ${t.ordenId ? `<div class="muted" style="font-size:0.78rem;">Orden #${t.ordenId}</div>` : ''}
+          </div>
+        </div>
+        <div class="ticket-right">
+          <div class="qr-box" id="qr-slot-${i}"></div>
+          <div class="qr-code-text">${escapeHtml(t.codigoQr || '')}</div>
+        </div>
+      </div>
+    `).join('');
+
+    // Renderizar códigos QR
+    tickets.forEach((t, i) => {
+      const slot = document.getElementById(`qr-slot-${i}`);
+      if (!slot) return;
+      if (typeof QRCode !== 'undefined' && t.codigoQr) {
+        new QRCode(slot, { text: String(t.codigoQr), width: 100, height: 100 });
+      } else {
+        slot.innerHTML = `<span style="font-size:0.7rem; text-align:center; color:var(--muted);">QR listo<br/>(sin CDN)</span>`;
+      }
+    });
+  }
+
+  function renderOrdenes(ordenes) {
+    const list = document.getElementById('ordenesList');
+    if (ordenes.length === 0) {
+      list.innerHTML = `<div class="card empty-state">Aún no registrás órdenes de compra.</div>`;
+      return;
+    }
+
+    list.innerHTML = [...ordenes].reverse().map(o => {
+      const ev = state.todosEventos.find(e => String(getEventId(e)) === String(o.eventoId)) || state.eventos.find(e => String(getEventId(e)) === String(o.eventoId));
+      const estado = (o.estado || 'PENDIENTE').toUpperCase();
+      const esPendiente = estado === 'PENDIENTE' || estado === 'PENDIENTE_PAGO';
+      const badgeCls = estado === 'CONFIRMADA' || estado === 'PAGADA' ? 'badge-success'
+        : esPendiente ? 'badge-warning' : 'badge-danger';
+      const itemsText = Array.isArray(o.items)
+        ? o.items.map(it => it.fila && it.asiento ? `F${it.fila}-A${it.asiento}` : 'General').join(', ')
+        : '';
+
+      return `
+        <div class="order-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
+            <div>
+              <strong>Orden #${o.id}</strong> — ${escapeHtml(ev?.nombre || `Evento ${o.eventoId || ''}`)}
+            </div>
+            <span class="badge ${badgeCls}">${escapeHtml(estado)}</span>
+          </div>
+          <div style="display:flex; gap:18px; flex-wrap:wrap; font-size:0.88rem; color:#475569;">
+            <span>Sector: <strong>${escapeHtml(o.sector || '-')}</strong></span>
+            <span>Total: <strong>$${Number(o.total || 0).toLocaleString('es-AR')}</strong></span>
+            <span>Medio: ${escapeHtml(o.medioPago || 'Sin pagar')}</span>
+            <span>Fecha: ${formatDate(o.fechaCreacion)}</span>
+          </div>
+          ${itemsText ? `<div class="muted" style="font-size:0.82rem; margin-top:6px;">Ítems (${o.items.length}): ${escapeHtml(itemsText)}</div>` : ''}
+          ${esPendiente ? `
+            <div style="margin-top:12px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+              <select id="medio-orden-${o.id}" style="width:auto; padding:6px 10px; font-size:0.82rem;">
+                <option value="TARJETA_CREDITO">Tarjeta de Crédito</option>
+                <option value="TARJETA_DEBITO">Tarjeta de Débito</option>
+                <option value="MERCADO_PAGO">Mercado Pago</option>
+                <option value="TRANSFERENCIA">Transferencia</option>
+              </select>
+              <button class="btn btn-success btn-sm" onclick="pagarOrdenPendiente(${o.id})">Pagar Orden ahora</button>
+            </div>` : ''}
+        </div>
+      `;
+    }).join('');
+  }
+
+  async function buscarEntradaPorId() {
+    const id = document.getElementById('buscarEntradaId').value.trim();
+    if (!id) return;
+    try {
+      const { data } = await apiFetch(`/api/entradas/${id}`);
+      const ent = Array.isArray(data) ? data[0] : data;
+      if (!ent) throw new Error('Entrada no encontrada');
+      guardarEntradasDesdeRespuesta({ entradas: [ent], eventoId: ent.eventoId }, null, null);
+      renderTickets();
+      document.getElementById('buscarEntradaId').value = '';
+      toast(`Entrada #${id} cargada correctamente`, 'success');
+    } catch (err) {
+      toast(`No se pudo obtener la entrada #${id}: ${err.message}`, 'error');
+    }
+  }
+
+  // ===================== PREFERENCIAS =====================
+  async function cargarPreferencias() {
+    const hasAuth = Boolean(state.session?.token && state.session?.userId);
+    document.getElementById('prefAuthAlert').style.display = hasAuth ? 'none' : 'block';
+    document.getElementById('prefForm').style.opacity = hasAuth ? '1' : '0.5';
+    if (!hasAuth) return;
+
+    try {
+      const { data } = await apiFetch(`/api/usuarios/${state.session.userId}/preferencias`);
+      if (!data) return;
+      document.getElementById('prefCiudad').value = data.ciudad || '';
+      document.getElementById('prefArtistas').value = Array.isArray(data.artistasFavoritos) ? data.artistasFavoritos.join(', ') : '';
+      const tipos = new Set((data.tiposEvento || []).map(t => t.toUpperCase()));
+      document.querySelectorAll('input[name="prefTipo"]').forEach(cb => {
+        cb.checked = tipos.has(cb.value);
+      });
+    } catch {
+      // Si todavía no registró preferencias, dejar el form limpio
+    }
+  }
+
+  async function guardarPreferencias(e) {
+    e.preventDefault();
+    if (!requireAuth()) return;
+    const ciudad = document.getElementById('prefCiudad').value.trim();
+    const tiposEvento = [...document.querySelectorAll('input[name="prefTipo"]:checked')].map(cb => cb.value);
+    const artistasRaw = document.getElementById('prefArtistas').value.trim();
+    const artistasFavoritos = artistasRaw ? artistasRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+    try {
+      await apiFetch(`/api/usuarios/${state.session.userId}/preferencias`, {
+        method: 'PUT',
+        body: { ciudad, tiposEvento, artistasFavoritos }
+      });
+      toast('Preferencias guardadas. ¡Tus recomendaciones se actualizarán!', 'success');
+      cargarRecomendaciones();
+    } catch (err) {
+      toast(`Error al guardar preferencias: ${err.message}`, 'error');
+    }
+  }
+
+  // ===================== UTILIDADES =====================
+  function requireAuth() {
+    if (!state.session?.token) {
+      toast('Necesitás iniciar sesión primero.', 'warning');
+      showView('auth');
+      return false;
+    }
+    if (!state.session?.userId) {
+      toast('Falta el ID numérico de usuario (X-Usuario-Id). Ingresalo tocando el badge arriba.', 'warning');
+      editarUserIdManual();
+      return Boolean(state.session?.userId);
+    }
+    return true;
+  }
+
+  function formatDate(iso) {
+    if (!iso) return 'Fecha a confirmar';
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
+    return d.toLocaleString('es-AR', {
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+  }
+
+  function escapeHtml(str) {
+    return String(str ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function escapeAttr(str) {
+    return String(str ?? '').replace(/'/g, "\\'");
+  }
+
+  function toast(message, type = 'info') {
+    const c = document.getElementById('toastContainer');
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.textContent = message;
+    c.appendChild(el);
+    setTimeout(() => el.remove(), 4200);
+  }
+</script>
+</body>
+</html>
