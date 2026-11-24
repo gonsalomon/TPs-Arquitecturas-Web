@@ -198,8 +198,7 @@ public class EntradaService {
         if (usuario == null) {
             throw new IllegalArgumentException("Usuario no encontrado");
         }
-        boolean esAdmin = usuario.getAuthorities() != null
-                && usuario.getAuthorities().contains(Rol.ADMINISTRADOR.name());
+        boolean esAdmin = usuario.getAuthorities().contains("ADMINISTRADOR");
         if(!esAdmin) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permisos para revisar la entrada");
         }
