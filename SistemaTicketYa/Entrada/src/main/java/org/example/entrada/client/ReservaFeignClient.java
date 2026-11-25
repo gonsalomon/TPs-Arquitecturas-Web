@@ -9,5 +9,5 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(name = "reserva-service", url = "http://localhost:8084/api/reservas")
 public interface ReservaFeignClient {
     @PutMapping("/{id}/estado")
-    ResponseEntity<Void> actualizarEstadoReserva(@PathVariable("id") Long id, @RequestParam("nuevoEstado") String nuevoEstado));
+    ResponseEntity<Void> actualizarEstadoReserva(@PathVariable Long id, @RequestParam String nuevoEstado);
 }

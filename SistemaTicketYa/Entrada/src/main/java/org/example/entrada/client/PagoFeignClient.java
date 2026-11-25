@@ -10,5 +10,5 @@ import org.springframework.web.bind.annotation.PostMapping;
 @FeignClient(name = "pago-service", url = "http://localhost:8082/api/pagos")
 public interface PagoFeignClient {
     @PostMapping("/reserva/{idReserva}/reembolso")
-    ResponseEntity<PagoResponseDTO> reembolsarPago(@PathVariable("idReserva") Long idReserva);
+    ResponseEntity<PagoResponseDTO> reembolsarPago(@PathVariable Long idReserva);
 }
