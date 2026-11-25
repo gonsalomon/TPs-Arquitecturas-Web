@@ -59,3 +59,8 @@ El presente documento describe la arquitectura de microservicios propuesta para 
 ## 9. Microservicio de Notificaciones (`Notificaciones`)
 * **Comunicación Asíncrona:** Escucha eventos del sistema (mensajería / *fire-and-forget*) para enviar alertas sin impactar los tiempos de respuesta del flujo principal.
 * **Canales de Alerta:** Envía correos electrónicos o notificaciones *push* para confirmaciones de compra, cancelaciones o reprogramaciones de eventos, y alertas sobre publicaciones de eventos de artistas favoritos en la ciudad del usuario.
+
+## 10. Microservicio de Fila Virtual (`Fila_Virtual`)
+* **Encolamiento en Alta Demanda:** Registra y ordena el ingreso de clientes (`POST /api/fila/ingresar`) en eventos marcados como de alta demanda para regular el tráfico antes de la compra.
+* **Control de Estado y Turnos:** Permite consultar la posición y el estado del usuario en la fila (`GET /api/fila/eventos/{eventoId}/estado`) y emite el token de turno/acceso requerido al crear órdenes para esos eventos.
+* **Integración con el Flujo de Compra:** Coordina con el acceso a través del Gateway (`8080`) y es validado en la creación de órdenes (`Ordenes`) para eventos de alta demanda.

@@ -1,5 +1,5 @@
 FUNCIONALIDAD
-# Tareas
+# Done
 6. Para eventos marcados como de alta demanda, al abrirse la venta los clientes ingresan a
    una fila virtual: el sistema les informa su posición y los habilita a comprar en orden, por
    tandas.
@@ -10,7 +10,7 @@ FUNCIONALIDAD
 
 12. Los organizadores deben poder consultar reportes de sus eventos: entradas vendidas y
     devueltas por sector, porcentaje de ocupación y recaudación.
-# Done
+
 11. Enviar notificaciones(email o push) al confirmar una compra, ante la cancelación o cambio
     de un evento, y cuando un artista favorito de un cliente publica un evento en su ciudad.
 8. En el ingreso al evento, el personal de acceso escanea el QR. El sistema valida que la
